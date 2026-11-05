@@ -32,6 +32,27 @@ export interface StaticLesson {
   questions: StaticQuestion[];
 }
 
+export interface VocabHistoryEntry {
+  key: string;
+  dateStr: string;
+  levelLabel: string;
+  dialogTitle: string;
+  items: StaticSlangNote[];
+}
+
+export interface GameScoreHistoryEntry {
+  id: string;
+  dateStr: string;
+  level: string;
+  clipNumber: number;
+  scoreOutOf5: number;
+  rawScore: number;
+  finalScore: number;
+  usedSlowdown: boolean;
+  usedCafeMode: boolean;
+  timestamp: number;
+}
+
 export const DEFAULT_ACCESS_PASSWORD =
   process.env.NEXT_PUBLIC_ACCESS_PASSWORD || "earworm2026";
 
@@ -92,6 +113,17 @@ const RAW_MEXICAN_LESSONS: Record<
     ],
     slangNotes: [
       {
+        term: "tacos de canasta",
+        meaning:
+          "Steamed street tacos kept warm in a cloth-lined basket, often sold from a bicycle",
+        literalTranslation: "basket tacos",
+      },
+      {
+        term: "efectivo",
+        meaning: "Cash (paper bills and coins, as opposed to card)",
+        literalTranslation: "effective / cash",
+      },
+      {
         term: "híjole",
         meaning: "Shoot / gosh / oh man (mild Mexican exclamation of surprise)",
         literalTranslation: "little son (altered exclamation)",
@@ -150,7 +182,7 @@ const RAW_MEXICAN_LESSONS: Record<
     title: "El café de olla y el pan dulce en Coyoacán",
     dialect: "Mexican Spanish 🇲🇽",
     dialectNotes:
-      "Intro level: Clear Mexican Spanish featuring everyday vocabulary like '¿mande?', 'concha', 'camión' (bus), and 'cambio'.",
+      "Intro level: Clear Mexican Spanish featuring everyday vocabulary like '¿mande?', 'concha', 'camión' (bus), and 'yo invito'.",
     dialogue: [
       {
         speaker: "Sofía",
@@ -196,9 +228,20 @@ const RAW_MEXICAN_LESSONS: Record<
         literalTranslation: "pot coffee",
       },
       {
+        term: "concha de vainilla",
+        meaning:
+          "Classic Mexican sweet bread roll topped with a shell-patterned vanilla sugar crust",
+        literalTranslation: "vanilla shell",
+      },
+      {
         term: "yo invito",
         meaning: "It's my treat / I'm paying",
         literalTranslation: "I invite",
+      },
+      {
+        term: "apúrate",
+        meaning: "Hurry up / get a move on",
+        literalTranslation: "hurry yourself",
       },
     ],
     questions: [
@@ -276,6 +319,11 @@ const RAW_MEXICAN_LESSONS: Record<
         term: "no manches",
         meaning: "No way / you've got to be kidding me",
         literalTranslation: "don't stain",
+      },
+      {
+        term: "un raspón en la defensa",
+        meaning: "A scrape/scratch on the car bumper",
+        literalTranslation: "a big scratch on the defense",
       },
       {
         term: "la chamba",
@@ -388,6 +436,11 @@ const RAW_MEXICAN_LESSONS: Record<
         literalTranslation: "to walk around like a witch",
       },
       {
+        term: "estar moliendo",
+        meaning: "To be nagging / pestering someone relentlessly",
+        literalTranslation: "to be grinding",
+      },
+      {
         term: "echar la mano",
         meaning: "To lend a hand / help someone out",
         literalTranslation: "to throw the hand",
@@ -425,7 +478,7 @@ const RAW_MEXICAN_LESSONS: Record<
     title: "El boleto falso afuera del Foro Sol",
     dialect: "Mexican Spanish 🇲🇽",
     dialectNotes:
-      "Advanced level: Fast Mexico City street banter ('Chilango') packed with 'no mames', 'güey', 'chafa', 'pasarse de lanza', 'cañón', and 'a huevo'.",
+      "Advanced level: Fast Mexico City street banter ('Chilango') packed with 'no mames', 'güey', 'chafa', 'pasarse de lanza', 'qué oso', and 'a huevo'.",
     dialogue: [
       {
         speaker: "Paco",
@@ -482,6 +535,11 @@ const RAW_MEXICAN_LESSONS: Record<
         literalTranslation: "to go past the spear",
       },
       {
+        term: "sin un quinto",
+        meaning: "Penniless / without a single cent left",
+        literalTranslation: "without a five-cent coin",
+      },
+      {
         term: "qué oso",
         meaning: "How embarrassing! / What a blunder!",
         literalTranslation: "what a bear",
@@ -493,7 +551,7 @@ const RAW_MEXICAN_LESSONS: Record<
       },
       {
         term: "la rola",
-        meaning: "The song / track",
+        meaning: "The song / music track",
         literalTranslation: "the roll",
       },
     ],
@@ -565,7 +623,7 @@ const RAW_MEXICAN_LESSONS: Record<
     slangNotes: [
       {
         term: "tirar a león",
-        meaning: "To ignore someone / ghost someone's messages",
+        meaning: "To ignore someone / ghost someone's calls or messages",
         literalTranslation: "to throw to the lion",
       },
       {
@@ -620,6 +678,69 @@ const RAW_MEXICAN_LESSONS: Record<
   },
 };
 
+/**
+ * Seeded vocabulary from previous days played so the "Review Vocab" modal
+ * always includes previous days alongside today's dialog + any other dialogs the user plays.
+ */
+export const SEEDED_PREVIOUS_DAYS_VOCAB: VocabHistoryEntry[] = [
+  {
+    key: "prev_day_1",
+    dateStr: "Yesterday",
+    levelLabel: "Conversational",
+    dialogTitle: "La mochila olvidada en el Uber en la Condesa",
+    items: [
+      {
+        term: "qué poca",
+        meaning: "How unfair / how rude (short for 'qué poca madre')",
+        literalTranslation: "what little",
+      },
+      {
+        term: "hacer un paro",
+        meaning: "To do someone a huge favor / help someone out",
+        literalTranslation: "to make a stop",
+      },
+      {
+        term: "la propina",
+        meaning: "The tip / gratuity for the driver or waiter",
+        literalTranslation: "the tip",
+      },
+      {
+        term: "de pelos",
+        meaning: "Awesome / fantastic / great news",
+        literalTranslation: "of hairs",
+      },
+    ],
+  },
+  {
+    key: "prev_day_2",
+    dateStr: "2 Days Ago",
+    levelLabel: "Intro",
+    dialogTitle: "El tianguis del domingo en la Narvarte",
+    items: [
+      {
+        term: "el tianguis",
+        meaning: "Traditional Mexican open-air street market",
+        literalTranslation: "open-air market (from Nahuatl)",
+      },
+      {
+        term: "el pilón",
+        meaning: "A free extra item thrown in by a market vendor",
+        literalTranslation: "the bonus / sugar loaf",
+      },
+      {
+        term: "está bara",
+        meaning: "It's cheap / a great bargain (short for 'barato')",
+        literalTranslation: "it's cheap",
+      },
+      {
+        term: "aguas",
+        meaning: "Watch out! / Be careful!",
+        literalTranslation: "waters",
+      },
+    ],
+  },
+];
+
 export function getStaticMexicanSpanishLesson(
   dateStr: string,
   level: string,
@@ -636,6 +757,70 @@ export function getStaticMexicanSpanishLesson(
     _id: `static_Spanish_${safeLevel}_${safeClip}`,
     dateStr,
     audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.mp3`,
+  };
+}
+
+export function calculateScoreOutOf5(params: {
+  rawScore: number; // 0-100
+  usedSlowdown: boolean;
+  usedCafeMode: boolean;
+}): {
+  baseScoreOutOf5: number;
+  scoreOutOf5: number;
+  formattedScoreOutOf5: string;
+  bonusesAndPenalties: Array<{
+    label: string;
+    effectText: string;
+    type: "bonus" | "penalty" | "neutral";
+  }>;
+} {
+  const baseRawOutOf5 = (Math.max(0, Math.min(100, params.rawScore)) / 100) * 5;
+  const baseScoreOutOf5 = Number(baseRawOutOf5.toFixed(1));
+
+  let multiplier = 1.0;
+  const bonusesAndPenalties: Array<{
+    label: string;
+    effectText: string;
+    type: "bonus" | "penalty" | "neutral";
+  }> = [];
+
+  if (params.usedSlowdown) {
+    multiplier -= 0.2;
+    bonusesAndPenalties.push({
+      label: "Slow Playback (0.75x)",
+      effectText: "-20% Penalty",
+      type: "penalty",
+    });
+  }
+
+  if (params.usedCafeMode) {
+    multiplier += 0.15;
+    bonusesAndPenalties.push({
+      label: "Crowded Cafe Background Noise",
+      effectText: "+15% Bonus",
+      type: "bonus",
+    });
+  }
+
+  if (bonusesAndPenalties.length === 0) {
+    bonusesAndPenalties.push({
+      label: "Standard Playback",
+      effectText: "No bonuses or penalties (1.0x)",
+      type: "neutral",
+    });
+  }
+
+  const adjusted = Math.max(0, Math.min(5, baseRawOutOf5 * multiplier));
+  const scoreOutOf5 = Number(adjusted.toFixed(1));
+  const formattedScoreOutOf5 = Number.isInteger(scoreOutOf5)
+    ? `${scoreOutOf5}`
+    : scoreOutOf5.toFixed(1);
+
+  return {
+    baseScoreOutOf5,
+    scoreOutOf5,
+    formattedScoreOutOf5,
+    bonusesAndPenalties,
   };
 }
 
@@ -740,7 +925,7 @@ export function gradeAnswersLocally(params: {
         explanation: `Missed the key details on this question (${minimalEffortScore}/${maxPts} pts). What actually happened: ${q.idealAnswerRubric}`,
         missedNuance: relatedSlang
           ? `Key phrase to listen for: "${relatedSlang.term}" — ${relatedSlang.meaning} (literally "${relatedSlang.literalTranslation}").`
-          : `Check Today's Vocab to see how the speakers phrased this.`,
+          : `Check Review Vocab to see how the speakers phrased this.`,
       };
     }
 
