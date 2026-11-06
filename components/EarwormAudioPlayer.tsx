@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Coffee, Gauge, CheckCircle2, Pause, Play, RotateCcw } from "lucide-react";
+import {
+  Car,
+  CheckCircle2,
+  Gauge,
+  Pause,
+  Play,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -41,75 +48,122 @@ export function EarwormAudioPlayer({
   const [clipEndedOnCurrentPlay, setClipEndedOnCurrentPlay] = useState(false);
   const hasCountedCurrentRunRef = useRef(false);
 
-  // Web Audio API refs for "Add Background Noise (15% Bonus)"
+  // Web Audio API refs for realistic street traffic background ambience
   const audioCtxRef = useRef<AudioContext | null>(null);
   const cafeSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const cafeGainRef = useRef<GainNode | null>(null);
 
-  const createCafeNoiseBuffer = useCallback((ctx: AudioContext): AudioBuffer => {
-    const sampleRate = ctx.sampleRate;
-    const lengthSeconds = 6;
-    const totalSamples = sampleRate * lengthSeconds;
-    const buffer = ctx.createBuffer(2, totalSamples, sampleRate);
+  /**
+   * Generates a realistic, warm, non-intrusive 9-second stereo loop of
+   * distant city street traffic:
+   * 1. Deep low-passed brownian tire/asphalt rumble & engine idle (60-160 Hz, zero white hiss).
+   * 2. Gentle stereo Doppler car pass-bys (left->right and right->left).
+   * 3. Occasional soft, distant muffled two-tone city horn in the background.
+   */
+  const createTrafficNoiseBuffer = useCallback(
+    (ctx: AudioContext): AudioBuffer => {
+      const sampleRate = ctx.sampleRate;
+      const lengthSeconds = 9;
+      const totalSamples = sampleRate * lengthSeconds;
+      const buffer = ctx.createBuffer(2, totalSamples, sampleRate);
 
-    for (let ch = 0; ch < 2; ch++) {
-      const channelData = buffer.getChannelData(ch);
-      let b0 = 0,
-        b1 = 0,
-        b2 = 0,
-        b3 = 0,
-        b4 = 0,
-        b5 = 0,
-        b6 = 0;
+      // Car pass-by events: { peakTime, duration, direction (1 = L->R, -1 = R->L), baseFreq }
+      const carPassEvents = [
+        { peakTime: 1.8, width: 0.75, dir: 1, freq: 115 },
+        { peakTime: 4.6, width: 0.9, dir: -1, freq: 98 },
+        { peakTime: 7.3, width: 0.7, dir: 1, freq: 128 },
+      ];
 
-      for (let i = 0; i < totalSamples; i++) {
-        const t = i / sampleRate;
-        const white = Math.random() * 2 - 1;
+      for (let ch = 0; ch < 2; ch++) {
+        const channelData = buffer.getChannelData(ch);
+        let brown = 0;
+        let lp1 = 0;
+        let lp2 = 0;
 
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        const pink =
-          (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
-        b6 = white * 0.115926;
+        for (let i = 0; i < totalSamples; i++) {
+          const t = i / sampleRate;
+          const white = Math.random() * 2 - 1;
 
-        const chatterMod =
-          0.65 +
-          0.2 * Math.sin(2 * Math.PI * 3.2 * t + ch * 1.1) +
-          0.15 * Math.sin(2 * Math.PI * 5.7 * t + ch * 2.4) +
-          0.1 * Math.cos(2 * Math.PI * 1.4 * t);
+          // Brownian integration + two-stage low-pass smoothing to remove all high-frequency white hiss
+          brown = (brown + 0.018 * white) / 1.018;
+          lp1 = lp1 + 0.04 * (brown - lp1);
+          lp2 = lp2 + 0.04 * (lp1 - lp2);
 
-        let clink = 0;
-        const clinkTimes = [1.4 + ch * 0.03, 4.1 + ch * 0.02];
-        for (const ct of clinkTimes) {
-          if (t >= ct && t < ct + 0.09) {
-            const dt = t - ct;
-            const env = Math.exp(-dt * 55);
-            clink +=
-              env *
-              0.12 *
-              (Math.sin(2 * Math.PI * 2840 * dt) +
-                0.6 * Math.sin(2 * Math.PI * 4120 * dt));
+          // Low engine idle hum (62 Hz + 124 Hz harmonic with slow traffic swell)
+          const trafficSwell =
+            0.7 +
+            0.2 * Math.sin(2 * Math.PI * 0.22 * t + ch * 0.5) +
+            0.1 * Math.cos(2 * Math.PI * 0.41 * t);
+          const engineIdle =
+            (0.035 * Math.sin(2 * Math.PI * 62 * t) +
+              0.02 * Math.sin(2 * Math.PI * 124 * t + 0.8)) *
+            trafficSwell;
+
+          // Stereo passing cars with Doppler pitch shift & panning
+          let passBySignal = 0;
+          for (const car of carPassEvents) {
+            const dt = t - car.peakTime;
+            const env = Math.exp(-(dt * dt) / (2 * car.width * car.width));
+            if (env > 0.005) {
+              // Pan position moves from -1 to +1 (or reverse)
+              const pan = Math.max(
+                -1,
+                Math.min(1, (dt / (car.width * 1.4)) * car.dir)
+              );
+              const chGain = ch === 0 ? (1 - pan) * 0.5 : (1 + pan) * 0.5;
+              // Subtle Doppler frequency shift (higher approaching, lower receding)
+              const dopplerFreq =
+                car.freq * (1 - 0.14 * Math.tanh(dt / car.width));
+              const tireWhoosh =
+                lp1 * 0.9 +
+                0.08 * Math.sin(2 * Math.PI * dopplerFreq * t) +
+                0.04 * Math.sin(2 * Math.PI * (dopplerFreq * 1.5) * t);
+              passBySignal += env * chGain * tireWhoosh;
+            }
           }
+
+          // Distant, soft two-tone city taxi horn around t = 3.2s and t = 3.42s (double tap)
+          let distantHorn = 0;
+          const hornWindows = [
+            { start: 3.15, end: 3.26 },
+            { start: 3.34, end: 3.52 },
+          ];
+          for (const hw of hornWindows) {
+            if (t >= hw.start && t <= hw.end) {
+              const ht = t - hw.start;
+              const hDur = hw.end - hw.start;
+              const hEnv =
+                Math.sin((ht / hDur) * Math.PI) * (ch === 0 ? 0.65 : 0.45);
+              distantHorn +=
+                hEnv *
+                0.022 *
+                (Math.sin(2 * Math.PI * 392 * t) +
+                  0.7 * Math.sin(2 * Math.PI * 494 * t));
+            }
+          }
+
+          // Smooth loop crossfade at start/end
+          const edgeFade =
+            Math.min(1, t / 0.35) * Math.min(1, (lengthSeconds - t) / 0.35);
+
+          channelData[i] =
+            (lp2 * 0.55 * trafficSwell +
+              engineIdle +
+              passBySignal * 0.65 +
+              distantHorn) *
+            edgeFade;
         }
-
-        const edgeFade =
-          Math.min(1, t / 0.15) * Math.min(1, (lengthSeconds - t) / 0.15);
-
-        channelData[i] = (pink * chatterMod + clink) * edgeFade;
       }
-    }
-    return buffer;
-  }, []);
+      return buffer;
+    },
+    []
+  );
 
   const syncCafeAudioState = useCallback(
-    (shouldPlayCafe: boolean) => {
+    (shouldPlayTraffic: boolean) => {
       if (typeof window === "undefined") return;
 
-      if (!shouldPlayCafe) {
+      if (!shouldPlayTraffic) {
         if (cafeGainRef.current && audioCtxRef.current) {
           cafeGainRef.current.gain.setTargetAtTime(
             0,
@@ -134,19 +188,23 @@ export function EarwormAudioPlayer({
         void ctx.resume();
       }
 
+      // Modest target gain (0.09) so traffic sounds realistic without overpowering speech
+      const targetGain = 0.09;
+
       if (!cafeSourceRef.current) {
-        const cafeBuffer = createCafeNoiseBuffer(ctx);
+        const trafficBuffer = createTrafficNoiseBuffer(ctx);
         const source = ctx.createBufferSource();
-        source.buffer = cafeBuffer;
+        source.buffer = trafficBuffer;
         source.loop = true;
 
+        // Warm low-pass filter at 360 Hz to keep traffic rumble out of vocal clarity range (800-3000 Hz)
         const filter = ctx.createBiquadFilter();
-        filter.type = "bandpass";
-        filter.frequency.value = 650;
-        filter.Q.value = 0.55;
+        filter.type = "lowpass";
+        filter.frequency.value = 360;
+        filter.Q.value = 0.7;
 
         const gainNode = ctx.createGain();
-        gainNode.gain.value = 0.15;
+        gainNode.gain.value = targetGain;
 
         source.connect(filter);
         filter.connect(gainNode);
@@ -156,10 +214,14 @@ export function EarwormAudioPlayer({
         cafeSourceRef.current = source;
         cafeGainRef.current = gainNode;
       } else if (cafeGainRef.current) {
-        cafeGainRef.current.gain.setTargetAtTime(0.15, ctx.currentTime, 0.08);
+        cafeGainRef.current.gain.setTargetAtTime(
+          targetGain,
+          ctx.currentTime,
+          0.08
+        );
       }
     },
-    [createCafeNoiseBuffer]
+    [createTrafficNoiseBuffer]
   );
 
   useEffect(() => {
@@ -264,7 +326,6 @@ export function EarwormAudioPlayer({
   const progressRatio =
     duration > 0 ? Math.min(100, Math.round((currentTime / duration) * 100)) : 0;
 
-  // Determine clear button label
   let playButtonLabel = "Play Audio";
   if (isPlaying) {
     playButtonLabel = "Pause Audio";
@@ -343,7 +404,7 @@ export function EarwormAudioPlayer({
         </Button>
       </div>
 
-      {/* Two Modifier Buttons Side-by-Side: Slow Playback (20% Penalty) | Add Background Noise (15% Bonus) */}
+      {/* Two Modifier Buttons Side-by-Side: Slow Playback (20% Penalty) | Add Background Noise (+1 Pt Bonus • Traffic) */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <button
           type="button"
@@ -373,11 +434,11 @@ export function EarwormAudioPlayer({
               : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-700"
           )}
         >
-          <Coffee className="h-4 w-4 shrink-0" />
+          <Car className="h-4 w-4 shrink-0" />
           <span>
             {cafeMode
-              ? "Background Noise ON (15% Bonus)"
-              : "Add Background Noise (15% Bonus)"}
+              ? "Traffic Noise ON (+1 Pt Bonus)"
+              : "Add Background Noise (+1 Pt Bonus)"}
           </span>
         </button>
       </div>

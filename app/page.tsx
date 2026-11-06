@@ -15,6 +15,8 @@ import {
   Award,
   BookOpen,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Copy,
   Ear,
@@ -62,16 +64,49 @@ const LEVEL_OPTIONS = [
     id: "A2",
     label: "Intro",
     subtitle: "Clear speech, everyday phrases, gentler pace",
+    cueBadge: "🌱 Intro Pace",
+    cueDesc: "Clear articulation • Everyday vocabulary",
+    tempoBars: 1,
+    frameBorderClass:
+      "border-sky-500/35 dark:border-sky-500/30 shadow-sky-500/5",
+    topStripClass: "from-sky-500 via-teal-400 to-emerald-400",
+    pillBadgeClass:
+      "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    barActiveClass: "bg-sky-500 dark:bg-sky-400",
+    glowBgClass:
+      "bg-gradient-to-b from-sky-500/[0.05] via-transparent to-transparent",
   },
   {
     id: "B1",
     label: "Conversational",
     subtitle: "Natural speed, everyday situations & idioms",
+    cueBadge: "💬 Conversational Pace",
+    cueDesc: "Natural speed • Everyday Mexican idioms",
+    tempoBars: 2,
+    frameBorderClass:
+      "border-emerald-500/35 dark:border-emerald-500/30 shadow-emerald-500/5",
+    topStripClass: "from-[#538d4e] via-emerald-500 to-amber-400",
+    pillBadgeClass:
+      "border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300",
+    barActiveClass: "bg-emerald-500 dark:bg-emerald-400",
+    glowBgClass:
+      "bg-gradient-to-b from-emerald-500/[0.05] via-transparent to-transparent",
   },
   {
     id: "B2",
     label: "Advanced",
     subtitle: "Fast street banter & heavy Mexican slang",
+    cueBadge: "🌶️ Advanced Street Pace",
+    cueDesc: "Rapid-fire banter • Heavy CDMX slang",
+    tempoBars: 3,
+    frameBorderClass:
+      "border-rose-500/35 dark:border-rose-500/30 shadow-rose-500/5",
+    topStripClass: "from-amber-500 via-orange-500 to-rose-500",
+    pillBadgeClass:
+      "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300",
+    barActiveClass: "bg-rose-500 dark:bg-rose-400",
+    glowBgClass:
+      "bg-gradient-to-b from-rose-500/[0.06] via-transparent to-transparent",
   },
 ] as const;
 
@@ -117,7 +152,7 @@ const RATING_TIERS: RatingTierInfo[] = [
   {
     id: "GREAT",
     label: "Great",
-    rangeLabel: "3.3–4.4 / 5",
+    rangeLabel: "3.3–4.6 / 5",
     tagline: "Sharp ear! You understood the story and most of the details.",
     bgClass: "bg-emerald-500/15 dark:bg-emerald-500/20",
     textClass: "text-emerald-800 dark:text-emerald-300",
@@ -128,7 +163,7 @@ const RATING_TIERS: RatingTierInfo[] = [
   {
     id: "AMAZING",
     label: "Amazing",
-    rangeLabel: "4.5–5.0 / 5",
+    rangeLabel: "4.7–6.0 / 5",
     tagline: "Native-level ear! You nailed the story, nuances, and slang.",
     bgClass: "bg-emerald-600/20 dark:bg-emerald-500/25",
     textClass: "text-emerald-900 dark:text-emerald-200",
@@ -139,7 +174,7 @@ const RATING_TIERS: RatingTierInfo[] = [
 ];
 
 function getRatingTierFrom5(scoreOutOf5: number): RatingTierInfo {
-  if (scoreOutOf5 >= 4.5) return RATING_TIERS[3]; // AMAZING
+  if (scoreOutOf5 >= 4.7) return RATING_TIERS[3]; // AMAZING
   if (scoreOutOf5 >= 3.3) return RATING_TIERS[2]; // GREAT
   if (scoreOutOf5 >= 1.8) return RATING_TIERS[1]; // OK
   return RATING_TIERS[0]; // TERRIBLE
@@ -172,7 +207,7 @@ function NextPuzzleCountdown() {
     <div className="flex flex-col items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-3.5 text-center dark:border-zinc-800 dark:bg-zinc-950/80">
       <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
         <Clock className="h-3.5 w-3.5 text-[#538d4e] dark:text-emerald-400" />
-        <span>Next Daily Earworm in</span>
+        <span>Next Daily Earshot in</span>
       </div>
       <div className="mt-1 font-mono text-xl font-black tracking-wider text-zinc-900 dark:text-zinc-100">
         {timeLeft}
@@ -191,7 +226,7 @@ interface LocalLeaderboardEntry {
   vocabStar?: VocabStarTier;
 }
 
-function EarwormGameContent() {
+function EarshotGameContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -233,8 +268,9 @@ function EarwormGameContent() {
   const [clipNumber, setClipNumber] = useState<number>(1);
 
   // Gameplay stage:
-  // "round1" (First attempt) -> "round2" (2nd listen & second attempt) -> "final" (Score pop-up + post-game practice mode)
+  // "round1" (First attempt) -> "round2" (2nd listen & retake missed questions) -> "final" (Score pop-up + post-game practice mode)
   const [stage, setStage] = useState<"round1" | "round2" | "final">("round1");
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(0);
   const [playCount, setPlayCount] = useState(0);
   const [usedSlowdown, setUsedSlowdown] = useState(false);
   const [usedCafeMode, setUsedCafeMode] = useState(false);
@@ -269,10 +305,13 @@ function EarwormGameContent() {
     Record<string, boolean>
   >({});
 
-  // Official Final Grade Result (from 2nd submission)
+  // Official Final Grade Result (from 1st-try sweep or 2nd submission)
   const [finalGradeResult, setFinalGradeResult] = useState<{
     rawScore: number;
     correctCount: number;
+    firstTryCorrectCount: number;
+    secondTryCorrectCount: number;
+    usedSecondAttempt: boolean;
     multiplier: number;
     finalScore: number;
     scoreOutOf5: number;
@@ -290,6 +329,7 @@ function EarwormGameContent() {
     feedback: Array<{
       questionId: string;
       isCorrect: boolean;
+      wasFirstTryCorrect: boolean;
       selectedOptionIndex: number;
       correctOptionIndex: number;
       score: number;
@@ -310,6 +350,7 @@ function EarwormGameContent() {
     feedback: Array<{
       questionId: string;
       isCorrect: boolean;
+      wasFirstTryCorrect: boolean;
       selectedOptionIndex: number;
       correctOptionIndex: number;
       score: number;
@@ -462,6 +503,7 @@ function EarwormGameContent() {
   // Reset local round state when switching level or dialog clip
   useEffect(() => {
     setStage("round1");
+    setCurrentQuestionIdx(0);
     setPlayCount(0);
     setUsedSlowdown(false);
     setUsedCafeMode(false);
@@ -572,7 +614,7 @@ function EarwormGameContent() {
         currentStreak: s.currentStreak,
         scoreOutOf5:
           s.todayFinalScore !== null
-            ? Number(Math.min(5, (s.todayFinalScore / 100) * 5).toFixed(1))
+            ? Number(Math.min(6, (s.todayFinalScore / 100) * 5).toFixed(1))
             : null,
         vocabStar: s.vocabStar ?? ("none" as VocabStarTier),
         isDemo: false,
@@ -690,129 +732,96 @@ function EarwormGameContent() {
   };
 
   /**
-   * First Attempt ("Submit (First Attempt)"):
-   * Evaluates the 5 multiple-choice questions, displays whether each question was
-   * Correct or Try Again (without spoiling the answer yet), and unlocks the 2nd listen.
+   * Shared helper to finalize the player's official score (called either immediately
+   * when getting 5/5 on the first attempt, or after submitting the 2nd attempt).
    */
-  const handleRoundOneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!lesson) return;
+  const finalizeOfficialSubmission = async (params: {
+    graded: ReturnType<typeof gradeMultipleChoiceLocally>;
+    usedSecondAttempt: boolean;
+    finalSelections: Record<string, number | undefined>;
+  }) => {
+    const { graded, usedSecondAttempt, finalSelections } = params;
 
-    setIsSubmitting(true);
-    try {
-      const localRes = gradeMultipleChoiceLocally({
-        lesson,
-        selectedIndices: selectedOptions,
-        usedSlowdown,
-        usedCafeMode,
-      });
-
-      const correctMap: Record<string, boolean> = {};
-      for (const fb of localRes.feedback) {
-        correctMap[fb.questionId] = fb.isCorrect;
+    if (convexLesson?._id && convexLesson.title === lesson.title && deviceId) {
+      try {
+        const userAnswers = lesson.questions.map((q) => {
+          const idx = finalSelections[q.id];
+          return {
+            questionId: q.id,
+            answerText: idx !== undefined ? (q.options[idx] ?? "") : "",
+          };
+        });
+        await submitAndGradeAction({
+          deviceId,
+          username: username || "Oliver",
+          groupId,
+          lessonId: convexLesson._id,
+          userAnswers,
+          playCount: Math.max(1, playCount),
+          usedSlowdown,
+          usedCafeMode,
+          isRoundOneCheck: false,
+        });
+      } catch {
+        // Static fallback
       }
-      setRound1CorrectMap(correctMap);
-      setStage("round2");
-    } finally {
-      setIsSubmitting(false);
     }
-  };
 
-  /**
-   * Second Attempt ("Final Submission"):
-   * Grades final multiple-choice selections, calculates bottom-line score out of 5,
-   * records player history (streak, average, 4+ count), and opens the Score Pop-Up.
-   */
-  const handleFinalSubmission = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!lesson || !deviceId) return;
+    const outOf5Info = calculateScoreOutOf5({
+      rawScore: graded.rawScore,
+      usedSlowdown,
+      usedCafeMode,
+      usedSecondAttempt,
+      usedSecondListen: playCount >= 2 || usedSecondAttempt,
+      firstTryCorrectCount: graded.firstTryCorrectCount,
+      secondTryCorrectCount: graded.secondTryCorrectCount,
+    });
 
-    setIsSubmitting(true);
-    try {
-      const graded = gradeMultipleChoiceLocally({
-        lesson,
-        selectedIndices: selectedOptions,
-        usedSlowdown,
-        usedCafeMode,
-      });
+    const newHistoryEntry: GameScoreHistoryEntry = {
+      id: `${todayStr}:${level}:${clipNumber}:${Date.now()}`,
+      dateStr: todayStr,
+      level,
+      clipNumber,
+      scoreOutOf5: outOf5Info.scoreOutOf5,
+      rawScore: graded.rawScore,
+      finalScore: graded.finalScore,
+      usedSlowdown,
+      usedCafeMode,
+      vocabStar: todayVocabStar,
+      timestamp: Date.now(),
+    };
 
-      if (convexLesson?._id && convexLesson.title === lesson.title) {
-        try {
-          const userAnswers = lesson.questions.map((q) => {
-            const idx = selectedOptions[q.id];
-            return {
-              questionId: q.id,
-              answerText:
-                idx !== undefined ? (q.options[idx] ?? "") : "",
-            };
-          });
-          await submitAndGradeAction({
-            deviceId,
-            username: username || "Oliver",
-            groupId,
-            lessonId: convexLesson._id,
-            userAnswers,
-            playCount: Math.max(1, playCount),
-            usedSlowdown,
-            usedCafeMode,
-            isRoundOneCheck: false,
-          });
-        } catch {
-          // Static fallback
-        }
+    let nextStreak = 1;
+    setScoreHistory((prev) => {
+      const next = [newHistoryEntry, ...prev];
+      try {
+        localStorage.setItem(
+          "earworm_score_history_v1",
+          JSON.stringify(next)
+        );
+      } catch {
+        // ignore
       }
+      const uniqueDates = Array.from(
+        new Set(next.map((h) => h.dateStr))
+      ).sort();
+      let s = 1;
+      for (let i = uniqueDates.length - 1; i > 0; i--) {
+        const c = new Date(uniqueDates[i] + "T00:00:00Z");
+        const p = new Date(uniqueDates[i - 1] + "T00:00:00Z");
+        const d = Math.round(
+          (c.getTime() - p.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (d === 1) s++;
+        else if (d > 1) break;
+      }
+      nextStreak = Math.max(1, s);
+      return next;
+    });
 
-      const outOf5Info = calculateScoreOutOf5({
-        rawScore: graded.rawScore,
-        usedSlowdown,
-        usedCafeMode,
-      });
+    recordVocabForCurrentLesson();
 
-      const newHistoryEntry: GameScoreHistoryEntry = {
-        id: `${todayStr}:${level}:${clipNumber}:${Date.now()}`,
-        dateStr: todayStr,
-        level,
-        clipNumber,
-        scoreOutOf5: outOf5Info.scoreOutOf5,
-        rawScore: graded.rawScore,
-        finalScore: graded.finalScore,
-        usedSlowdown,
-        usedCafeMode,
-        vocabStar: todayVocabStar,
-        timestamp: Date.now(),
-      };
-
-      let nextStreak = 1;
-      setScoreHistory((prev) => {
-        const next = [newHistoryEntry, ...prev];
-        try {
-          localStorage.setItem(
-            "earworm_score_history_v1",
-            JSON.stringify(next)
-          );
-        } catch {
-          // ignore
-        }
-        const uniqueDates = Array.from(
-          new Set(next.map((h) => h.dateStr))
-        ).sort();
-        let s = 1;
-        for (let i = uniqueDates.length - 1; i > 0; i--) {
-          const c = new Date(uniqueDates[i] + "T00:00:00Z");
-          const p = new Date(uniqueDates[i - 1] + "T00:00:00Z");
-          const d = Math.round(
-            (c.getTime() - p.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          if (d === 1) s++;
-          else if (d > 1) break;
-        }
-        nextStreak = Math.max(1, s);
-        return next;
-      });
-
-      recordVocabForCurrentLesson();
-
-      // Update local group scoreboard
+    if (deviceId) {
       const updatedEntry: LocalLeaderboardEntry = {
         userId: deviceId,
         deviceId,
@@ -839,32 +848,122 @@ function EarwormGameContent() {
         }
         return next;
       });
+    }
 
-      setFinalGradeResult({
-        ...graded,
-        ...outOf5Info,
-        currentStreak: nextStreak,
-        playCount: Math.max(1, playCount),
+    setFinalGradeResult({
+      ...graded,
+      ...outOf5Info,
+      usedSecondAttempt,
+      currentStreak: nextStreak,
+      playCount: Math.max(1, playCount),
+      usedSlowdown,
+      usedCafeMode,
+    });
+
+    setPracticeOptions({ ...finalSelections });
+    setPracticeGradeResult(null);
+    setStage("final");
+    setShowScorePopup(true);
+
+    if (outOf5Info.scoreOutOf5 >= 3.5) {
+      try {
+        void confetti({
+          particleCount: 70,
+          spread: 65,
+          origin: { y: 0.65 },
+        });
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  /**
+   * First Attempt ("Submit (First Attempt)"):
+   * - If the user got all 5 questions right on the first try, skip "Take 2" completely
+   *   and immediately show the "Great Job!" Score Pop-Up!
+   * - Otherwise, lock the questions they got right on the 1st try (marked "Correct"),
+   *   clear their wrong selections so their original wrong guess is NOT visible,
+   *   and jump to the first missed question for Round 2.
+   */
+  const handleRoundOneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lesson) return;
+
+    setIsSubmitting(true);
+    try {
+      const localRes = gradeMultipleChoiceLocally({
+        lesson,
+        selectedIndices: selectedOptions,
         usedSlowdown,
         usedCafeMode,
+        isSecondAttempt: false,
       });
 
-      setPracticeOptions({ ...selectedOptions });
-      setPracticeGradeResult(null);
-      setStage("final");
-      setShowScorePopup(true);
+      const correctMap: Record<string, boolean> = {};
+      for (const fb of localRes.feedback) {
+        correctMap[fb.questionId] = fb.isCorrect;
+      }
+      setRound1CorrectMap(correctMap);
 
-      if (outOf5Info.scoreOutOf5 >= 3.5) {
-        try {
-          void confetti({
-            particleCount: 65,
-            spread: 65,
-            origin: { y: 0.65 },
-          });
-        } catch {
-          // ignore
+      // If all 5 questions are correct on the 1st try, skip "Take 2" and show the Great Job! popup immediately!
+      if (localRes.correctCount === lesson.questions.length) {
+        await finalizeOfficialSubmission({
+          graded: localRes,
+          usedSecondAttempt: false,
+          finalSelections: selectedOptions,
+        });
+        return;
+      }
+
+      // Otherwise, keep only the 1st-try correct answers and CLEAR the missed questions
+      // so the user's original wrong guess is not visible in Round 2.
+      const cleanedSelections: Record<string, number | undefined> = {};
+      for (const q of lesson.questions) {
+        if (correctMap[q.id]) {
+          cleanedSelections[q.id] = q.correctOptionIndex;
+        } else {
+          cleanedSelections[q.id] = undefined;
         }
       }
+      setSelectedOptions(cleanedSelections);
+
+      const firstMissedIdx = lesson.questions.findIndex(
+        (q) => !correctMap[q.id]
+      );
+      setCurrentQuestionIdx(firstMissedIdx >= 0 ? firstMissedIdx : 0);
+      setStage("round2");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /**
+   * Second Attempt ("Final Submission"):
+   * Grades final multiple-choice selections (with 1st-try correct questions locked and
+   * 2nd-try questions carrying the retry penalty), calculates bottom-line score out of 5,
+   * and opens the Score Pop-Up.
+   */
+  const handleFinalSubmission = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lesson) return;
+
+    setIsSubmitting(true);
+    try {
+      const graded = gradeMultipleChoiceLocally({
+        lesson,
+        selectedIndices: selectedOptions,
+        usedSlowdown,
+        usedCafeMode,
+        round1CorrectMap,
+        isSecondAttempt: true,
+      });
+
+      await finalizeOfficialSubmission({
+        graded,
+        usedSecondAttempt: true,
+        finalSelections: selectedOptions,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -882,12 +981,16 @@ function EarwormGameContent() {
       selectedIndices: practiceOptions,
       usedSlowdown: false,
       usedCafeMode: false,
+      isSecondAttempt: false,
     });
 
     const outOf5Info = calculateScoreOutOf5({
       rawScore: graded.rawScore,
       usedSlowdown: false,
       usedCafeMode: false,
+      usedSecondAttempt: false,
+      firstTryCorrectCount: graded.correctCount,
+      secondTryCorrectCount: 0,
     });
 
     setPracticeGradeResult({
@@ -972,6 +1075,7 @@ function EarwormGameContent() {
       }
     }
     setStage("round1");
+    setCurrentQuestionIdx(0);
     setPlayCount(0);
     setUsedSlowdown(false);
     setUsedCafeMode(false);
@@ -988,7 +1092,9 @@ function EarwormGameContent() {
     if (!finalGradeResult || !lesson) return;
     const tier = getRatingTierFrom5(finalGradeResult.scoreOutOf5);
     const tiles = finalGradeResult.feedback
-      .map((f) => (f.isCorrect ? "🟩" : "⬜"))
+      .map((f) =>
+        !f.isCorrect ? "⬜" : f.wasFirstTryCorrect ? "🟩" : "🟨"
+      )
       .join("");
     const starLine =
       todayVocabStar !== "none"
@@ -996,7 +1102,7 @@ function EarwormGameContent() {
         : "";
 
     const shareText = [
-      `Earworm ${lesson.dateStr} • Mexican Spanish 🇲🇽 (${activeLevelOption.label})`,
+      `Earshot ${lesson.dateStr} • Mexican Spanish 🇲🇽 (${activeLevelOption.label})`,
       `Score: ${finalGradeResult.formattedScoreOutOf5} / 5 ${tiles} (${tier.label})`,
       starLine,
       `🔥 Streak: ${playerStats.streakDays}d`,
@@ -1027,8 +1133,19 @@ function EarwormGameContent() {
   };
 
   const allQuestionsAnswered =
-    lesson?.questions.every((q) => selectedOptions[q.id] !== undefined) ??
-    false;
+    lesson?.questions.every((q) => {
+      if (stage === "round2" && round1CorrectMap[q.id]) return true;
+      return selectedOptions[q.id] !== undefined;
+    }) ?? false;
+
+  const answeredCount =
+    lesson?.questions.filter((q) => {
+      if (stage === "round2" && round1CorrectMap[q.id]) return true;
+      return selectedOptions[q.id] !== undefined;
+    }).length ?? 0;
+
+  const activeQuestion =
+    lesson?.questions[currentQuestionIdx] ?? lesson?.questions[0];
 
   const allVocabQuizAnswered = audioVocabQuizQuestions.every(
     (q) => vocabQuizAnswers[q.id] !== undefined
@@ -1054,7 +1171,7 @@ function EarwormGameContent() {
           </div>
 
           <h1 className="font-serif text-3xl font-black tracking-tight">
-            Earworm
+            Earshot
           </h1>
           <p className="mt-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
             Private Preview • Enter password to play
@@ -1087,7 +1204,7 @@ function EarwormGameContent() {
               size="lg"
               className="h-12 w-full rounded-full bg-[#538d4e] text-sm font-black text-white hover:bg-[#467a42]"
             >
-              Unlock Earworm
+              Unlock Earshot
             </Button>
           </form>
         </div>
@@ -1186,7 +1303,7 @@ function EarwormGameContent() {
       )}
 
       {/* =====================================================================
-          BOTTOM-LINE SCORE POP-UP MODAL (Out of 5 + Vocab Star + Stats)
+          BOTTOM-LINE SCORE POP-UP MODAL (Out of 5, up to 6/5 with Traffic Noise)
           Clicking anywhere outside the card dismisses the pop-up immediately.
       ===================================================================== */}
       {showScorePopup && finalGradeResult && activeRatingTier && (
@@ -1208,10 +1325,13 @@ function EarwormGameContent() {
             </button>
 
             <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-              Bottom-Line Score
+              {finalGradeResult.correctCount === 5 &&
+              !finalGradeResult.usedSecondAttempt
+                ? "🎉 Great Job! Perfect First-Try Sweep!"
+                : "Bottom-Line Earshot Score"}
             </span>
 
-            {/* Score Out of 5 + Vocab Star */}
+            {/* Score Out of 5 (or 6/5 with Traffic Noise!) + Vocab Star */}
             <div className="mt-2 flex items-center justify-center gap-2">
               <div className="flex items-baseline gap-1">
                 <span className="font-mono text-5xl font-black tracking-tight text-[#538d4e] dark:text-emerald-400">
@@ -1236,19 +1356,31 @@ function EarwormGameContent() {
               )}
             </div>
 
-            {/* 5-Question Wordle Tile Row */}
+            {finalGradeResult.scoreOutOf5 > 5 && (
+              <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-0.5 text-[11px] font-black text-emerald-700 dark:text-emerald-300">
+                <span>🚗 Over-the-Top Bonus! Traffic Noise + Perfect 1st Try!</span>
+              </div>
+            )}
+
+            {/* 5-Question Wordle Tile Row (Green = 1st Try, Gold/Yellow = 2nd Try, Gray = Missed) */}
             <div className="mt-2.5 flex justify-center gap-1.5">
               {finalGradeResult.feedback.map((fb, idx) => (
                 <div
                   key={fb.questionId}
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-lg font-mono text-xs font-black text-white",
-                    fb.isCorrect
-                      ? "bg-[#538d4e]"
-                      : "bg-zinc-400 dark:bg-zinc-700"
+                    !fb.isCorrect
+                      ? "bg-zinc-400 dark:bg-zinc-700"
+                      : fb.wasFirstTryCorrect
+                        ? "bg-[#538d4e]"
+                        : "bg-[#b59f3b]"
                   )}
                   title={`Question ${idx + 1}: ${
-                    fb.isCorrect ? "Correct" : "Missed"
+                    !fb.isCorrect
+                      ? "Missed"
+                      : fb.wasFirstTryCorrect
+                        ? "Correct on 1st Try (1.0 pt)"
+                        : "Correct on 2nd Try (0.7 pt)"
                   }`}
                 >
                   Q{idx + 1}
@@ -1302,7 +1434,7 @@ function EarwormGameContent() {
                   Bonuses & Penalties
                 </span>
                 <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">
-                  Base: {finalGradeResult.baseScoreOutOf5.toFixed(1)} / 5
+                  Questions: {finalGradeResult.baseScoreOutOf5.toFixed(1)} / 5
                 </span>
               </div>
               <div className="space-y-1.5">
@@ -2166,14 +2298,14 @@ function EarwormGameContent() {
             </Button>
           </div>
 
-          {/* Earworm Logo */}
+          {/* Earshot Logo */}
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#538d4e] text-white shadow-lg shadow-[#538d4e]/25">
             <Ear className="h-9 w-9" />
           </div>
 
           {/* App Name */}
           <h1 className="font-serif text-4xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
-            Earworm
+            Earshot
           </h1>
 
           {/* Brief Description */}
@@ -2227,7 +2359,7 @@ function EarwormGameContent() {
           </Button>
 
           <p className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
-            {todayStr} • 5 Progressive Questions + Audio Vocab Star
+            {todayStr} • 5 Sequential Questions + Audio Vocab Star
           </p>
         </div>
       )}
@@ -2250,11 +2382,11 @@ function EarwormGameContent() {
                 <span>{activeLevelOption.label}</span>
               </button>
 
-              {/* Center: EARWORM */}
+              {/* Center: EARSHOT */}
               <div className="flex items-center gap-1.5">
                 <Ear className="h-4 w-4 text-[#538d4e] dark:text-emerald-400" />
                 <span className="font-serif text-lg font-black tracking-tight sm:text-xl">
-                  EARWORM
+                  EARSHOT
                 </span>
               </div>
 
@@ -2303,18 +2435,64 @@ function EarwormGameContent() {
 
           <main className="mx-auto max-w-lg px-4 pb-16 pt-5">
             {lesson && (
-              <div className="space-y-5">
-                {/* Dialog Header Strip: Shows current Level, Dialog Title & Quick Switcher */}
-                <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+              <div
+                className={cn(
+                  "relative overflow-hidden rounded-3xl border-2 p-4 sm:p-5 shadow-lg transition-all space-y-5",
+                  activeLevelOption.frameBorderClass,
+                  activeLevelOption.glowBgClass,
+                  "bg-white/90 dark:bg-zinc-900/70"
+                )}
+              >
+                {/* Top Level-Specific Accent Gradient Strip (Subtle visual level cue) */}
+                <div
+                  className={cn(
+                    "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r",
+                    activeLevelOption.topStripClass
+                  )}
+                />
+
+                {/* Dialog Header Strip with Subtle Level Cues (Tempo Meter + Level Badge + Quick Switcher) */}
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-zinc-200/90 bg-white px-4 py-3 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
                   <div>
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#538d4e] dark:text-emerald-400">
-                      <span>🇲🇽 Mexican Spanish</span>
-                      <span>•</span>
-                      <span>{activeLevelOption.label}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#538d4e] dark:text-emerald-400">
+                        🇲🇽 Mexican Spanish
+                      </span>
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-extrabold",
+                          activeLevelOption.pillBadgeClass
+                        )}
+                      >
+                        <span>{activeLevelOption.cueBadge}</span>
+                        {/* Subtle 3-bar tempo/complexity meter */}
+                        <span
+                          className="inline-flex items-end gap-0.5 pl-0.5"
+                          title={activeLevelOption.cueDesc}
+                        >
+                          {[1, 2, 3].map((bar) => (
+                            <span
+                              key={bar}
+                              className={cn(
+                                "w-1 rounded-full transition-all",
+                                bar === 1 && "h-2",
+                                bar === 2 && "h-2.5",
+                                bar === 3 && "h-3.5",
+                                bar <= activeLevelOption.tempoBars
+                                  ? activeLevelOption.barActiveClass
+                                  : "bg-zinc-300 dark:bg-zinc-700"
+                              )}
+                            />
+                          ))}
+                        </span>
+                      </span>
                     </div>
-                    <h2 className="text-sm font-black text-zinc-900 dark:text-white">
+                    <h2 className="mt-1 text-sm font-black text-zinc-900 dark:text-white">
                       “{lesson.title}”
                     </h2>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                      {activeLevelOption.cueDesc}
+                    </p>
                   </div>
 
                   {/* Quick Level Pills */}
@@ -2338,13 +2516,13 @@ function EarwormGameContent() {
                 </div>
 
                 {/* ===========================================================
-                    ROUND 1 & ROUND 2: 5 PROGRESSIVE MULTIPLE-CHOICE QUESTIONS
+                    ROUND 1 & ROUND 2: SEQUENTIAL ONE-AT-A-TIME QUESTIONS
                 =========================================================== */}
-                {stage !== "final" && (
+                {stage !== "final" && activeQuestion && (
                   <>
                     {/* Audio Player:
                         Play Audio
-                        Slow Playback (20% Penalty) | Add Background Noise (15% Bonus)
+                        Slow Playback (20% Penalty) | Add Background Noise (+1 Pt Bonus)
                     */}
                     <EarwormAudioPlayer
                       audioUrl={lesson.audioUrl}
@@ -2359,18 +2537,28 @@ function EarwormGameContent() {
                       onCafeModeChange={(enabled) => setUsedCafeMode(enabled)}
                     />
 
-                    {/* Round 2 Notice Banner (Shown after clicking "Submit (First Attempt)") */}
+                    {/* Round 2 Notice Banner (Shown after clicking "Submit (First Attempt)" when < 5/5) */}
                     {stage === "round2" && (
-                      <div className="rounded-2xl border border-[#538d4e]/40 bg-[#538d4e]/10 px-4 py-3 text-center text-xs font-bold text-zinc-800 dark:text-zinc-100">
-                        First Attempt Checked! See which questions you got right
-                        below. You can now{" "}
-                        <span className="underline">listen a second time</span>{" "}
-                        and change any of your answers before clicking{" "}
-                        <strong>Final Submission</strong>.
+                      <div className="rounded-2xl border border-[#b59f3b]/50 bg-[#b59f3b]/15 px-4 py-3 text-center text-xs font-bold text-zinc-800 dark:text-zinc-100">
+                        You got{" "}
+                        <span className="font-mono font-black text-[#538d4e] dark:text-emerald-400">
+                          {
+                            Object.values(round1CorrectMap).filter(Boolean)
+                              .length
+                          }{" "}
+                          / {lesson.questions.length}
+                        </span>{" "}
+                        right on your 1st try! Questions you got right stay
+                        locked{" "}
+                        <span className="text-[#538d4e] dark:text-emerald-400">
+                          (🟩 Correct)
+                        </span>
+                        . Listen a 2nd time and retry the remaining questions
+                        (worth <strong>0.7 pts</strong> each on 2nd try).
                       </div>
                     )}
 
-                    {/* 5 Progressive Multiple-Choice Questions Form */}
+                    {/* Sequential One-at-a-Time Question Form */}
                     <form
                       onSubmit={
                         stage === "round1"
@@ -2379,45 +2567,111 @@ function EarwormGameContent() {
                       }
                       className="space-y-4"
                     >
-                      {lesson.questions.map((q) => {
-                        const selectedIdx = selectedOptions[q.id];
+                      {/* 5-Question Sequential Stepper Bar */}
+                      <div className="flex items-center justify-between gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 dark:border-zinc-800 dark:bg-zinc-950/70">
+                        <div className="flex items-center gap-1.5">
+                          {lesson.questions.map((q, idx) => {
+                            const isCurrent = idx === currentQuestionIdx;
+                            const isR1Correct =
+                              stage === "round2" && round1CorrectMap[q.id];
+                            const isR1Missed =
+                              stage === "round2" &&
+                              round1CorrectMap[q.id] === false;
+                            const hasSelection =
+                              isR1Correct ||
+                              selectedOptions[q.id] !== undefined;
+
+                            return (
+                              <button
+                                key={q.id}
+                                type="button"
+                                onClick={() => setCurrentQuestionIdx(idx)}
+                                className={cn(
+                                  "flex h-8 w-9 items-center justify-center rounded-xl font-mono text-xs font-black transition-all cursor-pointer",
+                                  isCurrent &&
+                                    "ring-2 ring-zinc-900 ring-offset-1 dark:ring-white dark:ring-offset-zinc-900",
+                                  isR1Correct
+                                    ? "bg-[#538d4e] text-white"
+                                    : isR1Missed && hasSelection
+                                      ? "bg-[#b59f3b] text-white"
+                                      : isR1Missed
+                                        ? "border-2 border-[#b59f3b] bg-[#b59f3b]/15 text-amber-800 dark:text-amber-300"
+                                        : hasSelection
+                                          ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                                          : "bg-zinc-200/80 text-zinc-600 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-400"
+                                )}
+                                title={`Question ${idx + 1}`}
+                              >
+                                {isR1Correct ? "✓" : `Q${idx + 1}`}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <span className="font-mono text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                          {answeredCount}/{lesson.questions.length} Answered
+                        </span>
+                      </div>
+
+                      {/* Single Active Question Card (Sequential One-at-a-Time) */}
+                      {(() => {
+                        const q = activeQuestion;
                         const wasCorrectR1 = round1CorrectMap[q.id];
-                        const hasR1Status =
-                          stage === "round2" &&
-                          typeof wasCorrectR1 === "boolean";
+                        const isLockedCorrect =
+                          stage === "round2" && wasCorrectR1 === true;
+                        const isRetryingMissed =
+                          stage === "round2" && wasCorrectR1 === false;
+                        const selectedIdx = isLockedCorrect
+                          ? q.correctOptionIndex
+                          : selectedOptions[q.id];
 
                         return (
                           <div
-                            key={`${lesson._id}_${q.id}`}
-                            className="space-y-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900"
+                            key={`${lesson._id}_${q.id}_step`}
+                            className={cn(
+                              "space-y-3.5 rounded-2xl border-2 bg-white p-5 shadow-xs transition-all dark:bg-zinc-900",
+                              isLockedCorrect
+                                ? "border-[#538d4e]/60 dark:border-[#538d4e]/60"
+                                : isRetryingMissed
+                                  ? "border-[#b59f3b]/60 dark:border-[#b59f3b]/60"
+                                  : "border-zinc-200 dark:border-zinc-800"
+                            )}
                           >
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                                {q.difficultyLabel}
+                                Question {currentQuestionIdx + 1} of{" "}
+                                {lesson.questions.length} •{" "}
+                                {q.difficultyLabel.replace(
+                                  /^Q\d+\s*•\s*/,
+                                  ""
+                                )}
                               </span>
 
-                              {/* In Round 2 (after first Submit), show ONLY whether each question is Correct or Try Again */}
-                              {hasR1Status && (
-                                <span
-                                  className={cn(
-                                    "rounded-lg px-2.5 py-0.5 text-xs font-extrabold",
-                                    wasCorrectR1
-                                      ? "bg-[#538d4e] text-white"
-                                      : "bg-[#b59f3b] text-white"
-                                  )}
-                                >
-                                  {wasCorrectR1
-                                    ? "🟩 Score: Correct (1/1)"
-                                    : "🟨 Score: Try Again (0/1)"}
+                              {isLockedCorrect && (
+                                <span className="rounded-lg bg-[#538d4e] px-2.5 py-0.5 text-xs font-extrabold text-white">
+                                  🟩 Correct on 1st Try (Locked)
+                                </span>
+                              )}
+
+                              {isRetryingMissed && (
+                                <span className="rounded-lg bg-[#b59f3b] px-2.5 py-0.5 text-xs font-extrabold text-white">
+                                  🟨 Try Again (2nd Try)
                                 </span>
                               )}
                             </div>
 
-                            <p className="text-sm font-bold leading-snug text-zinc-900 dark:text-zinc-100">
+                            <p className="text-base font-bold leading-snug text-zinc-900 dark:text-zinc-100">
                               {q.questionText}
                             </p>
 
-                            {/* 4 Multiple Choice Options */}
+                            {isLockedCorrect && (
+                              <p className="rounded-xl bg-[#538d4e]/10 px-3 py-2 text-xs font-semibold text-[#538d4e] dark:text-emerald-300">
+                                You nailed this question on your first attempt!
+                                Your correct answer is locked in.
+                              </p>
+                            )}
+
+                            {/* 4 Multiple Choice Options (In Round 2, missed questions have NO prior guess shown!) */}
                             <div className="grid grid-cols-1 gap-2">
                               {q.options.map((optionText, optIdx) => {
                                 const isSelected = selectedIdx === optIdx;
@@ -2425,15 +2679,19 @@ function EarwormGameContent() {
                                   <button
                                     key={optIdx}
                                     type="button"
-                                    disabled={isSubmitting}
-                                    onClick={() =>
+                                    disabled={isSubmitting || isLockedCorrect}
+                                    onClick={() => {
+                                      if (isLockedCorrect) return;
                                       setSelectedOptions((prev) => ({
                                         ...prev,
                                         [q.id]: optIdx,
-                                      }))
-                                    }
+                                      }));
+                                    }}
                                     className={cn(
-                                      "flex items-center gap-3 rounded-xl border-2 px-3.5 py-2.5 text-left text-xs font-medium transition-all cursor-pointer",
+                                      "flex items-center gap-3 rounded-xl border-2 px-3.5 py-3 text-left text-xs font-medium transition-all",
+                                      isLockedCorrect
+                                        ? "cursor-default"
+                                        : "cursor-pointer",
                                       isSelected
                                         ? "border-[#538d4e] bg-[#538d4e]/15 text-zinc-950 font-bold dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-white"
                                         : "border-zinc-200 bg-zinc-50/70 text-zinc-800 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-200 dark:hover:border-zinc-700"
@@ -2456,10 +2714,59 @@ function EarwormGameContent() {
                                 );
                               })}
                             </div>
+
+                            {/* Sequential Navigation Controls: Previous / Next Question */}
+                            <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={currentQuestionIdx === 0}
+                                onClick={() =>
+                                  setCurrentQuestionIdx((i) =>
+                                    Math.max(0, i - 1)
+                                  )
+                                }
+                                className="rounded-xl"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                                <span>Previous</span>
+                              </Button>
+
+                              <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
+                                {currentQuestionIdx + 1} /{" "}
+                                {lesson.questions.length}
+                              </span>
+
+                              {currentQuestionIdx <
+                              lesson.questions.length - 1 ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() =>
+                                    setCurrentQuestionIdx((i) =>
+                                      Math.min(
+                                        lesson.questions.length - 1,
+                                        i + 1
+                                      )
+                                    )
+                                  }
+                                  className="rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                                >
+                                  <span>Next Question</span>
+                                  <ChevronRight className="h-4 w-4" />
+                                </Button>
+                              ) : (
+                                <span className="text-xs font-bold text-[#538d4e] dark:text-emerald-400">
+                                  Last Question ✓
+                                </span>
+                              )}
+                            </div>
                           </div>
                         );
-                      })}
+                      })()}
 
+                      {/* Submit Button (Enabled once all 5 questions have answers) */}
                       <Button
                         type="submit"
                         size="lg"
@@ -2472,16 +2779,18 @@ function EarwormGameContent() {
                             Grading...
                           </>
                         ) : stage === "round1" ? (
-                          "Submit (First Attempt)"
+                          `Submit (First Attempt) • ${answeredCount}/${lesson.questions.length}`
                         ) : (
-                          "Final Submission"
+                          `Final Submission • ${answeredCount}/${lesson.questions.length}`
                         )}
                       </Button>
 
                       {stage === "round1" && (
                         <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
-                          You get 2 chances! Submit your first attempt to check
-                          your question scores and unlock a 2nd listen.
+                          Get all 5 right on your 1st try for a{" "}
+                          <strong>perfect 5/5</strong> (or{" "}
+                          <strong>6/5 with Traffic Noise</strong>)! If you miss
+                          any, you&apos;ll get a 2nd listen to retry them.
                         </p>
                       )}
                     </form>
@@ -2489,7 +2798,7 @@ function EarwormGameContent() {
                 )}
 
                 {/* ===========================================================
-                    POST-GAME PAGE (After 2nd Submission):
+                    POST-GAME PAGE (After 1st-Try Sweep or 2nd Submission):
                     - Official Score Banner (with Vocab Star + button to re-open Score Pop-Up)
                     - Option to Read the Interactive Audio Transcript of the Dialog
                     - Option to Try Answering the Questions Again (Unscored Practice)
@@ -2500,7 +2809,7 @@ function EarwormGameContent() {
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border-2 border-[#538d4e]/50 bg-[#538d4e]/10 p-5">
                       <div>
                         <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                          Official Daily Score
+                          Official Daily Earshot Score
                         </span>
                         <div className="mt-0.5 flex flex-wrap items-center gap-2">
                           <span className="font-mono text-3xl font-black text-[#538d4e] dark:text-emerald-400">
@@ -2816,7 +3125,7 @@ function EarwormGameContent() {
   );
 }
 
-export default function EarwormPage() {
+export default function EarshotPage() {
   return (
     <Suspense
       fallback={
@@ -2825,7 +3134,7 @@ export default function EarwormPage() {
         </div>
       }
     >
-      <EarwormGameContent />
+      <EarshotGameContent />
     </Suspense>
   );
 }

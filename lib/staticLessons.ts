@@ -1422,6 +1422,10 @@ export function calculateScoreOutOf5(params: {
   rawScore: number; // 0-100
   usedSlowdown: boolean;
   usedCafeMode: boolean;
+  usedSecondAttempt?: boolean;
+  usedSecondListen?: boolean;
+  firstTryCorrectCount?: number;
+  secondTryCorrectCount?: number;
 }): {
   baseScoreOutOf5: number;
   scoreOutOf5: number;
@@ -1432,43 +1436,88 @@ export function calculateScoreOutOf5(params: {
     type: "bonus" | "penalty" | "neutral";
   }>;
 } {
-  const baseRawOutOf5 = (Math.max(0, Math.min(100, params.rawScore)) / 100) * 5;
-  const baseScoreOutOf5 = Number(baseRawOutOf5.toFixed(1));
+  const firstTryCount = params.firstTryCorrectCount;
+  const secondTryCount = params.secondTryCorrectCount ?? 0;
+  const totalCorrectCount =
+    firstTryCount !== undefined
+      ? firstTryCount + secondTryCount
+      : Math.round((Math.max(0, Math.min(100, params.rawScore)) / 100) * 5);
 
-  let multiplier = 1.0;
+  const rawQuestionPoints =
+    firstTryCount !== undefined
+      ? firstTryCount * 1.0 + secondTryCount * 1.0
+      : (Math.max(0, Math.min(100, params.rawScore)) / 100) * 5;
+  const baseScoreOutOf5 = Number(rawQuestionPoints.toFixed(1));
+
+  let runningScore = baseScoreOutOf5;
   const bonusesAndPenalties: Array<{
     label: string;
     effectText: string;
     type: "bonus" | "penalty" | "neutral";
   }> = [];
 
+  // Penalty for needing a 2nd attempt / 2nd listen:
+  // Each question answered on the 2nd try incurs -0.3 pts (worth 0.7 instead of 1.0).
+  // Even if no new questions were answered on the 2nd try, using a 2nd listen / Take 2 incurs at least -0.3 pts
+  // so a perfect 5/5 base score is ONLY possible on the first try with 1 listen.
+  const secondTryPenalty = Number((secondTryCount * 0.3).toFixed(1));
+  const needsSecondListenPenalty =
+    Boolean(params.usedSecondAttempt || params.usedSecondListen) &&
+    secondTryPenalty === 0 &&
+    runningScore > 0;
+  const totalRetryPenalty = needsSecondListenPenalty ? 0.3 : secondTryPenalty;
+
+  if (totalRetryPenalty > 0) {
+    runningScore = Math.max(0, runningScore - totalRetryPenalty);
+    bonusesAndPenalties.push({
+      label:
+        secondTryCount > 0
+          ? `2nd-Try / 2nd-Listen Penalty (${secondTryCount} retried)`
+          : "2nd Listen Used",
+      effectText: `-${totalRetryPenalty.toFixed(1)} pts`,
+      type: "penalty",
+    });
+  } else if (totalCorrectCount === 5 && !params.usedSecondAttempt) {
+    bonusesAndPenalties.push({
+      label: "First-Try Sweep (5/5 on 1st Listen)",
+      effectText: "Perfect 5.0 / 5 Base!",
+      type: "bonus",
+    });
+  }
+
   if (params.usedSlowdown) {
-    multiplier -= 0.2;
+    const slowPenalty = Number((baseScoreOutOf5 * 0.2).toFixed(1));
+    runningScore = Math.max(0, runningScore - slowPenalty);
     bonusesAndPenalties.push({
       label: "Slow Playback (0.75x)",
-      effectText: "-20% Penalty",
+      effectText: `-${slowPenalty.toFixed(1)} pts (-20%)`,
       type: "penalty",
     });
   }
 
   if (params.usedCafeMode) {
-    multiplier += 0.15;
+    // Traffic background noise grants up to +1.0 full bonus point (allowing 6 / 5 on a perfect first try!)
+    const noiseBonus =
+      totalCorrectCount > 0
+        ? Number(((totalCorrectCount / 5) * 1.0).toFixed(1))
+        : 0;
+    runningScore += noiseBonus;
     bonusesAndPenalties.push({
-      label: "Crowded Cafe Background Noise",
-      effectText: "+15% Bonus",
+      label: "City Traffic Background Noise",
+      effectText: `+${noiseBonus.toFixed(1)} pt Bonus (up to 6/5)`,
       type: "bonus",
     });
   }
 
   if (bonusesAndPenalties.length === 0) {
     bonusesAndPenalties.push({
-      label: "Standard Playback",
-      effectText: "No bonuses or penalties (1.0x)",
+      label: "Standard Playback (1st Try)",
+      effectText: "No bonuses or penalties",
       type: "neutral",
     });
   }
 
-  const adjusted = Math.max(0, Math.min(5, baseRawOutOf5 * multiplier));
+  const adjusted = Math.max(0, Math.min(6, runningScore));
   const scoreOutOf5 = Number(adjusted.toFixed(1));
   const formattedScoreOutOf5 = Number.isInteger(scoreOutOf5)
     ? `${scoreOutOf5}`
@@ -1484,45 +1533,71 @@ export function calculateScoreOutOf5(params: {
 
 /**
  * Grades the 5 multiple-choice questions deterministically.
- * Each of the 5 questions is worth 20 raw points (1.0 point out of 5).
+ * Questions answered right on the 1st try earn 20 raw points (1.0 / 5).
+ * Questions answered right on the 2nd try earn 14 raw points (0.7 / 5).
  */
 export function gradeMultipleChoiceLocally(params: {
   lesson: Pick<StaticLesson, "questions" | "slangNotes">;
   selectedIndices: Record<string, number | undefined>;
   usedSlowdown: boolean;
   usedCafeMode: boolean;
+  round1CorrectMap?: Record<string, boolean>;
+  isSecondAttempt?: boolean;
 }): {
   rawScore: number;
   correctCount: number;
+  firstTryCorrectCount: number;
+  secondTryCorrectCount: number;
   multiplier: number;
   finalScore: number;
   feedback: Array<{
     questionId: string;
     isCorrect: boolean;
+    wasFirstTryCorrect: boolean;
     selectedOptionIndex: number;
     correctOptionIndex: number;
-    score: number; // 20 if correct, 0 if incorrect
+    score: number; // 20 if 1st try correct, 14 if 2nd try correct, 0 if incorrect
     explanation: string;
     missedNuance: string;
   }>;
 } {
   let correctCount = 0;
+  let firstTryCorrectCount = 0;
+  let secondTryCorrectCount = 0;
 
   const feedback = params.lesson.questions.map((q, idx) => {
-    const selectedIdx = params.selectedIndices[q.id] ?? -1;
-    const isCorrect = selectedIdx === q.correctOptionIndex;
+    const wasFirstTryCorrect = Boolean(params.round1CorrectMap?.[q.id]);
+    const selectedIdx = wasFirstTryCorrect
+      ? q.correctOptionIndex
+      : (params.selectedIndices[q.id] ?? -1);
+    const isCorrect =
+      wasFirstTryCorrect || selectedIdx === q.correctOptionIndex;
+
     if (isCorrect) {
       correctCount++;
+      if (!params.isSecondAttempt || wasFirstTryCorrect) {
+        firstTryCorrectCount++;
+      } else {
+        secondTryCorrectCount++;
+      }
     }
+
     const relatedSlang =
       params.lesson.slangNotes[idx] ?? params.lesson.slangNotes[0];
+
+    const questionScore = !isCorrect
+      ? 0
+      : !params.isSecondAttempt || wasFirstTryCorrect
+        ? 20
+        : 14;
 
     return {
       questionId: q.id,
       isCorrect,
+      wasFirstTryCorrect: isCorrect && (!params.isSecondAttempt || wasFirstTryCorrect),
       selectedOptionIndex: selectedIdx,
       correctOptionIndex: q.correctOptionIndex,
-      score: isCorrect ? 20 : 0,
+      score: questionScore,
       explanation: q.explanation,
       missedNuance: relatedSlang
         ? `"${relatedSlang.term}" means "${relatedSlang.meaning}" (literally "${relatedSlang.literalTranslation}").`
@@ -1530,21 +1605,23 @@ export function gradeMultipleChoiceLocally(params: {
     };
   });
 
-  const rawScore = correctCount * 20;
+  const rawScore = firstTryCorrectCount * 20 + secondTryCorrectCount * 14;
 
   let multiplier = 1.0;
   if (params.usedSlowdown) {
     multiplier -= 0.2;
   }
   if (params.usedCafeMode) {
-    multiplier += 0.15;
+    multiplier += 0.2;
   }
   multiplier = Number(multiplier.toFixed(2));
-  const finalScore = Math.min(100, Math.round(rawScore * multiplier));
+  const finalScore = Math.min(120, Math.round(rawScore * multiplier));
 
   return {
     rawScore,
     correctCount,
+    firstTryCorrectCount,
+    secondTryCorrectCount,
     multiplier,
     finalScore,
     feedback,

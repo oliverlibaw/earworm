@@ -3,9 +3,9 @@ import "./globals.css";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 
 export const metadata: Metadata = {
-  title: "Earworm — Daily Foreign Language Listening Game",
+  title: "Earshot — Daily Spanish Listening Game",
   description:
-    "Wordle-style daily listening comprehension game with messy, realistic native dialogues, street slang, Crowded Cafe mode, and AI open-ended grading.",
+    "Daily Mexican Spanish listening comprehension game with realistic native dialogues, street slang, traffic noise bonus mode, and audio vocabulary review.",
 };
 
 export default function RootLayout({
