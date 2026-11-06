@@ -12,7 +12,12 @@ export interface StaticSlangNote {
 
 export interface StaticQuestion {
   id: string;
+  difficultyLabel: string;
+  category: "General Gist" | "Key Detail" | "Vocab & Slang";
   questionText: string;
+  options: [string, string, string, string];
+  correctOptionIndex: number;
+  explanation: string;
   idealAnswerRubric: string;
 }
 
@@ -30,6 +35,75 @@ export interface StaticLesson {
   dialogue: StaticDialogueTurn[];
   slangNotes: StaticSlangNote[];
   questions: StaticQuestion[];
+}
+
+export type VocabStarTier = "gold" | "silver" | "bronze" | "none";
+
+export interface VocabStarInfo {
+  tier: VocabStarTier;
+  label: string;
+  shortLabel: string;
+  icon: string;
+  badgeClass: string;
+  description: string;
+}
+
+export function getVocabStarInfo(
+  correctCount: number,
+  totalCount = 5
+): VocabStarInfo {
+  if (totalCount <= 0 || correctCount <= 1) {
+    return {
+      tier: "none",
+      label: "No Vocab Star Yet",
+      shortLabel: "No Star",
+      icon: "☆",
+      badgeClass:
+        "border-zinc-300 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+      description:
+        "Complete the 5-question Audio Vocab Review to earn a Gold, Silver, or Bronze star!",
+    };
+  }
+  const ratio = correctCount / totalCount;
+  if (ratio >= 1.0) {
+    return {
+      tier: "gold",
+      label: "Gold Vocab Star (100%)",
+      shortLabel: "Gold Star",
+      icon: "🥇",
+      badgeClass:
+        "border-amber-400 bg-amber-400/20 text-amber-800 dark:border-amber-400/60 dark:bg-amber-400/20 dark:text-amber-200",
+      description: "Perfect 5/5! You aced 100% of today's Audio Vocab Review.",
+    };
+  }
+  if (ratio >= 0.75) {
+    return {
+      tier: "silver",
+      label: "Silver Vocab Star (Nearly All)",
+      shortLabel: "Silver Star",
+      icon: "🥈",
+      badgeClass:
+        "border-slate-400 bg-slate-300/30 text-slate-800 dark:border-slate-400/60 dark:bg-slate-400/20 dark:text-slate-200",
+      description:
+        "Great ear! You got nearly all (4/5) of today's Audio Vocab Review.",
+    };
+  }
+  return {
+    tier: "bronze",
+    label: "Bronze Vocab Star (OK)",
+    shortLabel: "Bronze Star",
+    icon: "🥉",
+    badgeClass:
+      "border-orange-500/50 bg-orange-500/15 text-orange-800 dark:border-orange-400/50 dark:bg-orange-500/20 dark:text-orange-200",
+    description: "Solid effort! Keep listening to level up to Gold.",
+  };
+}
+
+export function getVocabStarInfoByTier(tier: VocabStarTier): VocabStarInfo {
+  if (tier === "gold") return getVocabStarInfo(5, 5);
+  if (tier === "silver") return getVocabStarInfo(4, 5);
+  if (tier === "bronze") return getVocabStarInfo(3, 5);
+  return getVocabStarInfo(0, 5);
 }
 
 export interface VocabHistoryEntry {
@@ -50,7 +124,20 @@ export interface GameScoreHistoryEntry {
   finalScore: number;
   usedSlowdown: boolean;
   usedCafeMode: boolean;
+  vocabStar?: VocabStarTier;
   timestamp: number;
+}
+
+export interface AudioVocabQuizQuestion {
+  id: string;
+  spanishTerm: string;
+  literalTranslation: string;
+  correctMeaning: string;
+  sourceLabel: string;
+  spokenContextSentence: string;
+  englishContextSentence: string;
+  options: [string, string, string, string];
+  correctOptionIndex: number;
 }
 
 export const DEFAULT_ACCESS_PASSWORD =
@@ -64,6 +151,9 @@ const RAW_MEXICAN_LESSONS: Record<
   string,
   Omit<StaticLesson, "_id" | "dateStr" | "audioUrl">
 > = {
+  // =========================================================================
+  // INTRO (A2) — DIALOG #1
+  // =========================================================================
   "A2:1": {
     language: "Spanish",
     level: "A2",
@@ -152,28 +242,99 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
         questionText:
-          "Why do Carlos and Valeria need cash for the tacos, and how much money does each person have?",
+          "What are Carlos and Valeria trying to figure out outside the subway station?",
+        options: [
+          "Whether they have enough cash to buy street tacos and sodas",
+          "Which subway line they need to take to get to a restaurant",
+          "Where to find an ATM because they lost their wallets",
+          "How to cook potato and bean tacos at home tonight",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Carlos is hungry for tacos de canasta outside the metro, and Valeria checks if they have enough cash ('efectivo') since the bicycle vendor doesn't take cards.",
         idealAnswerRubric:
-          "The taco vendor on the bicycle only takes cash (no cards). Carlos has a 50-peso bill and Valeria has 20 pesos in coins.",
+          "Whether they have enough cash to buy basket tacos and sodas from the vendor on the bicycle outside the metro.",
       },
       {
         id: "q2",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "How much does an order of 5 tacos cost, and what do they use Valeria's 20 pesos for?",
+          "How much money does Carlos have on him, and how much does an order of 5 tacos cost?",
+        options: [
+          "He has a 20-peso bill, and the tacos cost 50 pesos",
+          "He has a 50-peso bill, and the order of 5 tacos costs 40 pesos",
+          "He has 100 pesos in coins, and the tacos cost 60 pesos",
+          "He has no cash at all, so Valeria pays 40 pesos by card",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Carlos says 'solo traigo un billete de cincuenta pesos' (50-peso bill), and Valeria says 'La orden de cinco tacos cuesta cuarenta pesos' (40 pesos).",
         idealAnswerRubric:
-          "An order of 5 tacos costs 40 pesos, and Valeria's 20 pesos in coins is used to buy two sodas (refrescos).",
+          "Carlos has a 50-peso bill and the order of 5 tacos costs 40 pesos.",
       },
       {
         id: "q3",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "Which taco flavors does Valeria ask Carlos to order, and what warning does she give him?",
+          "Which taco fillings does Valeria ask Carlos to order for them to share?",
+        options: [
+          "Five carnitas tacos with red salsa",
+          "Three chicken tacos and two cheese tacos",
+          "Two potato-with-chorizo tacos and three bean tacos",
+          "Four steak tacos and one potato taco",
+        ],
+        correctOptionIndex: 2,
+        explanation:
+          "Valeria says: 'Sale, pide dos de papa con chorizo y tres de frijol' (two potato-with-chorizo and three bean tacos).",
         idealAnswerRubric:
-          "She asks for two potato with chorizo (papa con chorizo) and three bean (frijol) tacos, and warns him that the green salsa (salsa verde) is very spicy.",
+          "Two potato with chorizo (papa con chorizo) and three bean (frijol) tacos.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "When Valeria asks '¿Tienes efectivo?' and Carlos replies 'Híjole...', what do 'efectivo' and 'híjole' mean here?",
+        options: [
+          "'Efectivo' means a subway ticket, and 'híjole' means 'hurry up'",
+          "'Efectivo' means cash, and 'híjole' means 'shoot / oh man'",
+          "'Efectivo' means appetite, and 'híjole' means 'of course'",
+          "'Efectivo' means receipt, and 'híjole' means 'wait for me'",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Spanish, 'efectivo' means cash (as opposed to 'tarjeta' / card), and 'híjole' is a classic Mexican exclamation meaning 'shoot!' or 'oh man!'",
+        idealAnswerRubric:
+          "Efectivo means cash and híjole means shoot / oh man.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "At the very end, Valeria warns Carlos: '¡Cuidado con la salsa verde que pica un montón!' What is she warning him about?",
+        options: [
+          "The green salsa costs extra money",
+          "The green salsa is super spicy",
+          "The green salsa is sour and spoiled",
+          "The green salsa stains your clothes easily",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexican Spanish, 'picar' refers to chili heat, so 'pica un montón' means 'it's super spicy!'",
+        idealAnswerRubric: "She warns him that the green salsa is super spicy.",
       },
     ],
   },
 
+  // =========================================================================
+  // INTRO (A2) — DIALOG #2
+  // =========================================================================
   "A2:2": {
     language: "Spanish",
     level: "A2",
@@ -247,26 +408,98 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
-        questionText: "Why didn't Luis hear Sofía the first time she spoke?",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
+        questionText:
+          "Where are Sofía and Luis stopping on their way to work, and why?",
+        options: [
+          "At a bakery to grab hot coffee and sweet bread on a cold morning",
+          "At a pharmacy because Luis has a cold and needs medicine",
+          "At a phone repair shop because Luis dropped his cell phone",
+          "At a supermarket to buy groceries for dinner tonight",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Sofía suggests stopping at the bakery ('la panadería') for two 'cafés de olla' and two 'conchas de vainilla' before their bus arrives.",
         idealAnswerRubric:
-          "He was distracted looking at his cell phone (celular).",
+          "At a bakery to get spiced coffee and vanilla sweet bread before taking the bus to the office.",
       },
       {
         id: "q2",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "What drinks and food do they get at the bakery, and how much does it cost?",
-        idealAnswerRubric:
-          "Two spiced coffees (cafés de olla) and two vanilla sweet breads (conchas de vainilla) for breakfast at the office, costing 35 pesos total.",
+          "Why didn't Luis catch what Sofía said the first time she spoke?",
+        options: [
+          "A loud bus was passing by on the avenue",
+          "He was distracted looking at his cell phone",
+          "He was talking to the bakery cashier",
+          "He was still half-asleep because he woke up late",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Luis apologizes: '¿Mande? Perdón, estaba viendo mi celular' (Sorry, I was looking at my cell phone).",
+        idealAnswerRubric: "He was distracted looking at his cell phone.",
       },
       {
         id: "q3",
-        questionText: "Who pays, and why do they need to hurry?",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
+        questionText:
+          "How much does the bakery order cost in total, and how soon does their bus arrive?",
+        options: [
+          "50 pesos total, and the bus arrives in 15 minutes",
+          "20 pesos total, and the bus arrives in 5 minutes",
+          "35 pesos total, and the bus arrives in 8 minutes",
+          "45 pesos total, and the bus is already waiting outside",
+        ],
+        correctOptionIndex: 2,
+        explanation:
+          "Sofía says 'Son treinta y cinco pesos en total' (35 pesos), and Luis says 'nuestro camión pasa en ocho minutos' (8 minutes).",
+        idealAnswerRubric: "35 pesos total, and the bus arrives in 8 minutes.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "In Mexican Spanish, what do '¿Mande?' and 'el camión' mean in this conversation?",
+        options: [
+          "'¿Mande?' means 'Where to?' and 'el camión' means 'the delivery truck'",
+          "'¿Mande?' means 'Pardon / What did you say?' and 'el camión' means 'the city bus'",
+          "'¿Mande?' means 'Order for me' and 'el camión' means 'the subway train'",
+          "'¿Mande?' means 'Are you sure?' and 'el camión' means 'the taxi'",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexico, '¿Mande?' is the polite everyday way to say 'Pardon?' and 'el camión' is the standard word for a city passenger bus.",
         idealAnswerRubric:
-          "Luis pays ('yo invito'), and they need to hurry because their bus ('el camión') arrives on the avenue in 8 minutes.",
+          "¿Mande? means Pardon? and el camión means the city bus.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "When Luis says 'Yo invito hoy, Sofía. Pero apúrate...', what is he telling her?",
+        options: [
+          "He is inviting her to a party tonight, if she finishes work early",
+          "It's his treat (he's paying today), but she needs to hurry up",
+          "She should pay today, and he will pay her back on the bus",
+          "He wants her to order for him while he goes to the bus stop",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "'Yo invito' literally translates to 'I invite', which is the standard Spanish idiom for 'It's my treat / I'm paying', and 'apúrate' means 'hurry up!'",
+        idealAnswerRubric:
+          "It's his treat (he is paying), and he tells her to hurry up.",
       },
     ],
   },
 
+  // =========================================================================
+  // CONVERSATIONAL (B1) — DIALOG #1
+  // =========================================================================
   "B1:1": {
     language: "Spanish",
     level: "B1",
@@ -350,28 +583,99 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
         questionText:
-          "What damage did Diego discover on his car, and how did it happen?",
+          "Why is Diego upset with Fernanda at the start of the conversation?",
+        options: [
+          "She returned his car with an empty gas tank",
+          "He found a big scratch on the back bumper of his car after lending it to her",
+          "She forgot to pick him up from the repair shop two weeks ago",
+          "She parked his car in a tow-away zone outside her office",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Diego just went down to the parking lot and saw a huge scratch ('un raspón enorme') on the rear bumper ('la defensa trasera') after lending his car to Fernanda yesterday.",
         idealAnswerRubric:
-          "He found a huge scratch ('raspón') on the rear bumper ('defensa trasera'). Fernanda scraped a tight pillar on a parking ramp yesterday when she borrowed the car to pick up work ('chamba') supplies.",
+          "He found a huge scratch on the rear bumper after lending her his car.",
       },
       {
         id: "q2",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "What arrangement did Fernanda already make to fix the car, and how much will it cost?",
+          "How did the car get scratched, and what plan did Fernanda already arrange?",
+        options: [
+          "Another driver hit her in traffic; her insurance will pay 3,000 pesos",
+          "She scraped a tight pillar on a ramp; her Uncle Memo's shop in Zapopan will buff and paint it tomorrow for 1,500 pesos",
+          "A shopping cart hit the door; she bought touch-up paint for 500 pesos",
+          "She backed into a tree at night; Diego's mechanic will fix it next week",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Fernanda explains a pillar ('un poste') was super close on the ramp when she went to pick up her work stuff ('cosas de mi chamba'), and her Uncle Memo's body shop in Zapopan will buff and paint it tomorrow for 1,500 pesos.",
         idealAnswerRubric:
-          "She already called her Uncle Memo's body shop in Zapopan, who will buff and paint the bumper tomorrow for 1,500 pesos.",
+          "She scraped a pillar on a ramp, and her Uncle Memo's shop in Zapopan will buff and paint it tomorrow for 1,500 pesos.",
       },
       {
         id: "q3",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "What two conditions does Diego insist on, and what local food does Fernanda offer to cheer him up?",
+          "In addition to Fernanda paying for the repair, what else does Diego demand—and what food does Fernanda offer him?",
+        options: [
+          "She must wash his car, and she offers him street tacos",
+          "She must drive him to his office in the morning, and she offers to buy him a 'torta ahogada'",
+          "She must lend him her bicycle, and she offers to buy him coffee",
+          "She must pay his parking fee, and she offers to cook dinner",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Diego insists she pay the cash ('esa lana la pones tú') and drive him to his office in the morning ('me llevas a mi oficina'), and Fernanda offers him a Guadalajara 'torta ahogada' sandwich.",
         idealAnswerRubric:
-          "Diego insists Fernanda pay the full repair cost ('la lana') and drive him to his office in the morning. Fernanda agrees and offers to buy him a 'torta ahogada' sandwich.",
+          "She must drive him to his office in the morning, and she offers to buy him a torta ahogada.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "Diego asks: '¿Y pensabas hacerte pato o qué?' What does the Mexican idiom 'hacerse pato' mean?",
+        options: [
+          "To drive recklessly fast",
+          "To play dumb and dodge responsibility",
+          "To borrow something without asking",
+          "To cry and make excuses",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Literally 'to make oneself a duck', 'hacerse pato' is a classic Mexican idiom meaning to play dumb or pretend nothing happened to avoid responsibility.",
+        idealAnswerRubric: "To play dumb / dodge responsibility.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "In this dialogue, what do the Mexican slang terms 'la chamba', 'la lana', and 'para que se te baje el coraje' mean?",
+        options: [
+          "'Chamba' = party, 'lana' = sweater, 'baje el coraje' = feel braver",
+          "'Chamba' = work/job, 'lana' = money/cash, 'baje el coraje' = stop being mad / cool off",
+          "'Chamba' = garage, 'lana' = paint, 'baje el coraje' = get to work on time",
+          "'Chamba' = school, 'lana' = debt, 'baje el coraje' = stop worrying",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexican Spanish, 'la chamba' is work/job, 'la lana' is money/cash, and 'para que se te baje el coraje' means 'so your anger goes down / so you stop being mad.'",
+        idealAnswerRubric:
+          "Chamba means work/job, lana means money/cash, and bajarse el coraje means to stop being mad.",
       },
     ],
   },
 
+  // =========================================================================
+  // CONVERSATIONAL (B1) — DIALOG #2
+  // =========================================================================
   "B1:2": {
     language: "Spanish",
     level: "B1",
@@ -449,27 +753,100 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
         questionText:
-          "Why is Mateo stressed about the electricity bill, and why is he short on cash right now?",
+          "What caused the two-month electricity bill in Mateo and Lucía's apartment to double?",
+        options: [
+          "Mateo left his desktop computer running day and night for a design project",
+          "Lucía left the electric space heater on for a couple of freezing nights last week",
+          "The landlord accidentally billed them for the whole building",
+          "Their refrigerator broke and was using twice as much power",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Lucía admits: 'la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido un par de noches' (she left the electric space heater on).",
         idealAnswerRubric:
-          "The electricity bill doubled, the landlord has been nagging him on WhatsApp since 8 AM, and Mateo is broke ('ando bien bruja') because he hasn't been paid for his design project yet.",
+          "Lucía left the electric space heater on for a couple of freezing nights.",
       },
       {
         id: "q2",
-        questionText: "Why did the electricity bill jump so high?",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
+        questionText:
+          "Why is Mateo unable to pay a big electricity bill right now, and who has been messaging him since 8 AM?",
+        options: [
+          "He spent his money on concert tickets, and the power company called him",
+          "He hasn't been paid yet for his design project, and the landlord has been nagging him on WhatsApp",
+          "He lost his wallet on the bus, and his boss is messaging him",
+          "He lent money to his cousin Javi, and his roommate is messaging him",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Mateo says they haven't paid him for his design project ('no me han pagado el proyecto de diseño'), and the landlord ('el casero') has been nagging him on WhatsApp since 8 AM.",
         idealAnswerRubric:
-          "Lucía left the electric space heater ('calentador eléctrico') on for a couple of nights because it was freezing last week.",
+          "He hasn't been paid for his design project yet, and the landlord has been nagging him on WhatsApp since 8 AM.",
       },
       {
         id: "q3",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "How does Lucía solve the problem, and what does she ask Mateo to help her with?",
+          "Where did Lucía just get extra money from, and how much of the electricity bill does she agree to pay?",
+        options: [
+          "From her paycheck; she agrees to pay 50% of the bill",
+          "Her cousin Javi transferred her money he owed for concert tickets; she covers 70% of the bill",
+          "Her parents sent her a transfer; she covers 100% of the bill",
+          "She sold her electric heater; she covers 60% of the bill",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Lucía says her cousin Javi owed her cash ('una lana') for concert tickets and just sent a transfer, so she will pay 70% ('el setenta por ciento') of the bill.",
         idealAnswerRubric:
-          "Her cousin Javi just paid her back for concert tickets, so she pays 70% of the bill and offers to buy Mateo 'esquites' (street corn) if he helps her carry boxes to the storage room ('bodega').",
+          "Her cousin Javi paid her back for concert tickets, and she covers 70% of the bill.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "Mateo says 'ahorita ando bien bruja' and Lucía earlier told him 'no te esponjes'. What do those two Mexican expressions mean?",
+        options: [
+          "'Andar bruja' = to be exhausted; 'no te esponjes' = don't fall asleep",
+          "'Andar bruja' = to be completely broke; 'no te esponjes' = don't get worked up / angry",
+          "'Andar bruja' = to be superstitious; 'no te esponjes' = don't get wet in the rain",
+          "'Andar bruja' = to be working late; 'no te esponjes' = don't complain",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexican slang, 'andar bruja' (literally 'walking like a witch') means to be broke/out of money, and 'no te esponjes' (literally 'don't puff up like a sponge') means 'don't get worked up or angry.'",
+        idealAnswerRubric:
+          "Andar bruja means to be broke, and no te esponjes means don't get worked up.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "At the end, Lucía offers to buy Mateo 'esquites' if he 'le echa la mano con las cajas de la bodega'. What is she asking him to do?",
+        options: [
+          "Help her carry/move the boxes in the storage room",
+          "Pay the remaining 30% of the bill in cash at the store",
+          "Throw away the old cardboard boxes in the kitchen",
+          "Go down to the street vendor to buy the corn cups himself",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "'Echar la mano' means to lend a hand / help out, and 'la bodega' in a Mexican apartment building refers to the storage room/locker.",
+        idealAnswerRubric:
+          "She asks him to lend her a hand (help her) with the boxes in the storage room.",
       },
     ],
   },
 
+  // =========================================================================
+  // ADVANCED (B2) — DIALOG #1
+  // =========================================================================
   "B2:1": {
     language: "Spanish",
     level: "B2",
@@ -558,27 +935,100 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
         questionText:
-          "Why do Paco and Mariana panic at the concert gate, and why is Mariana suspicious of where he bought the ticket?",
+          "Why do Paco and Mariana panic when they arrive at the entrance to the Foro Sol concert venue?",
+        options: [
+          "Paco forgot his cell phone in the parking lot",
+          "The ticket scanner flashes red on Paco's ticket, making them fear he bought a fake ticket",
+          "The concert was canceled at the last minute due to rain",
+          "Mariana bought tickets for the wrong date",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "The barcode scanner at the gate flashes red ('acaba de prender en rojo'), and Mariana fears the sketchy Facebook reseller sold Paco a cloned/fake ticket.",
         idealAnswerRubric:
-          "The scanner flashes red on Paco's ticket, and Mariana thinks the sketchy ('chafa') Facebook reseller ripped him off ('se pasó de lanza') with a cloned ticket.",
+          "The scanner flashes red on Paco's ticket and they fear the Facebook reseller sold him a cloned ticket.",
       },
       {
         id: "q2",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "What silly mistake did Mariana discover when she looked at Paco's phone?",
+          "What silly mistake does Mariana discover when she looks at Paco's phone screen?",
+        options: [
+          "His screen brightness was turned all the way down",
+          "He was showing the QR code for the parking lot instead of the concert ticket",
+          "He was showing an old movie ticket from last week",
+          "His phone battery had died right at the gate",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Mariana looks at his phone and says: 'Estabas enseñando el código QR del estacionamiento en vez del boleto del concierto' (he was showing the parking lot QR code).",
         idealAnswerRubric:
-          "Paco was accidentally scanning the QR code for the parking lot ('estacionamiento') instead of the concert ticket QR code.",
+          "He was showing the parking lot QR code instead of the concert ticket.",
       },
       {
         id: "q3",
-        questionText: "Why do they have to run once the scanner turns green?",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
+        questionText:
+          "Why does Paco say the ticket 'me dejó sin un quinto para toda la quincena'?",
+        options: [
+          "He had to wait in line for five hours to buy it",
+          "It was so expensive it left him without a cent for the whole two-week pay period",
+          "He bought five tickets for his friends and nobody paid him back",
+          "He lost a 500-peso bill at the stadium entrance",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "'Me costó un ojo de la cara' (cost an arm and a leg) and 'me quedé sin un quinto para toda la quincena' means he's left without a cent for the entire two-week pay period.",
         idealAnswerRubric:
-          "The band is about to start playing their first song ('la primera rola') and their tickets are all the way down on the main floor ('la pista').",
+          "It cost him an arm and a leg and left him without a cent for the two-week pay period.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "Mariana says the reseller looked 'súper chafa' and 'se pasó de lanza', and Paco later says '¡Qué oso hice!'. What do 'chafa', 'pasarse de lanza', and 'qué oso' mean?",
+        options: [
+          "'Chafa' = polite, 'pasarse de lanza' = to be late, 'qué oso' = how lucky",
+          "'Chafa' = sketchy/low-quality, 'pasarse de lanza' = to rip someone off / go too far, 'qué oso' = how embarrassing",
+          "'Chafa' = expensive, 'pasarse de lanza' = to run away, 'qué oso' = how scary",
+          "'Chafa' = famous, 'pasarse de lanza' = to charge extra, 'qué oso' = how funny",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexico City slang, 'chafa' means sketchy/shoddy, 'pasarse de lanza' means to cross the line/rip someone off, and 'hacer un oso / ¡qué oso!' means 'how embarrassing!'",
+        idealAnswerRubric:
+          "Chafa means sketchy/low-quality, pasarse de lanza means to rip off/go too far, and qué oso means how embarrassing.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "At the end, Mariana shouts: '¡A huevo! ... la banda está a punto de tocar la primera rola y nos toca hasta la pista.' What does she mean?",
+        options: [
+          "Awesome! The band is about to play their first song and their spot is all the way down on the main floor",
+          "Oh no! The band is already on their last song and they have to sit in the top balcony",
+          "Hurry! They need to buy food before the opening band finishes their set",
+          "Great! They won backstage passes to meet the band after the first song",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "'¡A huevo!' means 'Hell yeah / Awesome!', 'la primera rola' means 'the first song', and 'la pista' is the general-admission floor section of the stadium.",
+        idealAnswerRubric:
+          "Hell yeah! The band is about to play their first song and their spot is all the way down on the floor.",
       },
     ],
   },
 
+  // =========================================================================
+  // ADVANCED (B2) — DIALOG #2
+  // =========================================================================
   "B2:2": {
     language: "Spanish",
     level: "B2",
@@ -655,24 +1105,93 @@ const RAW_MEXICAN_LESSONS: Record<
     questions: [
       {
         id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
         questionText:
-          "Why did Valeria ignore Ramiro's messages ('tirar a león') all morning?",
+          "What event are Ramiro and Valeria preparing for, and why didn't Valeria meet him at 1:00 PM?",
+        options: [
+          "A birthday party at a restaurant; her car broke down on the highway",
+          "A backyard barbecue ('carnita asada'); the server crashed at her office and her boss wouldn't let them leave",
+          "A camping trip in the mountains; she overslept after working late",
+          "A soccer watch party; she was stuck in a dentist appointment",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "They are preparing a barbecue ('carbón y arrachera'), and Valeria explains there was chaos ('un desmadre') at the office because the server crashed ('se cayó el servidor').",
         idealAnswerRubric:
-          "There was chaos ('un desmadre') at her office because the server crashed and her boss wouldn't let anyone leave.",
+          "A barbecue (carnita asada), and Valeria was stuck at the office because the server crashed.",
       },
       {
         id: "q2",
+        difficultyLabel: "Q2 • Medium-Easy (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "Why couldn't Ramiro buy the barbecue supplies by himself before the guests arrive at 5 PM?",
+          "When do the guests arrive, and how did Valeria solve the meat and charcoal problem?",
+        options: [
+          "Guests arrive at 7 PM; she asked another friend to pick up the meat",
+          "Guests arrive at 5 PM; she ordered everything for delivery from San Juan butcher shop paid with her card, arriving in 20 minutes",
+          "Guests arrive at 6 PM; she transferred cash to Ramiro's bank account",
+          "Guests arrive at 4 PM; she is bringing cooked food from a restaurant",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Ramiro says the guests arrive at 5 ('llegan a las cinco'), and Valeria already ordered delivery from 'la carnicería San Juan' paid with her card, arriving in 20 minutes.",
         idealAnswerRubric:
-          "He didn't have enough cash ('feria') on him to pay for all the meat alone.",
+          "Guests arrive at 5 PM, and Valeria ordered everything for delivery from San Juan butcher shop paid with her card, arriving in 20 minutes.",
       },
       {
         id: "q3",
+        difficultyLabel: "Q3 • Medium (Key Detail)",
+        category: "Key Detail",
         questionText:
-          "How did Valeria solve the problem, and what is Ramiro going to do while waiting?",
+          "What two things is Ramiro going to do right now while waiting for the delivery?",
+        options: [
+          "Clean the patio and go buy tortillas",
+          "Start lighting the grill and put the beers in the cooler",
+          "Set the table and make guacamole",
+          "Call the guests and tell them to arrive an hour later",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Ramiro says: 'yo voy prendiendo el asador y pongo las cheves en la hielera' (light the grill and put the beers in the cooler).",
         idealAnswerRubric:
-          "She ordered the meat and charcoal for delivery from the butcher shop paid with her card (arriving in 20 minutes), while Ramiro lights the grill and puts the beers ('las cheves') in the cooler.",
+          "Start lighting the grill and put the beers in the cooler.",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium-Hard (Vocabulary)",
+        category: "Vocab & Slang",
+        questionText:
+          "Ramiro asks: '¿Por qué me tiraste a león toda la mañana?' and says 'no traigo suficiente feria'. What do 'tirar a león' and 'feria' mean?",
+        options: [
+          "'Tirar a león' = to yell at someone; 'feria' = free time",
+          "'Tirar a león' = to ignore/ghost someone; 'feria' = money/cash",
+          "'Tirar a león' = to play a prank; 'feria' = space in the car",
+          "'Tirar a león' = to arrive late; 'feria' = credit limit",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "In Mexican slang, 'tirar a león' means to ignore/ghost someone's calls or messages, and in Northern Mexico ('Regio' slang), 'la feria' means money/cash.",
+        idealAnswerRubric:
+          "Tirar a león means to ignore/ghost someone, and feria means money/cash.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Hard (Slang & Nuance)",
+        category: "Vocab & Slang",
+        questionText:
+          "Valeria says the delivery arrives 'de volada', and Ramiro replies '¡Sobres, te quedó con madre!'. What do those expressions mean?",
+        options: [
+          "'De volada' = by air mail; 'Sobres, te quedó con madre' = Wait, my mom is coming too",
+          "'De volada' = super fast; 'Sobres, te quedó con madre' = Awesome/deal, you nailed it (it turned out great)!",
+          "'De volada' = free of charge; 'Sobres, te quedó con madre' = Careful, don't spend too much",
+          "'De volada' = tomorrow morning; 'Sobres, te quedó con madre' = Okay, I'll pay you back",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "'De volada' means super fast/right away; '¡Sobres!' means 'Deal / Sounds good!', and 'con madre' is classic Monterrey slang for 'awesome / top-notch!'",
+        idealAnswerRubric:
+          "De volada means super fast, and Sobres, te quedó con madre means Awesome, you nailed it!",
       },
     ],
   },
@@ -680,7 +1199,7 @@ const RAW_MEXICAN_LESSONS: Record<
 
 /**
  * Seeded vocabulary from previous days played so the "Review Vocab" modal
- * always includes previous days alongside today's dialog + any other dialogs the user plays.
+ * and Audio Vocab Quiz always include previous days alongside today's dialog.
  */
 export const SEEDED_PREVIOUS_DAYS_VOCAB: VocabHistoryEntry[] = [
   {
@@ -690,14 +1209,14 @@ export const SEEDED_PREVIOUS_DAYS_VOCAB: VocabHistoryEntry[] = [
     dialogTitle: "La mochila olvidada en el Uber en la Condesa",
     items: [
       {
-        term: "qué poca",
-        meaning: "How unfair / how rude (short for 'qué poca madre')",
-        literalTranslation: "what little",
-      },
-      {
         term: "hacer un paro",
         meaning: "To do someone a huge favor / help someone out",
         literalTranslation: "to make a stop",
+      },
+      {
+        term: "qué poca",
+        meaning: "How unfair / how rude (short for 'qué poca madre')",
+        literalTranslation: "what little",
       },
       {
         term: "la propina",
@@ -741,6 +1260,44 @@ export const SEEDED_PREVIOUS_DAYS_VOCAB: VocabHistoryEntry[] = [
   },
 ];
 
+/**
+ * Simulated friends for the static MVP Leaderboard so the user can preview
+ * how the friend group leaderboard looks with `/ 5` scores and Vocab Stars.
+ */
+export const SIMULATED_GROUP_FRIENDS: Array<{
+  userId: string;
+  deviceId: string;
+  username: string;
+  currentStreak: number;
+  scoreOutOf5: number;
+  vocabStar: VocabStarTier;
+}> = [
+  {
+    userId: "sim_friend_1",
+    deviceId: "sim_1",
+    username: "Sofia (Demo Friend)",
+    currentStreak: 5,
+    scoreOutOf5: 4.5,
+    vocabStar: "gold",
+  },
+  {
+    userId: "sim_friend_2",
+    deviceId: "sim_2",
+    username: "Mateo (Demo Friend)",
+    currentStreak: 3,
+    scoreOutOf5: 3.8,
+    vocabStar: "silver",
+  },
+  {
+    userId: "sim_friend_3",
+    deviceId: "sim_3",
+    username: "Camila (Demo Friend)",
+    currentStreak: 2,
+    scoreOutOf5: 3.0,
+    vocabStar: "bronze",
+  },
+];
+
 export function getStaticMexicanSpanishLesson(
   dateStr: string,
   level: string,
@@ -758,6 +1315,107 @@ export function getStaticMexicanSpanishLesson(
     dateStr,
     audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.mp3`,
   };
+}
+
+/**
+ * Builds a 5-question Audio Vocabulary Review Quiz combining slang/vocab
+ * from Today's Dialog + Previous Days Played.
+ */
+export function buildAudioVocabQuizQuestions(
+  lesson: StaticLesson,
+  previousDays: VocabHistoryEntry[]
+): AudioVocabQuizQuestion[] {
+  const pool: Array<{
+    term: string;
+    meaning: string;
+    literalTranslation: string;
+    sourceLabel: string;
+    spokenContextSentence: string;
+    englishContextSentence: string;
+  }> = [];
+
+  // Add items from Today's Dialog first (Up to 3)
+  for (const note of lesson.slangNotes.slice(0, 3)) {
+    const firstWord = note.term
+      .toLowerCase()
+      .replace(/[¿?¡!]/g, "")
+      .split(/\s+/)[0];
+    const matchingLine = lesson.dialogue.find((d) =>
+      d.text.toLowerCase().includes(firstWord)
+    );
+    pool.push({
+      term: note.term,
+      meaning: note.meaning,
+      literalTranslation: note.literalTranslation,
+      sourceLabel: `Today's Dialog • ${lesson.title}`,
+      spokenContextSentence: matchingLine
+        ? `${ note.term }. Por ejemplo: ${ matchingLine.text }`
+        : `${ note.term }`,
+      englishContextSentence: matchingLine
+        ? matchingLine.englishTranslation
+        : note.meaning,
+    });
+  }
+
+  // Add items from Previous Days Played to reach 5 questions
+  for (const entry of previousDays) {
+    for (const item of entry.items) {
+      if (pool.length >= 5) break;
+      if (!pool.some((p) => p.term === item.term)) {
+        pool.push({
+          term: item.term,
+          meaning: item.meaning,
+          literalTranslation: item.literalTranslation,
+          sourceLabel: `${entry.dateStr} • ${entry.dialogTitle}`,
+          spokenContextSentence: item.term,
+          englishContextSentence: item.meaning,
+        });
+      }
+    }
+    if (pool.length >= 5) break;
+  }
+
+  // Fallback distractor meanings pool
+  const allMeanings = [
+    ...lesson.slangNotes.map((s) => s.meaning),
+    ...SEEDED_PREVIOUS_DAYS_VOCAB.flatMap((e) => e.items.map((i) => i.meaning)),
+    "To miss the last subway train home",
+    "To ask the waiter for the check immediately",
+    "A rainstorm that floods the street",
+  ];
+
+  return pool.slice(0, 5).map((item, idx) => {
+    const distractors = allMeanings
+      .filter((m) => m !== item.meaning)
+      .slice(idx, idx + 3);
+    while (distractors.length < 3) {
+      distractors.push("To arrive early to an appointment");
+    }
+
+    // Deterministic rotation of correct option index (0..3)
+    const correctIndex = (idx * 3 + 1) % 4;
+    const opts: string[] = [];
+    let dIdx = 0;
+    for (let i = 0; i < 4; i++) {
+      if (i === correctIndex) {
+        opts.push(item.meaning);
+      } else {
+        opts.push(distractors[dIdx++] ?? "An everyday greeting");
+      }
+    }
+
+    return {
+      id: `vquiz_${idx + 1}`,
+      spanishTerm: item.term,
+      literalTranslation: item.literalTranslation,
+      correctMeaning: item.meaning,
+      sourceLabel: item.sourceLabel,
+      spokenContextSentence: item.spokenContextSentence,
+      englishContextSentence: item.englishContextSentence,
+      options: opts as [string, string, string, string],
+      correctOptionIndex: correctIndex,
+    };
+  });
 }
 
 export function calculateScoreOutOf5(params: {
@@ -824,145 +1482,55 @@ export function calculateScoreOutOf5(params: {
   };
 }
 
-export function gradeAnswersLocally(params: {
+/**
+ * Grades the 5 multiple-choice questions deterministically.
+ * Each of the 5 questions is worth 20 raw points (1.0 point out of 5).
+ */
+export function gradeMultipleChoiceLocally(params: {
   lesson: Pick<StaticLesson, "questions" | "slangNotes">;
-  userAnswers: Array<{ questionId: string; answerText: string }>;
+  selectedIndices: Record<string, number | undefined>;
   usedSlowdown: boolean;
   usedCafeMode: boolean;
 }): {
   rawScore: number;
+  correctCount: number;
   multiplier: number;
   finalScore: number;
   feedback: Array<{
     questionId: string;
-    score: number;
+    isCorrect: boolean;
+    selectedOptionIndex: number;
+    correctOptionIndex: number;
+    score: number; // 20 if correct, 0 if incorrect
     explanation: string;
     missedNuance: string;
   }>;
 } {
-  const maxPerQuestion = [34, 33, 33];
-  const stopWords = new Set([
-    "the",
-    "and",
-    "that",
-    "this",
-    "with",
-    "from",
-    "they",
-    "their",
-    "have",
-    "has",
-    "was",
-    "were",
-    "for",
-    "are",
-    "but",
-    "not",
-    "she",
-    "him",
-    "her",
-    "his",
-    "because",
-    "about",
-    "into",
-    "while",
-    "when",
-    "what",
-    "where",
-    "which",
-    "after",
-    "before",
-    "also",
-    "very",
-    "some",
-    "them",
-    "then",
-  ]);
+  let correctCount = 0;
 
   const feedback = params.lesson.questions.map((q, idx) => {
-    const maxPts = maxPerQuestion[idx] ?? 33;
-    const userObj = params.userAnswers.find((a) => a.questionId === q.id);
-    const answer = (userObj?.answerText ?? "").trim();
+    const selectedIdx = params.selectedIndices[q.id] ?? -1;
+    const isCorrect = selectedIdx === q.correctOptionIndex;
+    if (isCorrect) {
+      correctCount++;
+    }
     const relatedSlang =
       params.lesson.slangNotes[idx] ?? params.lesson.slangNotes[0];
 
-    if (!answer || answer.length < 2) {
-      return {
-        questionId: q.id,
-        score: 0,
-        explanation: `No answer provided (0/${maxPts} pts). Expected answer: ${q.idealAnswerRubric}`,
-        missedNuance: relatedSlang
-          ? `Slang tip: "${relatedSlang.term}" means "${relatedSlang.meaning}" (literally "${relatedSlang.literalTranslation}").`
-          : "Listen closely for the speaker's main reason in this turn.",
-      };
-    }
-
-    const rubricWords = q.idealAnswerRubric
-      .toLowerCase()
-      .replace(/[^a-z0-9áéíóúñüçàèìòù\s]/gi, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 3 && !stopWords.has(w));
-
-    const lowerAnswer = answer.toLowerCase();
-    let matchedCount = 0;
-    for (const rw of rubricWords) {
-      const stem = rw.slice(0, Math.max(4, rw.length - 2));
-      if (lowerAnswer.includes(stem)) {
-        matchedCount++;
-      }
-    }
-
-    if (matchedCount === 0) {
-      const minimalEffortScore =
-        lowerAnswer.includes("don't know") ||
-        lowerAnswer.includes("idk") ||
-        answer.length < 8
-          ? 0
-          : 4;
-      return {
-        questionId: q.id,
-        score: minimalEffortScore,
-        explanation: `Missed the key details on this question (${minimalEffortScore}/${maxPts} pts). What actually happened: ${q.idealAnswerRubric}`,
-        missedNuance: relatedSlang
-          ? `Key phrase to listen for: "${relatedSlang.term}" — ${relatedSlang.meaning} (literally "${relatedSlang.literalTranslation}").`
-          : `Check Review Vocab to see how the speakers phrased this.`,
-      };
-    }
-
-    const matchRatio =
-      rubricWords.length > 0 ? matchedCount / rubricWords.length : 0.5;
-    const normalizedScore = Math.min(
-      1,
-      Math.max(0.45, matchRatio * 1.7 + (matchedCount >= 3 ? 0.25 : 0.1))
-    );
-    const score = Math.round(normalizedScore * maxPts);
-
-    const mentionedSlang =
-      relatedSlang &&
-      (lowerAnswer.includes(relatedSlang.term.toLowerCase()) ||
-        lowerAnswer.includes(
-          relatedSlang.meaning.toLowerCase().split(/\s+/)[0] ?? ""
-        ));
-
     return {
       questionId: q.id,
-      score,
-      explanation:
-        score >= maxPts * 0.82
-          ? `Spot on! (${score}/${maxPts} pts) — You caught the key details: ${q.idealAnswerRubric}`
-          : `Partial gist captured (${score}/${maxPts} pts) — You caught part of it! Full answer: ${q.idealAnswerRubric}`,
-      missedNuance: mentionedSlang
-        ? `Nice job catching the slang nuance around "${relatedSlang.term}"!`
-        : relatedSlang
-          ? `Slang spotlight: "${relatedSlang.term}" literally means "${relatedSlang.literalTranslation}", used here to mean "${relatedSlang.meaning}".`
-          : `Notice how the speakers use conversational fillers to soften the conflict.`,
+      isCorrect,
+      selectedOptionIndex: selectedIdx,
+      correctOptionIndex: q.correctOptionIndex,
+      score: isCorrect ? 20 : 0,
+      explanation: q.explanation,
+      missedNuance: relatedSlang
+        ? `"${relatedSlang.term}" means "${relatedSlang.meaning}" (literally "${relatedSlang.literalTranslation}").`
+        : q.explanation,
     };
   });
 
-  const rawScore = Math.min(
-    100,
-    feedback.reduce((sum, f) => sum + f.score, 0)
-  );
+  const rawScore = correctCount * 20;
 
   let multiplier = 1.0;
   if (params.usedSlowdown) {
@@ -972,10 +1540,11 @@ export function gradeAnswersLocally(params: {
     multiplier += 0.15;
   }
   multiplier = Number(multiplier.toFixed(2));
-  const finalScore = Math.round(rawScore * multiplier);
+  const finalScore = Math.min(100, Math.round(rawScore * multiplier));
 
   return {
     rawScore,
+    correctCount,
     multiplier,
     finalScore,
     feedback,
