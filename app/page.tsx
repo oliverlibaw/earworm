@@ -61,12 +61,30 @@ import { cn } from "@/lib/utils";
 
 const LEVEL_OPTIONS = [
   {
+    id: "A1",
+    label: "Basic",
+    shortBadge: "~15s Clip",
+    subtitle: "Short 3-line dialog (1/3 length), slow pace & survival phrases",
+    cueBadge: "🐣 Basic Starter Pace",
+    cueDesc: "Short ~15s clip • Slow & clear survival Spanish",
+    tempoBars: 1,
+    frameBorderClass:
+      "border-violet-500/35 dark:border-violet-500/30 shadow-violet-500/5",
+    topStripClass: "from-violet-500 via-indigo-400 to-sky-400",
+    pillBadgeClass:
+      "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+    barActiveClass: "bg-violet-500 dark:bg-violet-400",
+    glowBgClass:
+      "bg-gradient-to-b from-violet-500/[0.05] via-transparent to-transparent",
+  },
+  {
     id: "A2",
     label: "Intro",
+    shortBadge: "~40s Clip",
     subtitle: "Clear speech, everyday phrases, gentler pace",
     cueBadge: "🌱 Intro Pace",
     cueDesc: "Clear articulation • Everyday vocabulary",
-    tempoBars: 1,
+    tempoBars: 2,
     frameBorderClass:
       "border-sky-500/35 dark:border-sky-500/30 shadow-sky-500/5",
     topStripClass: "from-sky-500 via-teal-400 to-emerald-400",
@@ -79,10 +97,11 @@ const LEVEL_OPTIONS = [
   {
     id: "B1",
     label: "Conversational",
+    shortBadge: "Natural",
     subtitle: "Natural speed, everyday situations & idioms",
     cueBadge: "💬 Conversational Pace",
     cueDesc: "Natural speed • Everyday Mexican idioms",
-    tempoBars: 2,
+    tempoBars: 3,
     frameBorderClass:
       "border-emerald-500/35 dark:border-emerald-500/30 shadow-emerald-500/5",
     topStripClass: "from-[#538d4e] via-emerald-500 to-amber-400",
@@ -95,10 +114,11 @@ const LEVEL_OPTIONS = [
   {
     id: "B2",
     label: "Advanced",
+    shortBadge: "Fast Slang",
     subtitle: "Fast street banter & heavy Mexican slang",
     cueBadge: "🌶️ Advanced Street Pace",
     cueDesc: "Rapid-fire banter • Heavy CDMX slang",
-    tempoBars: 3,
+    tempoBars: 4,
     frameBorderClass:
       "border-rose-500/35 dark:border-rose-500/30 shadow-rose-500/5",
     topStripClass: "from-amber-500 via-orange-500 to-rose-500",
@@ -263,6 +283,7 @@ function EarshotGameContent() {
   const [showScorePopup, setShowScorePopup] = useState(false);
   const [showMvpDebugModal, setShowMvpDebugModal] = useState(false);
   const [showDemoFriends, setShowDemoFriends] = useState(true);
+  const [showBeginnerWarmup, setShowBeginnerWarmup] = useState(false);
 
   // QA clip switcher (Dialog #1 or Dialog #2 per level)
   const [clipNumber, setClipNumber] = useState<number>(1);
@@ -2318,12 +2339,12 @@ function EarshotGameContent() {
             <span>🇲🇽 Mexican Spanish Edition</span>
           </div>
 
-          {/* Select Level: Intro / Conversational / Advanced */}
+          {/* Select Level: Basic / Intro / Conversational / Advanced */}
           <div className="mt-7 w-full space-y-2 text-left">
             <label className="block text-center text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
               Select Level
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {LEVEL_OPTIONS.map((opt) => {
                 const selected = level === opt.id;
                 return (
@@ -2332,13 +2353,23 @@ function EarshotGameContent() {
                     type="button"
                     onClick={() => setLevel(opt.id)}
                     className={cn(
-                      "flex flex-col items-center justify-center rounded-2xl border-2 px-3 py-3 text-center transition-all cursor-pointer",
+                      "flex flex-col items-center justify-center rounded-2xl border-2 px-2.5 py-2.5 text-center transition-all cursor-pointer",
                       selected
                         ? "border-[#538d4e] bg-[#538d4e] text-white shadow-md"
                         : "border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
                     )}
                   >
                     <span className="text-sm font-black">{opt.label}</span>
+                    <span
+                      className={cn(
+                        "mt-0.5 text-[10px] font-bold",
+                        selected
+                          ? "text-white/85"
+                          : "text-zinc-400 dark:text-zinc-500"
+                      )}
+                    >
+                      {opt.shortBadge}
+                    </span>
                   </button>
                 );
               })}
@@ -2465,19 +2496,20 @@ function EarshotGameContent() {
                         )}
                       >
                         <span>{activeLevelOption.cueBadge}</span>
-                        {/* Subtle 3-bar tempo/complexity meter */}
+                        {/* Subtle 4-bar tempo/complexity meter */}
                         <span
                           className="inline-flex items-end gap-0.5 pl-0.5"
                           title={activeLevelOption.cueDesc}
                         >
-                          {[1, 2, 3].map((bar) => (
+                          {[1, 2, 3, 4].map((bar) => (
                             <span
                               key={bar}
                               className={cn(
                                 "w-1 rounded-full transition-all",
-                                bar === 1 && "h-2",
-                                bar === 2 && "h-2.5",
-                                bar === 3 && "h-3.5",
+                                bar === 1 && "h-1.5",
+                                bar === 2 && "h-2",
+                                bar === 3 && "h-2.5",
+                                bar === 4 && "h-3.5",
                                 bar <= activeLevelOption.tempoBars
                                   ? activeLevelOption.barActiveClass
                                   : "bg-zinc-300 dark:bg-zinc-700"
@@ -2496,7 +2528,7 @@ function EarshotGameContent() {
                   </div>
 
                   {/* Quick Level Pills */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
                     {LEVEL_OPTIONS.map((opt) => (
                       <button
                         key={opt.id}
@@ -2514,6 +2546,72 @@ function EarshotGameContent() {
                     ))}
                   </div>
                 </div>
+
+                {/* Beginner Aid (Basic Level A1): Scene Context + Optional Key Phrases Warm-Up */}
+                {level === "A1" && stage !== "final" && (
+                  <div className="rounded-2xl border border-violet-500/30 bg-violet-500/[0.08] p-3.5 text-xs dark:border-violet-400/25 dark:bg-violet-500/10">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <span className="font-black uppercase tracking-wider text-violet-700 dark:text-violet-300">
+                          📍 Scene Context (Basic Level)
+                        </span>
+                        <p className="mt-0.5 font-medium text-zinc-800 dark:text-zinc-200">
+                          {lesson.sceneSummary ??
+                            "Short 3-line everyday Mexican Spanish interaction (~15 seconds)."}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowBeginnerWarmup((prev) => !prev)}
+                        className="shrink-0 rounded-xl border border-violet-500/40 bg-white px-2.5 py-1.5 text-[11px] font-extrabold text-violet-700 hover:bg-violet-50 dark:bg-zinc-900 dark:text-violet-300 cursor-pointer"
+                      >
+                        {showBeginnerWarmup
+                          ? "Hide Key Words"
+                          : "👀 Warm-Up: 3 Key Phrases"}
+                      </button>
+                    </div>
+
+                    {showBeginnerWarmup && (
+                      <div className="mt-3 grid grid-cols-1 gap-2 border-t border-violet-500/20 pt-2.5 sm:grid-cols-3">
+                        {lesson.slangNotes.slice(0, 3).map((item) => {
+                          const warmId = `warmup_${item.term}`;
+                          const isPlaying = playingVocabId === warmId;
+                          return (
+                            <div
+                              key={item.term}
+                              className="flex flex-col justify-between rounded-xl border border-violet-500/20 bg-white/90 p-2.5 dark:bg-zinc-900/90"
+                            >
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="font-black text-violet-700 dark:text-violet-300">
+                                  “{item.term}”
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handlePlayVocabAudio(warmId, item.term)
+                                  }
+                                  className={cn(
+                                    "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold cursor-pointer",
+                                    isPlaying
+                                      ? "border-violet-600 bg-violet-600 text-white"
+                                      : "border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                                  )}
+                                >
+                                  <Volume2 className="h-2.5 w-2.5" />
+                                  <span>Hear</span>
+                                </button>
+                              </div>
+                              <p className="mt-1 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300">
+                                {item.meaning}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* ===========================================================
                     ROUND 1 & ROUND 2: SEQUENTIAL ONE-AT-A-TIME QUESTIONS

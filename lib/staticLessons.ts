@@ -30,6 +30,7 @@ export interface StaticLesson {
   clipNumber: number;
   dialect: string;
   dialectNotes: string;
+  sceneSummary?: string;
   title: string;
   audioUrl: string;
   dialogue: StaticDialogueTurn[];
@@ -151,6 +152,297 @@ const RAW_MEXICAN_LESSONS: Record<
   string,
   Omit<StaticLesson, "_id" | "dateStr" | "audioUrl">
 > = {
+  // =========================================================================
+  // BASIC (A1) — DIALOG #1 (~15 sec, 3 short turns, ~1/3 length of Intro)
+  // =========================================================================
+  "A1:1": {
+    language: "Spanish",
+    level: "A1",
+    isSideQuest: false,
+    clipNumber: 1,
+    title: "Un agua de mango en el parque",
+    dialect: "Mexican Spanish 🇲🇽",
+    dialectNotes:
+      "Basic level: Short, slow 3-line conversation (~15 seconds) using essential Mexican survival phrases like '¿me da...?', 'chica o grande', and 'veinte pesos'.",
+    sceneSummary:
+      "Ordering a cold fruit drink ('agua fresca') from a vendor in a Mexico City park.",
+    dialogue: [
+      {
+        speaker: "Ana",
+        text: "Hola, buenos días. ¿Me da un agua de mango, por favor?",
+        englishTranslation:
+          "Hello, good morning. Can you give me a mango water, please?",
+      },
+      {
+        speaker: "Don Pepe",
+        text: "¡Claro que sí! ¿Grande o chica? La grande cuesta treinta pesos.",
+        englishTranslation:
+          "Of course! Large or small? The large one costs thirty pesos.",
+      },
+      {
+        speaker: "Ana",
+        text: "Chica, por favor. Aquí tiene veinte pesos. ¡Muchas gracias!",
+        englishTranslation:
+          "Small, please. Here is twenty pesos. Thank you very much!",
+      },
+    ],
+    slangNotes: [
+      {
+        term: "¿me da...?",
+        meaning:
+          "Can you give me...? / May I have...? (Most common polite way to order food or drinks in Mexico)",
+        literalTranslation: "do you give me...?",
+      },
+      {
+        term: "agua de mango",
+        meaning:
+          "Fresh mango fruit drink ('agua fresca' made with blended fruit, water, and a touch of sugar)",
+        literalTranslation: "mango water",
+      },
+      {
+        term: "¿grande o chica?",
+        meaning:
+          "Large or small? (In Mexico, 'chico/chica' is used instead of 'pequeño' for drink and clothing sizes)",
+        literalTranslation: "big or small?",
+      },
+      {
+        term: "treinta / veinte pesos",
+        meaning: "Thirty / twenty pesos",
+        literalTranslation: "30 / 20 pesos",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
+        questionText: "What is Ana buying from Don Pepe in the park?",
+        options: [
+          "A mango fruit drink ('agua de mango')",
+          "A cup of hot coffee with milk",
+          "A ticket to enter the museum",
+          "Two chicken tacos with salsa",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Ana greets Don Pepe and asks: '¿Me da un agua de mango, por favor?' (Can you give me a mango water, please?).",
+        idealAnswerRubric: "She is buying a mango fruit drink (agua de mango).",
+      },
+      {
+        id: "q2",
+        difficultyLabel: "Q2 • Easy-Medium (Key Detail)",
+        category: "Key Detail",
+        questionText: "What two cup sizes does Don Pepe offer her?",
+        options: [
+          "Hot or cold ('caliente o fría')",
+          "Large or small ('grande o chica')",
+          "Sweet or plain ('dulce o simple')",
+          "Bottle or cup ('botella o vaso')",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Don Pepe asks '¿Grande o chica?' — in Mexico, 'chica' is the everyday word for size small.",
+        idealAnswerRubric: "Large or small (grande o chica).",
+      },
+      {
+        id: "q3",
+        difficultyLabel: "Q3 • Medium (Numbers)",
+        category: "Key Detail",
+        questionText: "How much does the large ('grande') drink cost?",
+        options: [
+          "10 pesos ('diez pesos')",
+          "15 pesos ('quince pesos')",
+          "30 pesos ('treinta pesos')",
+          "50 pesos ('cincuenta pesos')",
+        ],
+        correctOptionIndex: 2,
+        explanation:
+          "Don Pepe says: 'La grande cuesta treinta pesos' (The large one costs 30 pesos).",
+        idealAnswerRubric: "The large drink costs 30 pesos (treinta pesos).",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium (Key Detail)",
+        category: "Key Detail",
+        questionText:
+          "Which size does Ana choose at the end, and how much does she hand Don Pepe?",
+        options: [
+          "Large ('grande'), and she pays 30 pesos",
+          "Small ('chica'), and she hands him 20 pesos",
+          "Two small drinks, and she pays 40 pesos",
+          "She decides not to buy anything",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Ana replies: 'Chica, por favor. Aquí tiene veinte pesos' (Small, please. Here is 20 pesos).",
+        idealAnswerRubric: "She chooses the small size (chica) and pays 20 pesos.",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Everyday Mexican Phrase",
+        category: "Vocab & Slang",
+        questionText:
+          "In Mexico, what does the phrase '¿Me da...?' mean when ordering at a stand or café?",
+        options: [
+          "Can you give me / May I have...?",
+          "Where is the bathroom?",
+          "Do you accept credit cards?",
+          "What time do you close?",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "'¿Me da...?' (literally 'Do you give me...?') is the #1 polite, natural way to order food or drinks in Mexico.",
+        idealAnswerRubric: "Can you give me / May I have...?",
+      },
+    ],
+  },
+
+  // =========================================================================
+  // BASIC (A1) — DIALOG #2 (~15 sec, 3 short turns, ~1/3 length of Intro)
+  // =========================================================================
+  "A1:2": {
+    language: "Spanish",
+    level: "A1",
+    isSideQuest: false,
+    clipNumber: 2,
+    title: "Buscando la estación del metro",
+    dialect: "Mexican Spanish 🇲🇽",
+    dialectNotes:
+      "Basic level: Short, slow 3-line conversation (~15 seconds) covering polite street directions ('disculpe', 'cuadras', 'derecho', 'a la izquierda').",
+    sceneSummary:
+      "Asking a passerby on the street how to walk to the nearest subway station.",
+    dialogue: [
+      {
+        speaker: "Marco",
+        text: "Disculpe, señorita. ¿Dónde está la estación del metro más cercana?",
+        englishTranslation:
+          "Excuse me, miss. Where is the nearest subway station?",
+      },
+      {
+        speaker: "Elena",
+        text: "Está muy cerca. Camine dos cuadras derecho y doble a la izquierda.",
+        englishTranslation:
+          "It's very close. Walk two blocks straight ahead and turn left.",
+      },
+      {
+        speaker: "Marco",
+        text: "¡Perfecto! Está al lado del banco, ¿verdad? ¡Buen día!",
+        englishTranslation:
+          "Perfect! It's next to the bank, right? Have a good day!",
+      },
+    ],
+    slangNotes: [
+      {
+        term: "disculpe",
+        meaning:
+          "Excuse me (polite way to get a stranger's attention on the street)",
+        literalTranslation: "forgive / excuse",
+      },
+      {
+        term: "dos cuadras derecho",
+        meaning:
+          "Two blocks straight ahead (in Mexico, 'cuadra' means city block and 'derecho' means straight ahead)",
+        literalTranslation: "two blocks straight",
+      },
+      {
+        term: "doble a la izquierda",
+        meaning: "Turn to the left",
+        literalTranslation: "fold/turn to the left",
+      },
+      {
+        term: "al lado del banco",
+        meaning: "Next to the bank",
+        literalTranslation: "at the side of the bank",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        difficultyLabel: "Q1 • Easy (General Gist)",
+        category: "General Gist",
+        questionText: "What place is Marco looking for?",
+        options: [
+          "The nearest subway station ('la estación del metro')",
+          "A hotel near the airport",
+          "A taco restaurant on the corner",
+          "A pharmacy that is open late",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Marco asks: '¿Dónde está la estación del metro más cercana?' (Where is the nearest subway station?).",
+        idealAnswerRubric: "The nearest subway station.",
+      },
+      {
+        id: "q2",
+        difficultyLabel: "Q2 • Easy-Medium (Key Detail)",
+        category: "Key Detail",
+        questionText:
+          "How many blocks straight ahead ('derecho') does Elena tell him to walk?",
+        options: [
+          "One block ('una cuadra')",
+          "Two blocks ('dos cuadras')",
+          "Five blocks ('cinco cuadras')",
+          "Ten blocks ('diez cuadras')",
+        ],
+        correctOptionIndex: 1,
+        explanation:
+          "Elena says: 'Camine dos cuadras derecho' (Walk two blocks straight ahead).",
+        idealAnswerRubric: "Two blocks straight ahead (dos cuadras derecho).",
+      },
+      {
+        id: "q3",
+        difficultyLabel: "Q3 • Medium (Directions)",
+        category: "Key Detail",
+        questionText:
+          "After walking two blocks straight ahead, which way should Marco turn?",
+        options: [
+          "Turn left ('doble a la izquierda')",
+          "Turn right ('doble a la derecha')",
+          "Go back the way he came",
+          "Go inside the shopping mall",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Elena tells him: 'y doble a la izquierda' (and turn to the left).",
+        idealAnswerRubric: "Turn left (a la izquierda).",
+      },
+      {
+        id: "q4",
+        difficultyLabel: "Q4 • Medium (Key Detail)",
+        category: "Key Detail",
+        questionText: "What building is the subway station right next to?",
+        options: [
+          "Next to the bank ('al lado del banco')",
+          "Next to the hospital ('al lado del hospital')",
+          "Next to the school ('al lado de la escuela')",
+          "Next to the church ('al lado de la iglesia')",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "Marco confirms: 'Está al lado del banco, ¿verdad?' (It's next to the bank, right?).",
+        idealAnswerRubric: "Next to the bank (al lado del banco).",
+      },
+      {
+        id: "q5",
+        difficultyLabel: "Q5 • Everyday Mexican Vocab",
+        category: "Vocab & Slang",
+        questionText:
+          "In Mexican Spanish directions, what do 'una cuadra' and 'derecho' mean?",
+        options: [
+          "'Cuadra' = a city block; 'derecho' = straight ahead",
+          "'Cuadra' = a traffic light; 'derecho' = upstairs",
+          "'Cuadra' = a bus stop; 'derecho' = slowly",
+          "'Cuadra' = a ticket booth; 'derecho' = on the left",
+        ],
+        correctOptionIndex: 0,
+        explanation:
+          "In Mexico and Latin America, 'una cuadra' is a street block, and walking 'derecho' means walking straight ahead!",
+        idealAnswerRubric:
+          "Cuadra means a city block and derecho means straight ahead.",
+      },
+    ],
+  },
+
   // =========================================================================
   // INTRO (A2) — DIALOG #1
   // =========================================================================
@@ -1303,17 +1595,18 @@ export function getStaticMexicanSpanishLesson(
   level: string,
   clipNumber = 1
 ): StaticLesson {
-  const safeLevel = ["A2", "B1", "B2"].includes(level) ? level : "B1";
+  const safeLevel = ["A1", "A2", "B1", "B2"].includes(level) ? level : "B1";
   const safeClip = clipNumber === 2 ? 2 : 1;
   const key = `${safeLevel}:${safeClip}`;
   const base = RAW_MEXICAN_LESSONS[key] ?? RAW_MEXICAN_LESSONS["B1:1"];
   const basePath = getPublicBasePath();
+  const ext = safeLevel === "A1" ? "m4a" : "mp3";
 
   return {
     ...base,
     _id: `static_Spanish_${safeLevel}_${safeClip}`,
     dateStr,
-    audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.mp3`,
+    audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.${ext}`,
   };
 }
 
