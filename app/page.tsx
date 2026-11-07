@@ -241,6 +241,7 @@ interface LocalLeaderboardEntry {
   deviceId: string;
   username: string;
   groupId: string;
+  level?: string;
   currentStreak: number;
   todayFinalScore: number | null;
   vocabStar?: VocabStarTier;
@@ -284,6 +285,8 @@ function EarshotGameContent() {
   const [showMvpDebugModal, setShowMvpDebugModal] = useState(false);
   const [showDemoFriends, setShowDemoFriends] = useState(true);
   const [showBeginnerWarmup, setShowBeginnerWarmup] = useState(false);
+  const [showPhoneticHint, setShowPhoneticHint] = useState(false);
+  const [practicedShadowing, setPracticedShadowing] = useState(false);
 
   // QA clip switcher (Dialog #1 or Dialog #2 per level)
   const [clipNumber, setClipNumber] = useState<number>(1);
@@ -538,6 +541,8 @@ function EarshotGameContent() {
     setVocabQuizAnswers({});
     setVocabQuizSubmitted(false);
     setRevealedSpanishTerms({});
+    setShowPhoneticHint(false);
+    setPracticedShadowing(false);
   }, [level, clipNumber]);
 
   // Previous days / other dialogs vocabulary list for the "Review Vocab" modal
@@ -611,6 +616,13 @@ function EarshotGameContent() {
 
   // Combined Friend Leaderboard (Player + Simulated Demo Friends when enabled)
   const combinedLeaderboard = useMemo(() => {
+    const getLevelBadgeLabel = (lvl?: string) => {
+      if (lvl === "A1") return "🐣 Basic";
+      if (lvl === "A2") return "🌱 Intro";
+      if (lvl === "B2") return "🌶️ Advanced";
+      return "💬 Conversational";
+    };
+
     const myScoreOutOf5 =
       finalGradeResult?.scoreOutOf5 ??
       scoreHistory[0]?.scoreOutOf5 ??
@@ -620,6 +632,8 @@ function EarshotGameContent() {
       userId: deviceId || "me",
       deviceId: deviceId || "me",
       username: username || "Oliver",
+      level,
+      levelLabel: getLevelBadgeLabel(level),
       currentStreak: playerStats.streakDays,
       scoreOutOf5: myScoreOutOf5,
       vocabStar: todayVocabStar,
@@ -632,6 +646,8 @@ function EarshotGameContent() {
         userId: s.userId,
         deviceId: s.deviceId,
         username: s.username,
+        level: s.level ?? "B1",
+        levelLabel: getLevelBadgeLabel(s.level),
         currentStreak: s.currentStreak,
         scoreOutOf5:
           s.todayFinalScore !== null
@@ -792,6 +808,7 @@ function EarshotGameContent() {
       rawScore: graded.rawScore,
       usedSlowdown,
       usedCafeMode,
+      level,
       usedSecondAttempt,
       usedSecondListen: playCount >= 2 || usedSecondAttempt,
       firstTryCorrectCount: graded.firstTryCorrectCount,
@@ -848,6 +865,7 @@ function EarshotGameContent() {
         deviceId,
         username: username || "Oliver",
         groupId,
+        level,
         currentStreak: nextStreak,
         todayFinalScore: graded.finalScore,
         vocabStar: todayVocabStar,
@@ -2145,11 +2163,17 @@ function EarshotGameContent() {
               </div>
             </form>
 
-            {/* Today's Group Rankings (Score out of 5 + Vocab Star) */}
+            {/* Today's Group Rankings (Score out of 5 + Vocab Star + Level-Normalized Badge) */}
             <div className="mb-4">
+              <div className="mb-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-[11px] font-semibold text-zinc-700 dark:text-zinc-200">
+                ⚖️ <strong>Play Your Own Level, Compete Together:</strong>{" "}
+                Friends play at their own Spanish level (Basic → Advanced) and
+                compete fairly on the same <strong>/ 5</strong> scale!
+              </div>
+
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                  Today&apos;s Rank (Score + Vocab Star)
+                  Today&apos;s Rank (Level-Normalized)
                 </span>
                 <button
                   type="button"
@@ -2195,7 +2219,7 @@ function EarshotGameContent() {
                           {index + 1}
                         </span>
                         <div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-bold text-zinc-900 dark:text-white">
                               {row.username}
                             </span>
@@ -2204,6 +2228,9 @@ function EarshotGameContent() {
                                 YOU
                               </span>
                             )}
+                            <span className="rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                              {row.levelLabel}
+                            </span>
                           </div>
                           <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
                             <Flame className="h-3 w-3 fill-orange-500 text-orange-500" />
@@ -2620,11 +2647,12 @@ function EarshotGameContent() {
                   <>
                     {/* Audio Player:
                         Play Audio
-                        Slow Playback (20% Penalty) | Add Background Noise (+1 Pt Bonus)
+                        Slow Playback (Free on Basic / 20% Penalty) | Add Background Noise (+1 Pt Bonus)
                     */}
                     <EarwormAudioPlayer
                       audioUrl={lesson.audioUrl}
                       lessonId={String(lesson._id)}
+                      level={level}
                       playCount={playCount}
                       allowedPlays={stage === "round1" ? 1 : 2}
                       usedSlowdown={usedSlowdown}
@@ -2635,24 +2663,81 @@ function EarshotGameContent() {
                       onCafeModeChange={(enabled) => setUsedCafeMode(enabled)}
                     />
 
-                    {/* Round 2 Notice Banner (Shown after clicking "Submit (First Attempt)" when < 5/5) */}
+                    {/* Round 2 Notice Banner + Line-by-Line Stepped Audio Helper */}
                     {stage === "round2" && (
-                      <div className="rounded-2xl border border-[#b59f3b]/50 bg-[#b59f3b]/15 px-4 py-3 text-center text-xs font-bold text-zinc-800 dark:text-zinc-100">
-                        You got{" "}
-                        <span className="font-mono font-black text-[#538d4e] dark:text-emerald-400">
-                          {
-                            Object.values(round1CorrectMap).filter(Boolean)
-                              .length
-                          }{" "}
-                          / {lesson.questions.length}
-                        </span>{" "}
-                        right on your 1st try! Questions you got right stay
-                        locked{" "}
-                        <span className="text-[#538d4e] dark:text-emerald-400">
-                          (🟩 Correct)
-                        </span>
-                        . Listen a 2nd time and retry the remaining questions
-                        (worth <strong>0.7 pts</strong> each on 2nd try).
+                      <div className="space-y-2.5">
+                        <div className="rounded-2xl border border-[#b59f3b]/50 bg-[#b59f3b]/15 px-4 py-3 text-center text-xs font-bold text-zinc-800 dark:text-zinc-100">
+                          You got{" "}
+                          <span className="font-mono font-black text-[#538d4e] dark:text-emerald-400">
+                            {
+                              Object.values(round1CorrectMap).filter(Boolean)
+                                .length
+                            }{" "}
+                            / {lesson.questions.length}
+                          </span>{" "}
+                          right on your 1st try! Questions you got right stay
+                          locked{" "}
+                          <span className="text-[#538d4e] dark:text-emerald-400">
+                            (🟩 Correct)
+                          </span>
+                          . Listen a 2nd time and retry the remaining questions
+                          (worth <strong>0.7 pts</strong> each on 2nd try).
+                        </div>
+
+                        {/* Line-by-Line Stepped Audio Helper on 2nd Listen (No text spoiler!) */}
+                        <div className="rounded-2xl border border-violet-500/30 bg-violet-500/[0.08] p-3.5 text-xs dark:border-violet-400/25 dark:bg-violet-500/10">
+                          <div className="flex flex-wrap items-center justify-between gap-1">
+                            <span className="font-black uppercase tracking-wider text-violet-700 dark:text-violet-300">
+                              🎧 Stepped Audio Helper (2nd Listen)
+                            </span>
+                            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                              Isolate one speaker line at a time by ear (no text
+                              spoiler!)
+                            </span>
+                          </div>
+
+                          <div className="mt-2.5 flex flex-wrap gap-2">
+                            {lesson.dialogue.map((turn, idx) => {
+                              const stepId = `step_line_${idx}`;
+                              const isPlayingStep = playingVocabId === stepId;
+                              return (
+                                <button
+                                  key={stepId}
+                                  type="button"
+                                  onClick={() => {
+                                    setPlayingVocabId(stepId);
+                                    speakSpanishText(turn.text, {
+                                      rate:
+                                        level === "A1"
+                                          ? 0.8
+                                          : usedSlowdown
+                                            ? 0.78
+                                            : 0.9,
+                                      fallbackAudioUrl: lesson.audioUrl,
+                                      onEnd: () =>
+                                        setPlayingVocabId((curr) =>
+                                          curr === stepId ? null : curr
+                                        ),
+                                    });
+                                  }}
+                                  className={cn(
+                                    "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-extrabold transition-all cursor-pointer",
+                                    isPlayingStep
+                                      ? "border-violet-600 bg-violet-600 text-white shadow-xs"
+                                      : "border-violet-500/30 bg-white text-violet-800 hover:bg-violet-50 dark:border-violet-400/30 dark:bg-zinc-900 dark:text-violet-200"
+                                  )}
+                                >
+                                  <Volume2 className="h-3.5 w-3.5" />
+                                  <span>
+                                    {isPlayingStep
+                                      ? `Playing Line ${idx + 1}...`
+                                      : `▶ Line ${idx + 1} (${turn.speaker})`}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -2967,6 +3052,7 @@ function EarshotGameContent() {
                     <EarwormAudioPlayer
                       audioUrl={lesson.audioUrl}
                       lessonId={String(lesson._id)}
+                      level={level}
                       playCount={playCount}
                       allowedPlays={99}
                       usedSlowdown={usedSlowdown}
@@ -2976,6 +3062,139 @@ function EarshotGameContent() {
                       onSlowdownActivated={() => {}}
                       onCafeModeChange={() => {}}
                     />
+
+                    {/* TODAY'S #1 SURVIVAL PHRASE: LISTEN & REPEAT (SHADOWING) */}
+                    {lesson.survivalPhrase && (
+                      <div className="rounded-3xl border-2 border-violet-500/35 bg-gradient-to-br from-violet-500/[0.08] via-white to-emerald-500/[0.06] p-5 shadow-xs dark:border-violet-400/30 dark:from-violet-500/15 dark:via-zinc-900 dark:to-emerald-500/10">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/15 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-violet-700 dark:text-violet-300">
+                            🗣️ Today&apos;s #1 Survival Phrase (Listen &amp; Repeat)
+                          </span>
+                          {practicedShadowing && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#538d4e] px-2.5 py-0.5 text-[11px] font-black text-white">
+                              <Check className="h-3 w-3" />
+                              Practiced Out Loud!
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-3 font-serif text-xl font-black text-zinc-900 dark:text-white">
+                          “{lesson.survivalPhrase.spanish}”
+                        </p>
+                        <p className="mt-1 text-sm font-bold text-[#538d4e] dark:text-emerald-400">
+                          “{lesson.survivalPhrase.english}”
+                        </p>
+
+                        {showPhoneticHint && (
+                          <div className="mt-2 rounded-xl border border-violet-500/25 bg-white/80 px-3 py-2 font-mono text-xs font-bold text-violet-800 dark:bg-zinc-950/70 dark:text-violet-300">
+                            🔊 Pronunciation:{" "}
+                            <span>{lesson.survivalPhrase.phoneticHint}</span>
+                          </div>
+                        )}
+
+                        <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">
+                          <strong>When to use it: </strong>
+                          {lesson.survivalPhrase.whenToUse}
+                        </p>
+
+                        <div className="mt-3.5 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPlayingVocabId("shadow_normal");
+                              speakSpanishText(
+                                lesson.survivalPhrase?.spanish ?? "",
+                                {
+                                  rate: 0.92,
+                                  fallbackAudioUrl: lesson.audioUrl,
+                                  onEnd: () =>
+                                    setPlayingVocabId((c) =>
+                                      c === "shadow_normal" ? null : c
+                                    ),
+                                }
+                              );
+                            }}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-black transition-all cursor-pointer",
+                              playingVocabId === "shadow_normal"
+                                ? "bg-amber-500 text-zinc-950"
+                                : "bg-[#538d4e] text-white hover:bg-[#467a42]"
+                            )}
+                          >
+                            <Volume2 className="h-3.5 w-3.5" />
+                            <span>▶ Normal Speed</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPlayingVocabId("shadow_slow");
+                              speakSpanishText(
+                                lesson.survivalPhrase?.spanish ?? "",
+                                {
+                                  rate: 0.68,
+                                  fallbackAudioUrl: lesson.audioUrl,
+                                  onEnd: () =>
+                                    setPlayingVocabId((c) =>
+                                      c === "shadow_slow" ? null : c
+                                    ),
+                                }
+                              );
+                            }}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 rounded-xl border-2 px-3.5 py-2 text-xs font-black transition-all cursor-pointer",
+                              playingVocabId === "shadow_slow"
+                                ? "border-violet-600 bg-violet-600 text-white"
+                                : "border-violet-500/40 bg-white text-violet-700 hover:bg-violet-50 dark:bg-zinc-900 dark:text-violet-300"
+                            )}
+                          >
+                            <Volume2 className="h-3.5 w-3.5" />
+                            <span>🐢 Slow syllable pace</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowPhoneticHint((prev) => !prev)
+                            }
+                            className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 cursor-pointer"
+                          >
+                            {showPhoneticHint
+                              ? "Hide Phonetics"
+                              : "🔤 Show Phonetics"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPracticedShadowing(true);
+                              try {
+                                void confetti({
+                                  particleCount: 35,
+                                  spread: 50,
+                                  origin: { y: 0.7 },
+                                });
+                              } catch {
+                                // ignore
+                              }
+                            }}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-black transition-all cursor-pointer",
+                              practicedShadowing
+                                ? "bg-emerald-600 text-white"
+                                : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950"
+                            )}
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                            <span>
+                              {practicedShadowing
+                                ? "Said Out Loud!"
+                                : "I Said It Out Loud!"}
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* OPTION 1: Read the Interactive Audio Transcript of the Dialog */}
                     <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">

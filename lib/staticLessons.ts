@@ -21,6 +21,13 @@ export interface StaticQuestion {
   idealAnswerRubric: string;
 }
 
+export interface SurvivalPhraseInfo {
+  spanish: string;
+  phoneticHint: string;
+  english: string;
+  whenToUse: string;
+}
+
 export interface StaticLesson {
   _id: string;
   dateStr: string;
@@ -31,6 +38,7 @@ export interface StaticLesson {
   dialect: string;
   dialectNotes: string;
   sceneSummary?: string;
+  survivalPhrase?: SurvivalPhraseInfo;
   title: string;
   audioUrl: string;
   dialogue: StaticDialogueTurn[];
@@ -455,6 +463,8 @@ const RAW_MEXICAN_LESSONS: Record<
     dialect: "Mexican Spanish 🇲🇽",
     dialectNotes:
       "Intro level: Clear Mexico City Spanish using everyday words like 'híjole', 'ahorita', 'chido', and 'sale'.",
+    sceneSummary:
+      "Two friends pooling cash outside a subway station to buy steamed basket tacos and sodas.",
     dialogue: [
       {
         speaker: "Carlos",
@@ -537,12 +547,12 @@ const RAW_MEXICAN_LESSONS: Record<
         difficultyLabel: "Q1 • Easy (General Gist)",
         category: "General Gist",
         questionText:
-          "What are Carlos and Valeria trying to figure out outside the subway station?",
+          "What are Carlos and Valeria trying to figure out outside the subway station ('afuera del metro')?",
         options: [
-          "Whether they have enough cash to buy street tacos and sodas",
-          "Which subway line they need to take to get to a restaurant",
-          "Where to find an ATM because they lost their wallets",
-          "How to cook potato and bean tacos at home tonight",
+          "Whether they have enough cash ('efectivo') to buy street tacos and sodas ('refrescos')",
+          "Which subway line ('línea del metro') they need to take to get to a restaurant",
+          "Where to find an ATM ('cajero') because they lost their wallets",
+          "How to cook potato and bean tacos ('tacos de papa y frijol') at home tonight",
         ],
         correctOptionIndex: 0,
         explanation:
@@ -557,10 +567,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "How much money does Carlos have on him, and how much does an order of 5 tacos cost?",
         options: [
-          "He has a 20-peso bill, and the tacos cost 50 pesos",
-          "He has a 50-peso bill, and the order of 5 tacos costs 40 pesos",
-          "He has 100 pesos in coins, and the tacos cost 60 pesos",
-          "He has no cash at all, so Valeria pays 40 pesos by card",
+          "He has a 20-peso bill ('veinte pesos'), and the tacos cost 50 pesos ('cincuenta pesos')",
+          "He has a 50-peso bill ('cincuenta pesos'), and the 5 tacos cost 40 pesos ('cuarenta pesos')",
+          "He has 100 pesos in coins ('cien pesos'), and the tacos cost 60 pesos ('sesenta pesos')",
+          "He has no cash at all, so Valeria pays 40 pesos by card ('con tarjeta')",
         ],
         correctOptionIndex: 1,
         explanation:
@@ -575,10 +585,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "Which taco fillings does Valeria ask Carlos to order for them to share?",
         options: [
-          "Five carnitas tacos with red salsa",
-          "Three chicken tacos and two cheese tacos",
-          "Two potato-with-chorizo tacos and three bean tacos",
-          "Four steak tacos and one potato taco",
+          "Five pork tacos with red salsa ('cinco de carnitas con salsa roja')",
+          "Three chicken tacos and two cheese tacos ('tres de pollo y dos de queso')",
+          "Two potato-with-chorizo and three bean tacos ('dos de papa con chorizo y tres de frijol')",
+          "Four steak tacos and one potato taco ('cuatro de bistec y uno de papa')",
         ],
         correctOptionIndex: 2,
         explanation:
@@ -611,10 +621,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "At the very end, Valeria warns Carlos: '¡Cuidado con la salsa verde que pica un montón!' What is she warning him about?",
         options: [
-          "The green salsa costs extra money",
-          "The green salsa is super spicy",
-          "The green salsa is sour and spoiled",
-          "The green salsa stains your clothes easily",
+          "The green salsa costs extra money ('cuesta más')",
+          "The green salsa is super spicy ('pica un montón')",
+          "The green salsa is sour and spoiled ('está agria')",
+          "The green salsa stains your clothes easily ('mancha la ropa')",
         ],
         correctOptionIndex: 1,
         explanation:
@@ -636,6 +646,8 @@ const RAW_MEXICAN_LESSONS: Record<
     dialect: "Mexican Spanish 🇲🇽",
     dialectNotes:
       "Intro level: Clear Mexican Spanish featuring everyday vocabulary like '¿mande?', 'concha', 'camión' (bus), and 'yo invito'.",
+    sceneSummary:
+      "Grabbing spiced coffee and sweet bread at a neighborhood bakery before catching the morning bus.",
     dialogue: [
       {
         speaker: "Sofía",
@@ -705,10 +717,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "Where are Sofía and Luis stopping on their way to work, and why?",
         options: [
-          "At a bakery to grab hot coffee and sweet bread on a cold morning",
-          "At a pharmacy because Luis has a cold and needs medicine",
-          "At a phone repair shop because Luis dropped his cell phone",
-          "At a supermarket to buy groceries for dinner tonight",
+          "At a bakery ('la panadería') to grab hot coffee and sweet bread on a cold morning",
+          "At a pharmacy ('la farmacia') because Luis has a cold and needs medicine",
+          "At a phone shop ('tienda de celulares') because Luis dropped his phone",
+          "At a supermarket ('el súper') to buy groceries for dinner tonight",
         ],
         correctOptionIndex: 0,
         explanation:
@@ -723,10 +735,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "Why didn't Luis catch what Sofía said the first time she spoke?",
         options: [
-          "A loud bus was passing by on the avenue",
-          "He was distracted looking at his cell phone",
-          "He was talking to the bakery cashier",
-          "He was still half-asleep because he woke up late",
+          "A loud bus was passing by on the avenue ('por la avenida')",
+          "He was distracted looking at his cell phone ('estaba viendo mi celular')",
+          "He was talking to the bakery cashier ('el cajero')",
+          "He was still half-asleep because he woke up late ('se despertó tarde')",
         ],
         correctOptionIndex: 1,
         explanation:
@@ -740,10 +752,10 @@ const RAW_MEXICAN_LESSONS: Record<
         questionText:
           "How much does the bakery order cost in total, and how soon does their bus arrive?",
         options: [
-          "50 pesos total, and the bus arrives in 15 minutes",
-          "20 pesos total, and the bus arrives in 5 minutes",
-          "35 pesos total, and the bus arrives in 8 minutes",
-          "45 pesos total, and the bus is already waiting outside",
+          "50 pesos total ('cincuenta pesos'), and the bus arrives in 15 minutes ('quince minutos')",
+          "20 pesos total ('veinte pesos'), and the bus arrives in 5 minutes ('cinco minutos')",
+          "35 pesos total ('treinta y cinco pesos'), and the bus arrives in 8 minutes ('ocho minutos')",
+          "45 pesos total ('cuarenta y cinco pesos'), and the bus is already outside",
         ],
         correctOptionIndex: 2,
         explanation:
@@ -776,7 +788,7 @@ const RAW_MEXICAN_LESSONS: Record<
           "When Luis says 'Yo invito hoy, Sofía. Pero apúrate...', what is he telling her?",
         options: [
           "He is inviting her to a party tonight, if she finishes work early",
-          "It's his treat (he's paying today), but she needs to hurry up",
+          "It's his treat ('yo invito' = I'm paying), but she needs to hurry up ('apúrate')",
           "She should pay today, and he will pay her back on the bus",
           "He wants her to order for him while he goes to the bus stop",
         ],
@@ -1554,12 +1566,14 @@ export const SEEDED_PREVIOUS_DAYS_VOCAB: VocabHistoryEntry[] = [
 
 /**
  * Simulated friends for the static MVP Leaderboard so the user can preview
- * how the friend group leaderboard looks with `/ 5` scores and Vocab Stars.
+ * how the friend group leaderboard looks with level-normalized `/ 5` scores and Vocab Stars.
  */
 export const SIMULATED_GROUP_FRIENDS: Array<{
   userId: string;
   deviceId: string;
   username: string;
+  level: string;
+  levelLabel: string;
   currentStreak: number;
   scoreOutOf5: number;
   vocabStar: VocabStarTier;
@@ -1568,6 +1582,8 @@ export const SIMULATED_GROUP_FRIENDS: Array<{
     userId: "sim_friend_1",
     deviceId: "sim_1",
     username: "Sofia (Demo Friend)",
+    level: "B1",
+    levelLabel: "💬 Conversational",
     currentStreak: 5,
     scoreOutOf5: 4.5,
     vocabStar: "gold",
@@ -1576,6 +1592,8 @@ export const SIMULATED_GROUP_FRIENDS: Array<{
     userId: "sim_friend_2",
     deviceId: "sim_2",
     username: "Mateo (Demo Friend)",
+    level: "A2",
+    levelLabel: "🌱 Intro",
     currentStreak: 3,
     scoreOutOf5: 3.8,
     vocabStar: "silver",
@@ -1584,11 +1602,74 @@ export const SIMULATED_GROUP_FRIENDS: Array<{
     userId: "sim_friend_3",
     deviceId: "sim_3",
     username: "Camila (Demo Friend)",
+    level: "A1",
+    levelLabel: "🐣 Basic",
     currentStreak: 2,
     scoreOutOf5: 3.0,
     vocabStar: "bronze",
   },
 ];
+
+const SURVIVAL_PHRASES_BY_LESSON: Record<string, SurvivalPhraseInfo> = {
+  "A1:1": {
+    spanish: "¿Me da un agua de mango, por favor?",
+    phoneticHint: "meh dah oon AH-gwah deh MAHN-goh, por fah-VOR",
+    english: "Can you give me a mango water, please?",
+    whenToUse:
+      "Use '¿Me da...?' anytime you order food, drinks, or items at a stand, bakery, or café in Mexico.",
+  },
+  "A1:2": {
+    spanish: "Disculpe, ¿dónde está la estación del metro más cercana?",
+    phoneticHint:
+      "dees-KOOL-peh, DOHN-deh ehs-TAH lah ehs-tah-SYON dehl MEH-troh mahs sehr-KAH-nah",
+    english: "Excuse me, where is the nearest subway station?",
+    whenToUse:
+      "Use 'Disculpe, ¿dónde está...?' to politely ask anyone on the street for directions.",
+  },
+  "A2:1": {
+    spanish: "¿Tienes efectivo? Es que no aceptan tarjeta.",
+    phoneticHint: "TYEH-nehs eh-fehk-TEE-voh? ehs keh noh ah-SEHP-tahn tar-HEH-tah",
+    english: "Do you have cash? They don't take cards.",
+    whenToUse:
+      "Essential when buying street food ('tacos de canasta', 'tianguis') where vendors only take cash.",
+  },
+  "A2:2": {
+    spanish: "Yo invito hoy, pero apúrate porque pasa el camión.",
+    phoneticHint: "yoh een-VEE-toh oy, PEH-roh ah-POO-rah-teh por-keh PAH-sah ehl kah-MYON",
+    english: "It's my treat today, but hurry up because the bus is coming.",
+    whenToUse:
+      "Say 'Yo invito' whenever you want to treat a friend to coffee, tacos, or drinks!",
+  },
+  "B1:1": {
+    spanish: "Trato hecho, yo pongo esa lana.",
+    phoneticHint: "TRAH-toh EH-choh, yoh POHN-goh EH-sah LAH-nah",
+    english: "Deal, I'll put up that cash.",
+    whenToUse:
+      "Use 'Trato hecho' to seal an agreement and 'lana' as casual Mexican slang for money.",
+  },
+  "B1:2": {
+    spanish: "No te claves, ahorita nos echamos unos tacos al pastor.",
+    phoneticHint:
+      "noh teh KLAH-vehs, ah-oh-REE-tah nohs eh-CHAH-mohs OO-nohs TAH-kohs ahl pahs-TOR",
+    english: "Don't stress over it, right now let's grab some al pastor tacos.",
+    whenToUse:
+      "Use 'echarse unos tacos / unas chelas' as the natural Mexican way to say 'grab tacos or drinks'.",
+  },
+  "B2:1": {
+    spanish: "Ya ni llorar es bueno, vámonos en Metro.",
+    phoneticHint: "yah nee yoh-RAR ehs BWEH-noh, VAH-moh-nohs ehn MEH-troh",
+    english: "There's no use crying over spilled milk, let's take the Metro.",
+    whenToUse:
+      "Say 'Ya ni llorar es bueno' when plans go sideways and it's time to roll with it.",
+  },
+  "B2:2": {
+    spanish: "¡Sobres! Llega de volada, te quedó con madre.",
+    phoneticHint: "SOH-brehs! YEH-gah deh voh-LAH-dah, teh keh-DOH kohn MAH-dreh",
+    english: "Deal! It arrives super fast—you nailed it!",
+    whenToUse:
+      "Classic Northern/Mexican slang ('¡Sobres!' = deal, 'de volada' = right away).",
+  },
+};
 
 export function getStaticMexicanSpanishLesson(
   dateStr: string,
@@ -1607,6 +1688,10 @@ export function getStaticMexicanSpanishLesson(
     _id: `static_Spanish_${safeLevel}_${safeClip}`,
     dateStr,
     audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.${ext}`,
+    survivalPhrase:
+      base.survivalPhrase ??
+      SURVIVAL_PHRASES_BY_LESSON[key] ??
+      SURVIVAL_PHRASES_BY_LESSON["A1:1"],
   };
 }
 
@@ -1715,6 +1800,7 @@ export function calculateScoreOutOf5(params: {
   rawScore: number; // 0-100
   usedSlowdown: boolean;
   usedCafeMode: boolean;
+  level?: string;
   usedSecondAttempt?: boolean;
   usedSecondListen?: boolean;
   firstTryCorrectCount?: number;
@@ -1779,13 +1865,22 @@ export function calculateScoreOutOf5(params: {
   }
 
   if (params.usedSlowdown) {
-    const slowPenalty = Number((baseScoreOutOf5 * 0.2).toFixed(1));
-    runningScore = Math.max(0, runningScore - slowPenalty);
-    bonusesAndPenalties.push({
-      label: "Slow Playback (0.75x)",
-      effectText: `-${slowPenalty.toFixed(1)} pts (-20%)`,
-      type: "penalty",
-    });
+    if (params.level === "A1") {
+      // Penalty-free on Basic (A1) so beginners can train syllable & word segmentation without punishment
+      bonusesAndPenalties.push({
+        label: "Slow Playback (0.75x • Basic Level)",
+        effectText: "Free on Basic! (0 Penalty)",
+        type: "neutral",
+      });
+    } else {
+      const slowPenalty = Number((baseScoreOutOf5 * 0.2).toFixed(1));
+      runningScore = Math.max(0, runningScore - slowPenalty);
+      bonusesAndPenalties.push({
+        label: "Slow Playback (0.75x)",
+        effectText: `-${slowPenalty.toFixed(1)} pts (-20%)`,
+        type: "penalty",
+      });
+    }
   }
 
   if (params.usedCafeMode) {
@@ -1830,7 +1925,7 @@ export function calculateScoreOutOf5(params: {
  * Questions answered right on the 2nd try earn 14 raw points (0.7 / 5).
  */
 export function gradeMultipleChoiceLocally(params: {
-  lesson: Pick<StaticLesson, "questions" | "slangNotes">;
+  lesson: Pick<StaticLesson, "questions" | "slangNotes" | "level">;
   selectedIndices: Record<string, number | undefined>;
   usedSlowdown: boolean;
   usedCafeMode: boolean;
@@ -1901,7 +1996,7 @@ export function gradeMultipleChoiceLocally(params: {
   const rawScore = firstTryCorrectCount * 20 + secondTryCorrectCount * 14;
 
   let multiplier = 1.0;
-  if (params.usedSlowdown) {
+  if (params.usedSlowdown && params.lesson.level !== "A1") {
     multiplier -= 0.2;
   }
   if (params.usedCafeMode) {

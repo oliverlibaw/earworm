@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 interface EarwormAudioPlayerProps {
   audioUrl: string;
   lessonId: string;
+  level?: string;
   playCount: number;
   allowedPlays: number; // 1 in Round 1, 2 in Round 2 (after first Submit)
   usedSlowdown: boolean;
@@ -28,6 +29,7 @@ interface EarwormAudioPlayerProps {
 export function EarwormAudioPlayer({
   audioUrl,
   lessonId,
+  level = "B1",
   playCount,
   allowedPlays,
   usedSlowdown,
@@ -404,7 +406,7 @@ export function EarwormAudioPlayer({
         </Button>
       </div>
 
-      {/* Two Modifier Buttons Side-by-Side: Slow Playback (20% Penalty) | Add Background Noise (+1 Pt Bonus • Traffic) */}
+      {/* Two Modifier Buttons Side-by-Side: Slow Playback (Free on Basic / 20% Penalty on others) | Add Background Noise (+1 Pt Bonus • Traffic) */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <button
           type="button"
@@ -412,15 +414,21 @@ export function EarwormAudioPlayer({
           className={cn(
             "flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-2.5 text-xs font-bold transition-all cursor-pointer",
             playbackRate === 0.75 || usedSlowdown
-              ? "border-[#b59f3b] bg-[#b59f3b] text-white"
+              ? level === "A1"
+                ? "border-violet-600 bg-violet-600 text-white"
+                : "border-[#b59f3b] bg-[#b59f3b] text-white"
               : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-700"
           )}
         >
           <Gauge className="h-4 w-4 shrink-0" />
           <span>
-            {playbackRate === 0.75
-              ? "Slow Playback ON (20% Penalty)"
-              : "Slow Playback (20% Penalty)"}
+            {level === "A1"
+              ? playbackRate === 0.75
+                ? "Slow Playback ON (Free on Basic!)"
+                : "Slow Playback (Free on Basic!)"
+              : playbackRate === 0.75
+                ? "Slow Playback ON (20% Penalty)"
+                : "Slow Playback (20% Penalty)"}
           </span>
         </button>
 
