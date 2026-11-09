@@ -1,115 +1,133 @@
 {
-  "id": "ep-010",
-  "episodeNumber": 10,
+  "id": "ep-011",
+  "episodeNumber": 11,
   "date": "2026-11-15",
-  "title": "Perdiendo el AVE en Atocha",
-  "region": "Spain",
-  "regionFlag": "🇪🇸",
-  "ambientType": "transit",
+  "title": "Mate y facturas en la costanera",
+  "region": "Argentina",
+  "regionFlag": "🇦🇷",
+  "ambientType": "street",
   "audioUrl": "/earworm/episodes/2026-11-15.mp3",
-  "durationSeconds": 29.3,
+  "durationSeconds": 40.75,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Álvaro",
-      "gender": "male",
-      "spanish": "¡Corre, Elena, que el control de equipaje del AVE cierra en tres minutos!",
-      "english": "Run, Elena, the baggage check for the high-speed train closes in three minutes!",
-      "startTime": 0.14,
-      "endTime": 6.6
+      "speaker": "Micaela",
+      "gender": "female",
+      "spanish": "Che, Nico, mirá qué lindo solcito hay hoy en la costanera. ¿Trajiste el termo con agua caliente?",
+      "english": "Hey, Nico, look what lovely sunshine there is on the waterfront today. Did you bring the thermos with hot water?",
+      "startTime": 0.5,
+      "endTime": 7.68
     },
     {
       "id": 2,
-      "speaker": "Elena",
-      "gender": "female",
-      "spanish": "¡Madre mía, qué agobio! Es que el autobús venía a tope por el atasco en la Castellana.",
-      "english": "Oh my goodness, how stressful! The bus was packed to the gills because of the traffic jam on La Castellana.",
+      "speaker": "Nico",
+      "gender": "male",
+      "spanish": "¡Olvidate! Está a ochenta grados, ideal para cebar unos buenos mates amargos.",
+      "english": "You bet! It's at eighty degrees, ideal for brewing some good unsweetened mates.",
+      "startTime": 8.03,
+      "endTime": 14.15,
       "slang": {
-        "term": "a tope",
-        "literalMeaning": "to the bumper / limit",
-        "actualMeaning": "packed full / to the max (very common in Spain)",
-        "example": "El vagón del metro iba a tope a las ocho de la mañana."
-      },
-      "startTime": 7.03,
-      "endTime": 14.64
+        "term": "¡Olvidate!",
+        "literalMeaning": "forget about it!",
+        "actualMeaning": "You bet! / Of course! / Definitely! (enthusiastic Argentine affirmation)",
+        "example": "¿Venís al cumple de Sofi mañana? ¡Olvidate!"
+      }
     },
     {
       "id": 3,
-      "speaker": "Álvaro",
-      "gender": "male",
-      "spanish": "Por los pelos, tía... Mira, somos el coche cuatro, asientos de ventanilla.",
-      "english": "By the skin of our teeth, girl... Look, we're car four, window seats.",
+      "speaker": "Micaela",
+      "gender": "female",
+      "spanish": "Bueno, yo pasé recién por la panadería del barrio y compré una docena de facturas con dulce de leche.",
+      "english": "Well, I just stopped by the neighborhood bakery and bought a dozen pastries with dulce de leche.",
+      "startTime": 14.5,
+      "endTime": 21.89,
       "slang": {
-        "term": "Por los pelos",
-        "literalMeaning": "by the hairs",
-        "actualMeaning": "by the skin of one's teeth / just barely in time",
-        "example": "Llegamos al embarque por los pelos."
-      },
-      "startTime": 15.07,
-      "endTime": 22.2
+        "term": "facturas",
+        "literalMeaning": "invoices / bills",
+        "actualMeaning": "sweet bakery pastries (in Argentina, 'facturas' at a bakery are pastries!)",
+        "example": "Traje una docena de facturas para tomar el mate en la tarde."
+      }
     },
     {
       "id": 4,
-      "speaker": "Elena",
+      "speaker": "Nico",
+      "gender": "male",
+      "spanish": "¡Sos una genia total! O sea, hacía toda la semana que tenía ganas de comer vigilantes y medialunas.",
+      "english": "You're an absolute legend! I mean, all week long I've been craving pastries and croissants.",
+      "startTime": 22.24,
+      "endTime": 30.45
+    },
+    {
+      "id": 5,
+      "speaker": "Micaela",
       "gender": "female",
-      "spanish": "¡Qué alivio! En cuanto arranque el tren me echo una siesta hasta llegar a Valencia.",
-      "english": "What a relief! As soon as the train pulls out I'm taking a nap all the way to Valencia.",
-      "startTime": 22.63,
-      "endTime": 29.06
+      "spanish": "Sentémonos en ese banco de madera frente al río que corre una brisa divina.",
+      "english": "Let's sit on that wooden bench facing the river where there's a lovely breeze.",
+      "startTime": 30.8,
+      "endTime": 36.2
+    },
+    {
+      "id": 6,
+      "speaker": "Nico",
+      "gender": "male",
+      "spanish": "Dale, pero ojo con el primer mate que siempre sale un poco fuerte y caliente, ¿viste?",
+      "english": "Sure, just watch out for the first mate since it always comes out a bit strong and hot, you know?",
+      "startTime": 36.55,
+      "endTime": 43.39
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why were Álvaro and Elena almost late for their high-speed train ('el AVE')?",
+      "question": "Where are Micaela and Nico spending the afternoon?",
       "options": [
-        "Their bus was packed and stuck in a traffic jam on La Castellana",
-        "Elena packed the wrong suitcase",
-        "They went to the wrong train station in Madrid",
-        "Their alarm clock didn't ring"
+        "On a wooden bench facing the river along the waterfront ('la costanera')",
+        "Inside a shopping mall downtown",
+        "At Nico's office",
+        "On a long-distance bus"
       ],
       "correctIndex": 0,
-      "explanation": "Elena says: 'el autobús venía a tope por el atasco en la Castellana.'"
+      "explanation": "They are at 'la costanera' (the waterfront) and sit on 'ese banco de madera frente al río.'"
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "Which train car and seats do they have, and what city are they traveling to?",
+      "question": "What did Micaela buy at the neighborhood bakery to share with the mate?",
       "options": [
-        "Car 4, window seats, heading to Valencia",
-        "Car 1, aisle seats, heading to Barcelona",
-        "Car 7, dining car, heading to Seville",
-        "Car 2, window seats, heading to Toledo"
+        "A dozen pastries ('facturas') with dulce de leche",
+        "Two ham and cheese sandwiches",
+        "A bag of apples and oranges",
+        "A box of pizza"
       ],
       "correctIndex": 0,
-      "explanation": "Álvaro says 'somos el coche cuatro, asientos de ventanilla' and Elena says she'll nap 'hasta llegar a Valencia.'"
+      "explanation": "Micaela says: 'compré una docena de facturas con dulce de leche.'"
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "How much time was left before baggage security closed when they arrived?",
+      "question": "What does Nico warn Micaela about at the end?",
       "options": [
-        "3 minutes",
-        "15 minutes",
-        "30 minutes",
-        "1 hour"
+        "The first mate always comes out a bit strong and hot",
+        "The water in the thermos is already cold",
+        "The seagulls might steal their pastries",
+        "The park closes at five o'clock"
       ],
       "correctIndex": 0,
-      "explanation": "Álvaro shouts: 'el control de equipaje del AVE cierra en tres minutos!'"
+      "explanation": "Nico warns: 'ojo con el primer mate que siempre sale un poco fuerte y caliente.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: In Spain, what do 'venir a tope' and 'por los pelos' mean?",
+      "question": "Slang Side Quest: When Nico says '¡Olvidate!' and Micaela mentions 'una docena de facturas', what do they mean in Argentina?",
       "options": [
-        "'A tope' = packed full / to the max; 'por los pelos' = by the skin of our teeth / just barely",
-        "'A tope' = very slowly; 'por los pelos' = without luggage",
-        "'A tope' = empty; 'por los pelos' = with messy hair",
-        "'A tope' = broken down; 'por los pelos' = way too early"
+        "'¡Olvidate!' = You bet / Of course!; 'facturas' = sweet bakery pastries",
+        "'¡Olvidate!' = I forgot it!; 'facturas' = electricity bills",
+        "'¡Olvidate!' = Never mind; 'facturas' = bus tickets",
+        "'¡Olvidate!' = Wait for me; 'facturas' = tea bags"
       ],
       "correctIndex": 0,
-      "explanation": "'A tope' means packed full / at maximum capacity, and 'por los pelos' means just barely / by a hair!"
+      "explanation": "In Argentina, '¡Olvidate!' is an enthusiastic 'You bet / Of course!' (not 'I forgot!'), and 'facturas' are bakery pastries!"
     }
   ]
 }

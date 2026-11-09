@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate:episode": "node scripts/generate-episode.mjs",
-    "generate:buffer": "node scripts/generate-episode.mjs --buffer"
+    "generate:episode": "tsx scripts/generate-episode.ts",
+    "generate:buffer": "tsx scripts/generate-episode.ts --batch 14 --start-date 2026-11-06"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.7.0",
     "@google/genai": "^1.0.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-select": "^2.1.6",
@@ -24,6 +25,7 @@
     "convex": "^1.21.0",
     "lucide-react": "^0.475.0",
     "next": "^15.2.0",
+    "openai": "^7.54.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.2",
@@ -35,8 +37,11 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.0"
   }
 }

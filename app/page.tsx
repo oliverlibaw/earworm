@@ -41,10 +41,17 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
-import { ArchiveDrawer } from "@/components/ArchiveDrawer";
+import {
+  ArchiveDrawer,
+  ArchiveLastThreeDaysCard,
+} from "@/components/ArchiveDrawer";
 import { EarwormAudioPlayer } from "@/components/EarwormAudioPlayer";
 import { InteractiveTranscript } from "@/components/InteractiveTranscript";
-import { episodeToStaticLesson } from "@/lib/episodeHelpers";
+import {
+  DAILY_RESULTS_STORAGE_KEY,
+  type DailyDateResult,
+  episodeToStaticLesson,
+} from "@/lib/episodeHelpers";
 import { speakSpanishText } from "@/lib/speechAudio";
 import type { Episode } from "@/types/episode";
 import {
@@ -395,6 +402,9 @@ function EarshotGameContent() {
   const [episodeScoresById, setEpisodeScoresById] = useState<
     Record<string, number>
   >({});
+  const [dailyResultsByDate, setDailyResultsByDate] = useState<
+    Record<string, DailyDateResult>
+  >({});
 
   // Authoritative lesson for the selected (level, clipNumber) or Archive Episode
   const lesson = useMemo(() => {
@@ -485,6 +495,17 @@ function EarshotGameContent() {
       if (savedEpScores) {
         setEpisodeScoresById(
           JSON.parse(savedEpScores) as Record<string, number>
+        );
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      const savedByDate = localStorage.getItem(DAILY_RESULTS_STORAGE_KEY);
+      if (savedByDate) {
+        setDailyResultsByDate(
+          JSON.parse(savedByDate) as Record<string, DailyDateResult>
         );
       }
     } catch {
@@ -857,6 +878,39 @@ function EarshotGameContent() {
       timestamp: Date.now(),
     };
 
+    const activeDateKey = selectedArchiveEpisode
+      ? selectedArchiveEpisode.date
+      : todayStr;
+    const activeEpisodeId = selectedArchiveEpisode
+      ? selectedArchiveEpisode.id
+      : String(lesson._id);
+
+    setDailyResultsByDate((prev) => {
+      const prevEntry = prev[activeDateKey];
+      const nextEntry: DailyDateResult = {
+        date: activeDateKey,
+        episodeId: activeEpisodeId,
+        status: "completed",
+        correctCount: Math.max(
+          prevEntry?.correctCount ?? 0,
+          graded.correctCount
+        ),
+        totalQuestions: lesson.questions.length,
+        scoreOutOf5: Math.max(
+          prevEntry?.scoreOutOf5 ?? 0,
+          outOf5Info.scoreOutOf5
+        ),
+        updatedAt: Date.now(),
+      };
+      const next = { ...prev, [activeDateKey]: nextEntry };
+      try {
+        localStorage.setItem(DAILY_RESULTS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+
     if (selectedArchiveEpisode) {
       setEpisodeScoresById((prev) => {
         const prevBest = prev[selectedArchiveEpisode.id] ?? 0;
@@ -1022,6 +1076,33 @@ function EarshotGameContent() {
       );
       setCurrentQuestionIdx(firstMissedIdx >= 0 ? firstMissedIdx : 0);
       setStage("round2");
+
+      // Record "in_progress" status in localStorage dictionary keyed by YYYY-MM-DD
+      const activeDateKey = selectedArchiveEpisode
+        ? selectedArchiveEpisode.date
+        : todayStr;
+      const activeEpisodeId = selectedArchiveEpisode
+        ? selectedArchiveEpisode.id
+        : String(lesson._id);
+      setDailyResultsByDate((prev) => {
+        if (prev[activeDateKey]?.status === "completed") return prev;
+        const nextEntry: DailyDateResult = {
+          date: activeDateKey,
+          episodeId: activeEpisodeId,
+          status: "in_progress",
+          correctCount: localRes.correctCount,
+          totalQuestions: lesson.questions.length,
+          scoreOutOf5: 0,
+          updatedAt: Date.now(),
+        };
+        const next = { ...prev, [activeDateKey]: nextEntry };
+        try {
+          localStorage.setItem(DAILY_RESULTS_STORAGE_KEY, JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -2528,7 +2609,7 @@ function EarshotGameContent() {
                   title="Open 3-Day Archive Drawer (Today + Past 3 Days)"
                 >
                   <Calendar className="h-3.5 w-3.5 text-[#538d4e] dark:text-emerald-400" />
-                  <span>Archive</span>
+                  <span>Archive (Last 3 Days)</span>
                 </button>
 
                 <button
@@ -3330,59 +3411,35 @@ function EarshotGameContent() {
                       </div>
                     )}
 
-                    {/* OPTION 1: Read the Interactive Audio Transcript of the Dialog */}
+                    {/* Interactive Transcript with Slice Playback, Speed Toggle & Slang Highlights */}
                     <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <h3 className="font-serif text-lg font-black text-zinc-900 dark:text-white">
-                            Dialog Transcript (with Line-by-Line Audio)
-                          </h3>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                            Read the Spanish transcript, tap any line to hear it
-                            aloud, and try answering the questions again below.
-                          </p>
-                        </div>
-
-                        <Button
-                          type="button"
-                          variant={
-                            showPracticeTranscript ? "outline" : "default"
-                          }
-                          size="sm"
-                          onClick={() =>
-                            setShowPracticeTranscript((prev) => !prev)
-                          }
-                          className={cn(
-                            !showPracticeTranscript &&
-                              "bg-[#538d4e] text-white hover:bg-[#467a42]"
-                          )}
-                        >
-                          {showPracticeTranscript ? (
-                            <>
-                              <EyeOff className="h-4 w-4" />
-                              <span>Hide Transcript</span>
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4" />
-                              <span>Read Dialog Transcript</span>
-                            </>
-                          )}
-                        </Button>
-                      </div>
-
-                      {showPracticeTranscript && (
-                        <div className="mt-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                          <InteractiveTranscript
-                            dialogue={lesson.dialogue}
-                            slangNotes={lesson.slangNotes}
-                            audioUrl={lesson.audioUrl}
-                          />
-                        </div>
-                      )}
+                      <InteractiveTranscript
+                        dialogue={lesson.dialogue}
+                        slangNotes={lesson.slangNotes}
+                        audioUrl={lesson.audioUrl}
+                        region={lesson.region}
+                        regionFlag={lesson.regionFlag}
+                      />
                     </div>
 
-                    {/* OPTION 2: Try Answering the 5 Questions Again (Unscored Practice Mode) */}
+                    {/* Prominent Results Screen Callout: "Want another round? Play the last 3 days:" */}
+                    <ArchiveLastThreeDaysCard
+                      todayStr={todayStr}
+                      activeEpisodeId={selectedArchiveEpisode?.id ?? null}
+                      scoreHistory={scoreHistory}
+                      dailyResultsByDate={dailyResultsByDate}
+                      episodeScoresById={episodeScoresById}
+                      onOpenFullDrawer={() => setShowArchiveDrawer(true)}
+                      onSelectEpisode={(episode, slotLabel) => {
+                        setSelectedArchiveEpisode(episode);
+                        setArchiveSlotLabel(slotLabel ?? null);
+                        if (screen !== "play") {
+                          setScreen("play");
+                        }
+                      }}
+                    />
+
+                    {/* OPTION 2: Try Answering the Questions Again (Unscored Practice Mode) */}
                     <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-800">
                         <div>
@@ -3499,7 +3556,7 @@ function EarshotGameContent() {
                           <div className="rounded-2xl border border-[#538d4e]/40 bg-[#538d4e]/10 p-3 text-center text-xs font-bold text-zinc-900 dark:text-zinc-100">
                             Practice Check:{" "}
                             <span className="font-mono text-sm font-black text-[#538d4e] dark:text-emerald-400">
-                              {practiceGradeResult.correctCount} / 5 Correct (
+                              {practiceGradeResult.correctCount} / {lesson.questions.length} Correct (
                               {practiceGradeResult.formattedScoreOutOf5} / 5)
                             </span>{" "}
                             (Unscored — your official score remains{" "}
@@ -3581,6 +3638,7 @@ function EarshotGameContent() {
         activeEpisodeId={selectedArchiveEpisode?.id ?? null}
         scoreHistory={scoreHistory}
         episodeScoresById={episodeScoresById}
+        dailyResultsByDate={dailyResultsByDate}
         onSelectEpisode={(episode, slotLabel) => {
           setSelectedArchiveEpisode(episode);
           setArchiveSlotLabel(slotLabel ?? null);

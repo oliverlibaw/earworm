@@ -1,109 +1,139 @@
 {
-  "id": "ep-011",
-  "episodeNumber": 11,
+  "id": "ep-012",
+  "episodeNumber": 12,
   "date": "2026-11-16",
-  "title": "Mate y facturas en la costanera",
-  "region": "Argentina",
-  "regionFlag": "🇦🇷",
-  "ambientType": "street",
+  "title": "El recibo de la luz en la colonia Roma",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "cafe",
   "audioUrl": "/earworm/episodes/2026-11-16.mp3",
-  "durationSeconds": 32.93,
+  "durationSeconds": 48.46,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Micaela",
-      "gender": "female",
-      "spanish": "Che, Nico, ¡qué lindo solcito hay hoy en la costanera! ¿Trajiste el termo con agua caliente?",
-      "english": "Hey, Nico, what lovely sunshine on the waterfront today! Did you bring the thermos with hot water?",
-      "startTime": 0.14,
-      "endTime": 8.28
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "Oye, Lucía, no te pases... Acabo de ver el recibo de la luz de este bimestre y casi me da un infarto.",
+      "english": "Hey, Lucía, come on now... I just saw this two-month electricity bill and I almost had a heart attack.",
+      "startTime": 0.5,
+      "endTime": 8.56,
+      "slang": {
+        "term": "no te pases",
+        "literalMeaning": "don't pass yourself",
+        "actualMeaning": "come on / don't go too far / you're kidding me",
+        "example": "¡No te pases, te comiste todo el pastel!"
+      }
     },
     {
       "id": 2,
-      "speaker": "Nico",
-      "gender": "male",
-      "spanish": "¡Olvidate! Está a punto para cebar unos buenos mates. Y compré media docena de facturas con dulce de leche.",
-      "english": "You bet! It's at the perfect temperature to brew some good mates. And I bought half a dozen pastries with dulce de leche.",
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Aguanta, Mateo, pues no te esponjes. Es que la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido.",
+      "english": "Hold on, Mateo, well don't get worked up. Last week it was freezing cold and I left the electric space heater on.",
+      "startTime": 8.91,
+      "endTime": 18.41,
       "slang": {
-        "term": "facturas",
-        "literalMeaning": "invoices / bills",
-        "actualMeaning": "sweet bakery pastries (in Argentina, 'facturas' at a bakery are pastries!)",
-        "example": "Traje una docena de facturas para tomar el mate en la tarde."
-      },
-      "startTime": 8.71,
-      "endTime": 17.64
+        "term": "no te esponjes",
+        "literalMeaning": "don't sponge yourself up",
+        "actualMeaning": "don't get puffed up / don't get worked up or angry",
+        "example": "Tranquilo, no te esponjes, fue solo una broma."
+      }
     },
     {
       "id": 3,
-      "speaker": "Micaela",
-      "gender": "female",
-      "spanish": "¡Sos un genio! Sentémonos en ese banco frente al río que corre una brisa divina.",
-      "english": "You're a legend! Let's sit on that bench facing the river where there's a lovely breeze.",
-      "startTime": 18.07,
-      "endTime": 25.2
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "¡Pero si subió al doble! O sea, tú sabes que ahorita ando bien bruja porque no me han pagado el proyecto de diseño.",
+      "english": "It doubled! I mean, you know I'm super broke right now because they haven't paid me for the design project yet.",
+      "startTime": 18.76,
+      "endTime": 26.8,
+      "slang": {
+        "term": "ando bien bruja",
+        "literalMeaning": "I'm walking around very witch",
+        "actualMeaning": "I'm completely broke / out of money (Mexican idiom)",
+        "example": "Fin de quincena y ya ando bien bruja."
+      }
     },
     {
       "id": 4,
-      "speaker": "Nico",
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Bueno, tranquilo, mi primo Javi me debía una lana de los boletos del concierto y me acaba de transferir.",
+      "english": "Well, relax, my cousin Javi owed me cash for the concert tickets and he just sent me a transfer.",
+      "startTime": 27.15,
+      "endTime": 34.76
+    },
+    {
+      "id": 5,
+      "speaker": "Mateo",
       "gender": "male",
-      "spanish": "Dale, pero ojo con el primer mate que siempre sale un poco fuerte, ¿viste?",
-      "english": "Sure, just watch out for the first mate since it always comes out a bit strong, you know?",
-      "startTime": 25.63,
-      "endTime": 32.69
+      "spanish": "Uf, qué alivio... Porque el casero ya me estaba mandando mensajes por WhatsApp desde las ocho de la mañana.",
+      "english": "Phew, what a relief... Because the landlord was already sending me messages on WhatsApp since eight in the morning.",
+      "startTime": 35.11,
+      "endTime": 42.65
+    },
+    {
+      "id": 6,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Yo pongo el setenta por ciento ahorita en la app y te invito unos esquites si me echas la mano con las cajas de la bodega.",
+      "english": "I'll pay seventy percent right now in the app and treat you to some corn cups if you give me a hand with the storage room boxes.",
+      "startTime": 43,
+      "endTime": 51.14
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Where are Micaela and Nico spending the afternoon?",
+      "question": "What caused the two-month electricity bill in Mateo and Lucía's apartment to double?",
       "options": [
-        "On a bench facing the river along the waterfront ('la costanera')",
-        "Inside a shopping mall downtown",
-        "At Nico's office",
-        "On a long-distance bus"
+        "Lucía left the electric space heater on during freezing nights last week",
+        "Mateo left his computer running day and night",
+        "The landlord billed them for the whole building",
+        "Their refrigerator broke"
       ],
       "correctIndex": 0,
-      "explanation": "They are at 'la costanera' (the waterfront) and sit on 'ese banco frente al río' (that bench facing the river)."
+      "explanation": "Lucía admits she left the electric space heater on ('dejé el calentador eléctrico prendido')."
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "What did Nico bring along with his thermos of hot water?",
+      "question": "Why is Mateo broke right now, and how much of the bill does Lucía agree to cover?",
       "options": [
-        "Half a dozen pastries ('facturas') with dulce de leche",
-        "Two ham and cheese sandwiches",
-        "A bag of apples and oranges",
-        "A box of pizza"
+        "He hasn't been paid for his design project yet; Lucía covers 70% of the bill",
+        "He bought concert tickets; Lucía covers 50% of the bill",
+        "He lost his wallet; Lucía covers 100% of the bill",
+        "He paid the water bill; Lucía covers 30% of the bill"
       ],
       "correctIndex": 0,
-      "explanation": "Nico says: 'compré media docena de facturas con dulce de leche.'"
+      "explanation": "Mateo hasn't been paid for his design project yet, and Lucía covers 70% after her cousin Javi paid her back."
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "What does Nico warn Micaela about at the end?",
+      "question": "What favor does Lucía ask of Mateo in exchange for treating him to 'esquites'?",
       "options": [
-        "The first mate always comes out a bit strong/bitter",
-        "The water in the thermos is already cold",
-        "The seagulls might steal their pastries",
-        "The park closes at five o'clock"
+        "Help her with the boxes in the storage room ('la bodega')",
+        "Walk her dog in the park",
+        "Call the landlord back",
+        "Wash the dishes after dinner"
       ],
       "correctIndex": 0,
-      "explanation": "Nico warns: 'ojo con el primer mate que siempre sale un poco fuerte.'"
+      "explanation": "Lucía says: 'te invito unos esquites si me echas la mano con las cajas de la bodega.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: When Nico says '¡Olvidate!' and 'compré media docena de facturas', what do '¡Olvidate!' and 'facturas' mean in Argentina?",
+      "question": "Slang Side Quest: What do 'no te pases', 'no te esponjes', and 'andar bien bruja' mean in Mexican Spanish?",
       "options": [
-        "'¡Olvidate!' = You bet / Of course!; 'facturas' = sweet bakery pastries",
-        "'¡Olvidate!' = I forgot it!; 'facturas' = electricity bills",
-        "'¡Olvidate!' = Never mind; 'facturas' = bus tickets",
-        "'¡Olvidate!' = Wait for me; 'facturas' = tea bags"
+        "'No te pases' = come on/don't go too far; 'no te esponjes' = don't get worked up; 'andar bruja' = to be broke",
+        "'No te pases' = don't walk by; 'no te esponjes' = don't get wet; 'andar bruja' = to stay up late",
+        "'No te pases' = hurry up; 'no te esponjes' = don't eat too much; 'andar bruja' = to be angry",
+        "'No te pases' = excuse me; 'no te esponjes' = don't fall asleep; 'andar bruja' = to be lucky"
       ],
       "correctIndex": 0,
-      "explanation": "In Argentina, '¡Olvidate!' is an enthusiastic 'You bet / Of course!' (not 'I forgot!'), and 'facturas' are bakery pastries!"
+      "explanation": "'No te pases' means 'come on!', 'no te esponjes' means 'don't get puffed up/angry', and 'andar bruja' means to be broke!"
     }
   ]
 }

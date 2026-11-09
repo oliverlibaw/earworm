@@ -1,0 +1,133 @@
+{
+  "id": "ep-016",
+  "episodeNumber": 16,
+  "date": "2026-11-20",
+  "title": "Pizza de molde en la avenida Corrientes",
+  "region": "Argentina",
+  "regionFlag": "🇦🇷",
+  "ambientType": "cafe",
+  "audioUrl": "/earworm/episodes/2026-11-20.mp3",
+  "durationSeconds": 42.29,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Lucas",
+      "gender": "male",
+      "spanish": "Che, Agus, ¡qué buena estuvo la obra de teatro! Pero ahora tengo un hambre bárbaro.",
+      "english": "Hey, Agus, that play was so good! But now I'm super hungry.",
+      "startTime": 0.5,
+      "endTime": 6.67
+    },
+    {
+      "id": 2,
+      "speaker": "Agustina",
+      "gender": "female",
+      "spanish": "Mal, yo también estoy muerta de hambre. Mirá, entremos a esta pizzería clásica acá en Corrientes.",
+      "english": "Totally, I'm starving too. Look, let's go into this classic pizzeria right here on Corrientes Avenue.",
+      "startTime": 7.02,
+      "endTime": 14.53,
+      "slang": {
+        "term": "Mal",
+        "literalMeaning": "badly / wrong",
+        "actualMeaning": "Totally! / Tell me about it! / I agree 100%! (Argentine slang affirmation)",
+        "example": "—Hace muchísimo calor hoy. —¡Mal, no se aguanta!"
+      }
+    },
+    {
+      "id": 3,
+      "speaker": "Lucas",
+      "gender": "male",
+      "spanish": "Bueno, el salón del fondo está lleno, pero podemos comer de parado en la barra como hace todo el mundo.",
+      "english": "Well, the back dining room is full, but we can eat standing up at the counter like everyone else does.",
+      "startTime": 14.88,
+      "endTime": 22.32
+    },
+    {
+      "id": 4,
+      "speaker": "Agustina",
+      "gender": "female",
+      "spanish": "¡Re va! Pidamos dos porciones de muzzarella bien gratinada y dos de fugazzeta rellena con fainá.",
+      "english": "I'm totally down! Let's order two slices of melted mozzarella pizza and two of stuffed onion fugazzeta with chickpea flatbread.",
+      "startTime": 22.67,
+      "endTime": 29.77,
+      "slang": {
+        "term": "Re va",
+        "literalMeaning": "it super goes",
+        "actualMeaning": "That totally works! / I'm totally down for that!",
+        "example": "¿Pedimos helado de postre? ¡Re va!"
+      }
+    },
+    {
+      "id": 5,
+      "speaker": "Lucas",
+      "gender": "male",
+      "spanish": "O sea, con eso quedamos pipón. Yo pido en la caja y traigo dos aguas con gas bien frías.",
+      "english": "I mean, with that we'll be stuffed. I'll order at the register and bring two ice-cold sparkling waters.",
+      "startTime": 30.12,
+      "endTime": 37.34
+    },
+    {
+      "id": 6,
+      "speaker": "Agustina",
+      "gender": "female",
+      "spanish": "Dale, genial, yo voy guardando este rincón de la barra antes de que salga la gente del otro teatro.",
+      "english": "Awesome, I'll hold this corner of the counter before the crowd from the other theater gets out.",
+      "startTime": 37.69,
+      "endTime": 44.87
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Where did Lucas and Agustina just come from before stopping at the pizzeria?",
+      "options": [
+        "A theater play ('la obra de teatro') on Corrientes Avenue",
+        "A soccer game at the stadium",
+        "A late shift at the hospital",
+        "An airport terminal"
+      ],
+      "correctIndex": 0,
+      "explanation": "Lucas says: '¡qué buena estuvo la obra de teatro! Pero ahora tengo un hambre bárbaro.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "Why do they decide to eat standing up at the counter ('de parado en la barra')?",
+      "options": [
+        "The back dining room is full, and eating at the counter is a classic tradition there",
+        "Counter slices are half price",
+        "The pizzeria is closing in five minutes",
+        "They are waiting for a takeaway box"
+      ],
+      "correctIndex": 0,
+      "explanation": "Lucas notes: 'el salón del fondo está lleno, pero podemos comer de parado en la barra como hace todo el mundo.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What specific food order does Agustina suggest?",
+      "options": [
+        "Two slices of mozzarella and two slices of stuffed onion fugazzeta with fainá",
+        "One large pepperoni pizza and a salad",
+        "Four beef empanadas and red wine",
+        "Two ham sandwiches and coffee"
+      ],
+      "correctIndex": 0,
+      "explanation": "Agustina says: 'Pidamos dos porciones de muzzarella bien gratinada y dos de fugazzeta rellena con fainá.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: When Agustina replies '¡Mal!' and '¡Re va!', what do those Argentine expressions mean in context?",
+      "options": [
+        "'¡Mal!' = Totally / I completely agree!; '¡Re va!' = I'm totally down / That works great!",
+        "'¡Mal!' = I feel sick; '¡Re va!' = Leave right now!",
+        "'¡Mal!' = That's wrong; '¡Re va!' = It's too expensive",
+        "'¡Mal!' = Bad service; '¡Re va!' = The bus is coming"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Argentine slang, replying '¡Mal!' to a friend's statement means 'Totally / Tell me about it!', and '¡Re va!' means 'That totally works / I'm in!'"
+    }
+  ]
+}

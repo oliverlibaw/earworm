@@ -1,0 +1,133 @@
+{
+  "id": "ep-017",
+  "episodeNumber": 17,
+  "date": "2026-11-21",
+  "title": "Subiendo en el Metrocable a Parque Arví",
+  "region": "Colombia",
+  "regionFlag": "🇨🇴",
+  "ambientType": "transit",
+  "audioUrl": "/earworm/episodes/2026-11-21.mp3",
+  "durationSeconds": 41.57,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Daniela",
+      "gender": "female",
+      "spanish": "¡Uy, Mateo, mirá esa vista de todo el valle desde la cabina del Metrocable! Qué belleza, ¿cierto?",
+      "english": "Whoa, Mateo, look at that view of the whole valley from the Metrocable gondola! What a beauty, right?",
+      "startTime": 0.5,
+      "endTime": 8.13
+    },
+    {
+      "id": 2,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "¡Sí, está bacanísimo! Pues menos mal que madrugamos hoy porque la fila en la estación Acevedo ya estaba larga.",
+      "english": "Yes, it's super cool! Well thank goodness we got up early today because the line at Acevedo station was already long.",
+      "startTime": 8.48,
+      "endTime": 16.93,
+      "slang": {
+        "term": "bacanísimo",
+        "literalMeaning": "super bacano",
+        "actualMeaning": "super cool / awesome / fantastic (Colombian slang)",
+        "example": "El paseo por el eje cafetero estuvo bacanísimo."
+      }
+    },
+    {
+      "id": 3,
+      "speaker": "Daniela",
+      "gender": "female",
+      "spanish": "Bueno, acuérdate que en la estación Santo Domingo tenemos que hacer transbordo a la línea del parque.",
+      "english": "Well, remember that at Santo Domingo station we have to transfer to the park line.",
+      "startTime": 17.28,
+      "endTime": 24.07
+    },
+    {
+      "id": 4,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "O sea, ¿allá arriba en el bosque hace mucho más frío que acá en Medellín?",
+      "english": "I mean, is it much colder up there in the forest than down here in Medellín?",
+      "startTime": 24.42,
+      "endTime": 29.8
+    },
+    {
+      "id": 5,
+      "speaker": "Daniela",
+      "gender": "female",
+      "spanish": "Claro, baja como ocho grados. Por eso traje dos chompas en el morral para no pasar frío.",
+      "english": "Of course, it drops about eight degrees. That's why I brought two jackets in my backpack so we don't get cold.",
+      "startTime": 30.15,
+      "endTime": 36.89,
+      "slang": {
+        "term": "chompas",
+        "literalMeaning": "jumpers",
+        "actualMeaning": "jackets / hoodies / warm sweaters (Colombian & Andean Spanish)",
+        "example": "Llevá la chompa porque por la noche refresca bastante."
+      }
+    },
+    {
+      "id": 6,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "¡Qué jugada maestra! Apenas lleguemos arriba compramos fresas con crema en el mercado campesino.",
+      "english": "What a pro move! As soon as we get to the top let's buy strawberries and cream at the farmers' market.",
+      "startTime": 37.24,
+      "endTime": 44.2
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "How are Daniela and Mateo traveling up to Parque Arví?",
+      "options": [
+        "By aerial gondola on the Medellín Metrocable, transferring at Santo Domingo station",
+        "By rental car along the highway",
+        "By mountain bike",
+        "By tour bus from downtown Bogotá"
+      ],
+      "correctIndex": 0,
+      "explanation": "They are riding 'la cabina del Metrocable' and transferring at 'la estación Santo Domingo.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "Why did Daniela pack two jackets ('dos chompas') in her backpack?",
+      "options": [
+        "The temperature up in the forest drops about 8 degrees cooler than in the city",
+        "She wants to sell them at the market",
+        "The air conditioning inside the gondola is too strong",
+        "They are camping overnight in the woods"
+      ],
+      "correctIndex": 0,
+      "explanation": "Daniela explains: 'baja como ocho grados. Por eso traje dos chompas en el morral para no pasar frío.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What snack does Mateo want to buy when they arrive at the farmers' market at the top?",
+      "options": [
+        "Strawberries with cream ('fresas con crema')",
+        "Roasted corn on the cob",
+        "Cheese empanadas",
+        "Hot chocolate with bread"
+      ],
+      "correctIndex": 0,
+      "explanation": "Mateo says: 'Apenas lleguemos arriba compramos fresas con crema en el mercado campesino.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Colombia, what do 'bacanísimo', 'chompas', and 'morral' mean?",
+      "options": [
+        "'Bacanísimo' = super cool/awesome; 'chompas' = jackets/hoodies; 'morral' = backpack",
+        "'Bacanísimo' = very high up; 'chompas' = boots; 'morral' = ticket",
+        "'Bacanísimo' = scary; 'chompas' = sandwiches; 'morral' = wallet",
+        "'Bacanísimo' = crowded; 'chompas' = umbrellas; 'morral' = camera"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Colombia, 'bacano / bacanísimo' means cool/awesome, 'una chompa' is a jacket/hoodie, and 'el morral' is a backpack!"
+    }
+  ]
+}

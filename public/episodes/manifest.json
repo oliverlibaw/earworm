@@ -1,0 +1,200 @@
+[
+  {
+    "id": "ep-001",
+    "episodeNumber": 1,
+    "date": "2026-11-05",
+    "title": "Tacos de canasta afuera del metro",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "street",
+    "durationSeconds": 45.05,
+    "audioUrl": "/earworm/episodes/2026-11-05.mp3"
+  },
+  {
+    "id": "ep-002",
+    "episodeNumber": 2,
+    "date": "2026-11-06",
+    "title": "La cuenta dividida en el café de Madrid",
+    "region": "Spain",
+    "regionFlag": "🇪🇸",
+    "ambientType": "cafe",
+    "durationSeconds": 41.98,
+    "audioUrl": "/earworm/episodes/2026-11-06.mp3"
+  },
+  {
+    "id": "ep-003",
+    "episodeNumber": 3,
+    "date": "2026-11-07",
+    "title": "El subte cerrado en Palermo",
+    "region": "Argentina",
+    "regionFlag": "🇦🇷",
+    "ambientType": "transit",
+    "durationSeconds": 41.86,
+    "audioUrl": "/earworm/episodes/2026-11-07.mp3"
+  },
+  {
+    "id": "ep-004",
+    "episodeNumber": 4,
+    "date": "2026-11-08",
+    "title": "Fruta fresca en la plaza de Medellín",
+    "region": "Colombia",
+    "regionFlag": "🇨🇴",
+    "ambientType": "market",
+    "durationSeconds": 37.06,
+    "audioUrl": "/earworm/episodes/2026-11-08.mp3"
+  },
+  {
+    "id": "ep-005",
+    "episodeNumber": 5,
+    "date": "2026-11-09",
+    "title": "El café de olla y el pan dulce en Coyoacán",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "cafe",
+    "durationSeconds": 39.05,
+    "audioUrl": "/earworm/episodes/2026-11-09.mp3"
+  },
+  {
+    "id": "ep-006",
+    "episodeNumber": 6,
+    "date": "2026-11-10",
+    "title": "Tapas de última hora en Lavapiés",
+    "region": "Spain",
+    "regionFlag": "🇪🇸",
+    "ambientType": "street",
+    "durationSeconds": 40.56,
+    "audioUrl": "/earworm/episodes/2026-11-10.mp3"
+  },
+  {
+    "id": "ep-007",
+    "episodeNumber": 7,
+    "date": "2026-11-11",
+    "title": "Asado del domingo en San Telmo",
+    "region": "Argentina",
+    "regionFlag": "🇦🇷",
+    "ambientType": "market",
+    "durationSeconds": 42.77,
+    "audioUrl": "/earworm/episodes/2026-11-11.mp3"
+  },
+  {
+    "id": "ep-008",
+    "episodeNumber": 8,
+    "date": "2026-11-12",
+    "title": "Un tinto antes del aguacero en Bogotá",
+    "region": "Colombia",
+    "regionFlag": "🇨🇴",
+    "ambientType": "cafe",
+    "durationSeconds": 40.58,
+    "audioUrl": "/earworm/episodes/2026-11-12.mp3"
+  },
+  {
+    "id": "ep-009",
+    "episodeNumber": 9,
+    "date": "2026-11-13",
+    "title": "El coche prestado y el raspón en Guadalajara",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "street",
+    "durationSeconds": 52.06,
+    "audioUrl": "/earworm/episodes/2026-11-13.mp3"
+  },
+  {
+    "id": "ep-010",
+    "episodeNumber": 10,
+    "date": "2026-11-14",
+    "title": "Perdiendo el AVE en Atocha",
+    "region": "Spain",
+    "regionFlag": "🇪🇸",
+    "ambientType": "transit",
+    "durationSeconds": 41.66,
+    "audioUrl": "/earworm/episodes/2026-11-14.mp3"
+  },
+  {
+    "id": "ep-011",
+    "episodeNumber": 11,
+    "date": "2026-11-15",
+    "title": "Mate y facturas en la costanera",
+    "region": "Argentina",
+    "regionFlag": "🇦🇷",
+    "ambientType": "street",
+    "durationSeconds": 40.75,
+    "audioUrl": "/earworm/episodes/2026-11-15.mp3"
+  },
+  {
+    "id": "ep-012",
+    "episodeNumber": 12,
+    "date": "2026-11-16",
+    "title": "El recibo de la luz en la colonia Roma",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "cafe",
+    "durationSeconds": 48.46,
+    "audioUrl": "/earworm/episodes/2026-11-16.mp3"
+  },
+  {
+    "id": "ep-013",
+    "episodeNumber": 13,
+    "date": "2026-11-17",
+    "title": "Rumba y trancones en Chapinero",
+    "region": "Colombia",
+    "regionFlag": "🇨🇴",
+    "ambientType": "transit",
+    "durationSeconds": 42.79,
+    "audioUrl": "/earworm/episodes/2026-11-17.mp3"
+  },
+  {
+    "id": "ep-014",
+    "episodeNumber": 14,
+    "date": "2026-11-18",
+    "title": "El boleto falso afuera del Foro Sol",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "street",
+    "durationSeconds": 45.46,
+    "audioUrl": "/earworm/episodes/2026-11-18.mp3"
+  },
+  {
+    "id": "ep-015",
+    "episodeNumber": 15,
+    "date": "2026-11-19",
+    "title": "Regateando una cazadora en El Rastro",
+    "region": "Spain",
+    "regionFlag": "🇪🇸",
+    "ambientType": "market",
+    "durationSeconds": 40.06,
+    "audioUrl": "/earworm/episodes/2026-11-19.mp3"
+  },
+  {
+    "id": "ep-016",
+    "episodeNumber": 16,
+    "date": "2026-11-20",
+    "title": "Pizza de molde en la avenida Corrientes",
+    "region": "Argentina",
+    "regionFlag": "🇦🇷",
+    "ambientType": "cafe",
+    "durationSeconds": 42.29,
+    "audioUrl": "/earworm/episodes/2026-11-20.mp3"
+  },
+  {
+    "id": "ep-017",
+    "episodeNumber": 17,
+    "date": "2026-11-21",
+    "title": "Subiendo en el Metrocable a Parque Arví",
+    "region": "Colombia",
+    "regionFlag": "🇨🇴",
+    "ambientType": "transit",
+    "durationSeconds": 41.57,
+    "audioUrl": "/earworm/episodes/2026-11-21.mp3"
+  },
+  {
+    "id": "ep-018",
+    "episodeNumber": 18,
+    "date": "2026-11-22",
+    "title": "Tacos de canasta afuera del metro",
+    "region": "Mexico",
+    "regionFlag": "🇲🇽",
+    "ambientType": "street",
+    "durationSeconds": 45.05,
+    "audioUrl": "/earworm/episodes/2026-11-22.mp3"
+  }
+]

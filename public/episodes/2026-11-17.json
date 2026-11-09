@@ -1,145 +1,133 @@
 {
-  "id": "ep-012",
-  "episodeNumber": 12,
+  "id": "ep-013",
+  "episodeNumber": 13,
   "date": "2026-11-17",
-  "title": "El recibo de la luz en la colonia Roma",
-  "region": "Mexico",
-  "regionFlag": "🇲🇽",
-  "ambientType": "cafe",
+  "title": "Rumba y trancones en Chapinero",
+  "region": "Colombia",
+  "regionFlag": "🇨🇴",
+  "ambientType": "transit",
   "audioUrl": "/earworm/episodes/2026-11-17.mp3",
-  "durationSeconds": 64.56,
+  "durationSeconds": 42.79,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Mateo",
-      "gender": "male",
-      "spanish": "Oye, Lucía, no te pases... Acabo de ver el recibo de la luz de este bimestre y casi me da un infarto.",
-      "english": "Hey, Lucía, come on now... I just saw this two-month electricity bill and I almost had a heart attack.",
-      "slang": {
-        "term": "no te pases",
-        "literalMeaning": "don't pass yourself",
-        "actualMeaning": "come on / don't go too far / you're kidding me",
-        "example": "¡No te pases, te comiste todo el pastel!"
-      },
-      "startTime": 0.14,
-      "endTime": 9.48
+      "speaker": "Valentina",
+      "gender": "female",
+      "spanish": "¡Aló, Pipe! Pues ¿dónde vienen ustedes? Llevamos media hora haciendo fila en la entrada del bar.",
+      "english": "Hello, Pipe! Well where are you guys? We've been waiting in line at the bar entrance for half an hour.",
+      "startTime": 0.5,
+      "endTime": 7.46
     },
     {
       "id": 2,
-      "speaker": "Lucía",
-      "gender": "female",
-      "spanish": "Aguanta, Mateo, no te esponjes. Es que la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido un par de noches.",
-      "english": "Hold on, Mateo, don't get worked up. Last week it was freezing cold and I left the electric space heater on for a couple of nights.",
+      "speaker": "Pipe",
+      "gender": "male",
+      "spanish": "¡Ay, qué pena con vos, Vale! Mirá que nos cogió un trancón horrible por toda la carrera Séptima.",
+      "english": "Oh, I'm so sorry, Vale! Look, we got caught in a terrible traffic jam all along Seventh Avenue.",
+      "startTime": 7.81,
+      "endTime": 15.3,
       "slang": {
-        "term": "no te esponjes",
-        "literalMeaning": "don't sponge yourself up",
-        "actualMeaning": "don't get puffed up / don't get worked up or angry",
-        "example": "Tranquilo, no te esponjes, fue solo una broma."
-      },
-      "startTime": 9.91,
-      "endTime": 21.7
+        "term": "un trancón",
+        "literalMeaning": "a big bolt / blockage",
+        "actualMeaning": "a massive traffic jam / gridlock (Colombian Spanish)",
+        "example": "Salí temprano pero había un trancón monumental en la autopista."
+      }
     },
     {
       "id": 3,
-      "speaker": "Mateo",
-      "gender": "male",
-      "spanish": "¿Un par de noches? ¡Pero si subió al doble! Y tú sabes que ahorita ando bien bruja porque no me han pagado el proyecto de diseño.",
-      "english": "A couple of nights? It doubled! And you know I'm super broke right now because they haven't paid me for the design project yet.",
+      "speaker": "Valentina",
+      "gender": "female",
+      "spanish": "¡No me digás eso! Bueno, apúrense que antes de las diez no cobran cover y la rumba está buenísima.",
+      "english": "Don't tell me that! Well, hurry up because before ten o'clock there's no cover charge and the party is awesome.",
+      "startTime": 15.65,
+      "endTime": 23.11,
       "slang": {
-        "term": "bruja",
-        "literalMeaning": "witch",
-        "actualMeaning": "completely broke / out of money (andar bruja)",
-        "example": "Fin de quincena y ya ando bien bruja."
-      },
-      "startTime": 22.13,
-      "endTime": 32.59
+        "term": "la rumba",
+        "literalMeaning": "the rumba dance",
+        "actualMeaning": "the party / night out dancing (standard in Colombia)",
+        "example": "Este viernes se armó la rumba en Chapinero."
+      }
     },
     {
       "id": 4,
-      "speaker": "Lucía",
-      "gender": "female",
-      "spanish": "Tranquilo, mi primo Javi me debía una lana de los boletos del concierto y me acaba de transferir. Yo pongo el setenta por ciento del recibo.",
-      "english": "Relax, my cousin Javi owed me cash for the concert tickets and he just sent me a transfer. I'll cover seventy percent of the bill.",
-      "startTime": 33.02,
-      "endTime": 44.23
+      "speaker": "Pipe",
+      "gender": "male",
+      "spanish": "O sea, el taxista dice que hay un semáforo dañado en la calle sesenta y tres, entonces no avanza nada.",
+      "english": "I mean, the taxi driver says there's a broken traffic light at 63rd Street, so nothing is moving.",
+      "startTime": 23.46,
+      "endTime": 31.55
     },
     {
       "id": 5,
-      "speaker": "Mateo",
-      "gender": "male",
-      "spanish": "Uf, qué alivio... Es que el casero ya me estaba moliendo por WhatsApp desde las ocho de la mañana.",
-      "english": "Phew, what a relief... The landlord was already nagging me on WhatsApp since eight in the morning.",
-      "startTime": 44.66,
-      "endTime": 52.75
+      "speaker": "Valentina",
+      "gender": "female",
+      "spanish": "Pues bájense ahí mismo en la esquina y caminan tres cuadras que llegan mucho más rápido.",
+      "english": "Well hop out right there on the corner and walk three blocks—you'll get here way faster.",
+      "startTime": 31.9,
+      "endTime": 37.95
     },
     {
       "id": 6,
-      "speaker": "Lucía",
-      "gender": "female",
-      "spanish": "Ya sé cómo se pone. Ándale, yo lo pago ahorita en la app y además te invito unos esquites si me echas la mano con las cajas de la bodega.",
-      "english": "I know how he gets. Come on, I'll pay it right now in the app and treat you to some corn cups too if you give me a hand with the storage room boxes.",
-      "slang": {
-        "term": "echas la mano",
-        "literalMeaning": "throw the hand",
-        "actualMeaning": "lend a hand / help someone out (echar la mano)",
-        "example": "¿Me echas la mano para subir este sillón?"
-      },
-      "startTime": 53.18,
-      "endTime": 64.32
+      "speaker": "Pipe",
+      "gender": "male",
+      "spanish": "Listo, ya le pagué la carrera al señor y vamos corriendo. ¡Guardanos puesto en la mesa del balcón!",
+      "english": "Done, I just paid the driver for the ride and we're running over. Save us a spot at the balcony table!",
+      "startTime": 38.3,
+      "endTime": 45.38
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "What caused the two-month electricity bill in Mateo and Lucía's apartment to double?",
+      "question": "Why is Pipe running late to meet Valentina at the bar?",
       "options": [
-        "Lucía left the electric space heater on for a couple of freezing nights last week",
-        "Mateo left his computer running day and night",
-        "The landlord billed them for the whole building",
-        "Their refrigerator broke"
+        "His taxi got stuck in a terrible traffic jam ('un trancón') on Seventh Avenue due to a broken traffic light",
+        "He forgot his ID card at home",
+        "He went to the wrong neighborhood",
+        "His phone battery died"
       ],
       "correctIndex": 0,
-      "explanation": "Lucía admits she left the electric space heater on ('dejé el calentador eléctrico prendido un par de noches')."
+      "explanation": "Pipe says they got caught in 'un trancón horrible por toda la carrera Séptima' because of a broken traffic light at 63rd Street."
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "Why is Mateo broke right now, and how much of the bill does Lucía agree to cover?",
+      "question": "Why is it important that Pipe arrive before 10:00 PM?",
       "options": [
-        "He hasn't been paid for his design project yet; Lucía covers 70% of the bill",
-        "He bought concert tickets; Lucía covers 50% of the bill",
-        "He lost his wallet; Lucía covers 100% of the bill",
-        "He paid the water bill; Lucía covers 30% of the bill"
+        "There is no cover charge before 10:00 PM",
+        "The kitchen closes at 10:00 PM",
+        "Valentina has to leave at 10:00 PM",
+        "Drinks are half-price until 10:00 PM"
       ],
       "correctIndex": 0,
-      "explanation": "Mateo hasn't been paid for his design project yet, and Lucía covers 70% after her cousin Javi paid her back."
+      "explanation": "Valentina says: 'antes de las diez no cobran cover y la rumba está buenísima.'"
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "What favor does Lucía ask of Mateo in exchange for treating him to 'esquites'?",
+      "question": "What does Valentina suggest Pipe and his friends do to get there faster?",
       "options": [
-        "Help her with the boxes in the storage room ('la bodega')",
-        "Walk her dog in the park",
-        "Call the landlord back",
-        "Wash the dishes after dinner"
+        "Hop out of the taxi on the corner and walk three blocks",
+        "Rent electric scooters",
+        "Take the subway",
+        "Wait inside the taxi until traffic clears"
       ],
       "correctIndex": 0,
-      "explanation": "Lucía says: 'te invito unos esquites si me echas la mano con las cajas de la bodega.'"
+      "explanation": "Valentina says: 'bájense ahí mismo en la esquina y caminan tres cuadras que llegan mucho más rápido.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: What do 'no te esponjes', 'andar bruja', and 'echar la mano' mean in Mexican Spanish?",
+      "question": "Slang Side Quest: In Colombia, what do '¡Qué pena con vos!', 'un trancón', and 'la rumba' mean?",
       "options": [
-        "'No te esponjes' = don't get worked up; 'andar bruja' = to be broke; 'echar la mano' = to lend a hand",
-        "'No te esponjes' = don't get wet; 'andar bruja' = to stay up late; 'echar la mano' = to wave goodbye",
-        "'No te esponjes' = don't eat too much; 'andar bruja' = to be angry; 'echar la mano' = to applaud",
-        "'No te esponjes' = don't fall asleep; 'andar bruja' = to be lucky; 'echar la mano' = to pay in cash"
+        "'¡Qué pena!' = I'm so sorry; 'un trancón' = a traffic jam; 'la rumba' = the party / night out",
+        "'¡Qué pena!' = How sad; 'un trancón' = a big drink; 'la rumba' = the band",
+        "'¡Qué pena!' = How embarrassing; 'un trancón' = a rainstorm; 'la rumba' = the street",
+        "'¡Qué pena!' = What a pity; 'un trancón' = a police checkpoint; 'la rumba' = the line"
       ],
       "correctIndex": 0,
-      "explanation": "'No te esponjes' means don't get puffed up/angry, 'andar bruja' means to be broke, and 'echar la mano' means to lend a hand!"
+      "explanation": "In Colombia, '¡Qué pena con vos!' is the polite way to say 'I'm so sorry', 'un trancón' is a traffic jam, and 'la rumba' is a party/night out!"
     }
   ]
 }

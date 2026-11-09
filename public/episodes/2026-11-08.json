@@ -1,67 +1,85 @@
 {
-  "id": "ep-003",
-  "episodeNumber": 3,
+  "id": "ep-004",
+  "episodeNumber": 4,
   "date": "2026-11-08",
   "title": "Fruta fresca en la plaza de Medellín",
   "region": "Colombia",
   "regionFlag": "🇨🇴",
   "ambientType": "market",
   "audioUrl": "/earworm/episodes/2026-11-08.mp3",
-  "durationSeconds": 28.15,
+  "durationSeconds": 37.06,
   "dialogue": [
     {
       "id": 1,
       "speaker": "Camila",
       "gender": "female",
-      "spanish": "¡Quiubo, parcero! Mirá qué lulos tan bonitos tienen en este puesto de la plaza.",
-      "english": "What's up, buddy! Look how nice the lulo fruits are at this market stall.",
+      "spanish": "¡Quiubo, parcero! Mirá qué lulos y mangos tan bonitos tienen en este puesto de la plaza.",
+      "english": "What's up, buddy! Look how nice the lulo fruits and mangoes are at this market stall.",
+      "startTime": 0.5,
+      "endTime": 6.96,
       "slang": {
         "term": "parcero",
         "literalMeaning": "partner / sharecropper",
         "actualMeaning": "buddy / close friend (iconic Colombian slang)",
         "example": "Ese man es mi parcero desde el colegio."
-      },
-      "startTime": 0.14,
-      "endTime": 7.01
+      }
     },
     {
       "id": 2,
       "speaker": "Sebastián",
       "gender": "male",
-      "spanish": "¡Están una chimba! Llevemos una bolsa para hacer jugo frío en la casa.",
-      "english": "They look amazing! Let's get a bag to make cold juice at home.",
+      "spanish": "¡Uy, sí, están una chimba! Pues llevemos una bolsa grande para hacer jugo frío en la casa.",
+      "english": "Oh, yeah, they look amazing! Well let's get a big bag to make cold juice at home.",
+      "startTime": 7.31,
+      "endTime": 14.65,
       "slang": {
         "term": "una chimba",
         "literalMeaning": "awesome / super cool",
         "actualMeaning": "fantastic / amazing / top-notch (Medellín slang)",
         "example": "¡El concierto de anoche estuvo una chimba!"
-      },
-      "startTime": 7.44,
-      "endTime": 13.46
+      }
     },
     {
       "id": 3,
       "speaker": "Camila",
       "gender": "female",
-      "spanish": "La señora dice que la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.",
-      "english": "The lady says a dozen costs eight thousand pesos and she'll throw in two passion fruits as a free bonus.",
-      "slang": {
-        "term": "de ñapa",
-        "literalMeaning": "from the Quechua 'yapa' (addition)",
-        "actualMeaning": "as a free extra / baker's dozen bonus at a market",
-        "example": "Compré tres empanadas y me dieron una más de ñapa."
-      },
-      "startTime": 13.9,
-      "endTime": 21
+      "spanish": "Bueno, pregunté el precio y la señora dice que la docena vale ocho mil pesos.",
+      "english": "Well, I asked the price and the lady says a dozen costs eight thousand pesos.",
+      "startTime": 15,
+      "endTime": 20.88
     },
     {
       "id": 4,
       "speaker": "Sebastián",
       "gender": "male",
-      "spanish": "¡De una! Pagá vos en efectivo que yo te invito las arepas de queso ahorita.",
-      "english": "Let's do it! You pay in cash and I'll treat you to cheese corn cakes right now.",
-      "startTime": 21.43,
-      "endTime": 27.91
+      "spanish": "O sea, está súper bien de precio. Preguntále si nos deja llevar también unas guayabas.",
+      "english": "I mean, that's a super good price. Ask her if she'll let us grab some guavas too.",
+      "startTime": 21.23,
+      "endTime": 27.9
+    },
+    {
+      "id": 5,
+      "speaker": "Camila",
+      "gender": "female",
+      "spanish": "Dice que si compramos la docena nos regala dos maracuyás bien maduros de ñapa.",
+      "english": "She says if we buy the dozen she'll throw in two ripe passion fruits as a free bonus.",
+      "startTime": 28.25,
+      "endTime": 33.75,
+      "slang": {
+        "term": "de ñapa",
+        "literalMeaning": "from the Quechua 'yapa' (extra addition)",
+        "actualMeaning": "as a free extra / baker's dozen bonus at a market",
+        "example": "Compré tres empanadas y me dieron una más de ñapa."
+      }
+    },
+    {
+      "id": 6,
+      "speaker": "Sebastián",
+      "gender": "male",
+      "spanish": "¡De una! Pagá vos en efectivo que yo te invito las arepas de queso acá al lado.",
+      "english": "Let's do it! You pay in cash and I'll treat you to cheese corn cakes right next door.",
+      "startTime": 34.1,
+      "endTime": 39.69
     }
   ],
   "questions": [
@@ -76,7 +94,7 @@
         "To sell them at their own restaurant"
       ],
       "correctIndex": 0,
-      "explanation": "Sebastián says: 'Llevemos una bolsa para hacer jugo frío en la casa.'"
+      "explanation": "Sebastián says: 'llevemos una bolsa grande para hacer jugo frío en la casa.'"
     },
     {
       "id": "q2",
@@ -89,20 +107,20 @@
         "12,000 pesos plus a cheese arepa"
       ],
       "correctIndex": 1,
-      "explanation": "Camila says: 'la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.'"
+      "explanation": "Camila says a dozen costs 8,000 pesos and the vendor gives them 'dos maracuyás bien maduros de ñapa.'"
     },
     {
       "id": "q3",
       "type": "comprehension",
       "question": "What does Sebastián offer to buy for Camila if she pays cash at the fruit stand?",
       "options": [
-        "Cheese corn cakes ('arepas de queso')",
+        "Cheese corn cakes ('arepas de queso') next door",
         "Two cups of Colombian coffee",
         "A taxi ride home",
         "Tickets to a soccer match"
       ],
       "correctIndex": 0,
-      "explanation": "Sebastián says: 'Pagá vos en efectivo que yo te invito las arepas de queso ahorita.'"
+      "explanation": "Sebastián says: 'Pagá vos en efectivo que yo te invito las arepas de queso acá al lado.'"
     },
     {
       "id": "q4",

@@ -1,67 +1,85 @@
 {
-  "id": "ep-002",
-  "episodeNumber": 2,
+  "id": "ep-003",
+  "episodeNumber": 3,
   "date": "2026-11-07",
   "title": "El subte cerrado en Palermo",
   "region": "Argentina",
   "regionFlag": "🇦🇷",
   "ambientType": "transit",
   "audioUrl": "/earworm/episodes/2026-11-07.mp3",
-  "durationSeconds": 29.4,
+  "durationSeconds": 41.86,
   "dialogue": [
     {
       "id": 1,
       "speaker": "Julieta",
       "gender": "female",
-      "spanish": "Che, Tomás, la línea D del subte está cortada por obras. ¿Cómo vamos al centro?",
-      "english": "Hey, Tomás, subway Line D is closed for maintenance. How do we get downtown?",
+      "spanish": "Che, Tomás, mirá el cartel en la escalera: la línea D del subte está cortada por obras.",
+      "english": "Hey, Tomás, look at the sign on the stairs: subway Line D is closed for maintenance.",
+      "startTime": 0.5,
+      "endTime": 7.53,
       "slang": {
         "term": "subte",
         "literalMeaning": "underground (short for subterráneo)",
         "actualMeaning": "the Buenos Aires subway / metro system",
-        "example": "Tomamos el subte en Plaza Italia para llegar rápido."
-      },
-      "startTime": 0.14,
-      "endTime": 7.78
+        "example": "Tomamos el subte en Plaza Italia para llegar rápido al centro."
+      }
     },
     {
       "id": 2,
       "speaker": "Tomás",
       "gender": "male",
-      "spanish": "¡Qué garrón! Encima no tengo saldo en la tarjeta SUBE para tomar el colectivo.",
-      "english": "What a bummer! On top of that, I don't have balance on my SUBE transit card to take the bus.",
+      "spanish": "¡Uh, qué garrón! Y encima me parece que no tengo nada de saldo en la tarjeta SUBE para el colectivo.",
+      "english": "Ugh, what a bummer! And on top of that I don't think I have any balance on my SUBE card for the bus.",
+      "startTime": 7.88,
+      "endTime": 15.2,
       "slang": {
-        "term": "garrón",
-        "literalMeaning": "ankle / claw",
-        "actualMeaning": "a total bummer / drag / bad luck (Argentine slang)",
+        "term": "qué garrón",
+        "literalMeaning": "what a claw / ankle",
+        "actualMeaning": "what a total bummer / drag / bad luck (Argentine slang)",
         "example": "¡Qué garrón que se largó a llover justo ahora!"
-      },
-      "startTime": 8.21,
-      "endTime": 14.98
+      }
     },
     {
       "id": 3,
       "speaker": "Julieta",
       "gender": "female",
-      "spanish": "Tranquilo, boludo, acá a media cuadra hay un kiosco donde cargan la tarjeta.",
-      "english": "Relax, dude, half a block from here there's a convenience stand where they top up the card.",
+      "spanish": "Bueno, tranquilo, boludo, acá a media cuadra sobre Santa Fe hay un kiosco abierto donde cargan saldo.",
+      "english": "Well, relax, dude, half a block from here on Santa Fe Avenue there's an open kiosk where they load balance.",
+      "startTime": 15.55,
+      "endTime": 23.69,
       "slang": {
         "term": "boludo",
-        "literalMeaning": "big-balled / foolish",
-        "actualMeaning": "dude / buddy (friendly everyday Argentine address between friends)",
-        "example": "Che, boludo, ¿a qué hora nos vemos hoy?"
-      },
-      "startTime": 15.41,
-      "endTime": 21.98
+        "literalMeaning": "foolish / big-balled",
+        "actualMeaning": "dude / buddy (friendly everyday Argentine address between close friends)",
+        "example": "Che, boludo, ¿a qué hora nos encontramos hoy?"
+      }
     },
     {
       "id": 4,
       "speaker": "Tomás",
       "gender": "male",
-      "spanish": "Bárbaro. Carguemos mil pesos y paso a comprar unas medialunas para el viaje.",
-      "english": "Awesome. Let's load a thousand pesos and I'll stop to buy some croissants for the ride.",
-      "startTime": 22.42,
-      "endTime": 29.16
+      "spanish": "Menos mal, porque si llamamos un taxi a esta hora nos va a salir carísimo con el tráfico.",
+      "english": "Thank goodness, because if we call a taxi at this hour it's going to be super expensive with the traffic.",
+      "startTime": 24.04,
+      "endTime": 30.78
+    },
+    {
+      "id": 5,
+      "speaker": "Julieta",
+      "gender": "female",
+      "spanish": "Tal cual. El colectivo sesenta y ocho nos deja a dos cuadras del teatro en quince minutos.",
+      "english": "Totally. The number 68 bus drops us off two blocks from the theater in fifteen minutes.",
+      "startTime": 31.13,
+      "endTime": 37.66
+    },
+    {
+      "id": 6,
+      "speaker": "Tomás",
+      "gender": "male",
+      "spanish": "Bárbaro. Carguemos mil pesos en el kiosco y de paso compro unas medialunas para el viaje.",
+      "english": "Awesome. Let's load a thousand pesos at the kiosk and while we're at it I'll buy some croissants for the ride.",
+      "startTime": 38.01,
+      "endTime": 44.51
     }
   ],
   "questions": [
@@ -81,15 +99,15 @@
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "Where do they go to add balance to Tomás's SUBE transit card?",
+      "question": "Where do they go to add balance to Tomás's SUBE transit card, and which bus will they take?",
       "options": [
-        "A bank two blocks away",
-        "A neighborhood kiosk ('un kiosco') half a block away",
-        "A supermarket across the avenue",
-        "They pay the bus driver in coins"
+        "A neighborhood kiosk half a block away, then bus #68",
+        "A bank two blocks away, then bus #15",
+        "A supermarket across the avenue, then a taxi",
+        "They pay the bus driver in cash on bus #40"
       ],
-      "correctIndex": 1,
-      "explanation": "Julieta says: 'acá a media cuadra hay un kiosco donde cargan la tarjeta.'"
+      "correctIndex": 0,
+      "explanation": "Julieta points out a 'kiosco' half a block away on Santa Fe Avenue and says 'El colectivo sesenta y ocho nos deja a dos cuadras del teatro.'"
     },
     {
       "id": "q3",
@@ -102,7 +120,7 @@
         "300 pesos and a sandwich"
       ],
       "correctIndex": 1,
-      "explanation": "Tomás says: 'Carguemos mil pesos y paso a comprar unas medialunas para el viaje.'"
+      "explanation": "Tomás says: 'Carguemos mil pesos en el kiosco y de paso compro unas medialunas para el viaje.'"
     },
     {
       "id": "q4",

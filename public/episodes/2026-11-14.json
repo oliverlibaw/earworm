@@ -1,145 +1,133 @@
 {
-  "id": "ep-009",
-  "episodeNumber": 9,
+  "id": "ep-010",
+  "episodeNumber": 10,
   "date": "2026-11-14",
-  "title": "El coche prestado y el raspón en Guadalajara",
-  "region": "Mexico",
-  "regionFlag": "🇲🇽",
-  "ambientType": "street",
+  "title": "Perdiendo el AVE en Atocha",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "transit",
   "audioUrl": "/earworm/episodes/2026-11-14.mp3",
-  "durationSeconds": 63.65,
+  "durationSeconds": 41.66,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Diego",
+      "speaker": "Álvaro",
       "gender": "male",
-      "spanish": "Oye, Fernanda, no manches... Acabo de bajar al estacionamiento y vi que mi coche tiene un raspón enorme en la defensa trasera.",
-      "english": "Hey, Fernanda, no way... I just went down to the parking lot and saw that my car has a huge scratch on the back bumper.",
-      "slang": {
-        "term": "no manches",
-        "literalMeaning": "don't stain",
-        "actualMeaning": "No way! / You've got to be kidding me!",
-        "example": "¡No manches, qué rápido llegaste!"
-      },
-      "startTime": 0.14,
-      "endTime": 10.9
+      "spanish": "¡Corre, Elena, tía, que el control de equipaje del AVE a Valencia cierra en tres minutos!",
+      "english": "Run, Elena, girl, the baggage check for the high-speed train to Valencia closes in three minutes!",
+      "startTime": 0.5,
+      "endTime": 7.53
     },
     {
       "id": 2,
-      "speaker": "Fernanda",
+      "speaker": "Elena",
       "gender": "female",
-      "spanish": "Ay, Diego, te iba a decir ahorita que saliéramos. Ayer que me lo prestaste para ir por las cosas de mi chamba, un poste estaba súper pegado en la rampa.",
-      "english": "Oh, Diego, I was going to tell you right now when we went out. Yesterday when you lent it to me to pick up my work stuff, a pillar was super close on the ramp.",
+      "spanish": "¡Madre mía, qué agobio! Pues es que el autobús venía a tope por el atasco en el paseo de la Castellana.",
+      "english": "Oh my goodness, how stressful! Well the bus was packed to the gills because of the traffic jam on La Castellana.",
+      "startTime": 7.88,
+      "endTime": 15.37,
       "slang": {
-        "term": "chamba",
-        "literalMeaning": "job / gig",
-        "actualMeaning": "work / job (everyday Mexican slang)",
-        "example": "Conseguí una nueva chamba cerca de mi casa."
-      },
-      "startTime": 11.33,
-      "endTime": 24.22
+        "term": "a tope",
+        "literalMeaning": "to the bumper / limit",
+        "actualMeaning": "packed full / to the max (very common in Spain)",
+        "example": "El vagón del metro iba a tope a las ocho de la mañana."
+      }
     },
     {
       "id": 3,
-      "speaker": "Diego",
+      "speaker": "Álvaro",
       "gender": "male",
-      "spanish": "¿Y pensabas hacerte pato o qué? Sabes que lo acabo de sacar del taller hace dos semanas.",
-      "english": "And were you planning to play dumb or what? You know I just got it out of the repair shop two weeks ago.",
-      "slang": {
-        "term": "hacerte pato",
-        "literalMeaning": "to make yourself a duck",
-        "actualMeaning": "to play dumb / dodge responsibility",
-        "example": "No te hagas pato, te toca lavar los platos."
-      },
-      "startTime": 24.65,
-      "endTime": 31.9
+      "spanish": "Bueno, pasa tú primero la maleta por el escáner mientras yo enseño los billetes en el móvil.",
+      "english": "Well, put your suitcase through the scanner first while I show the tickets on my phone.",
+      "startTime": 15.72,
+      "endTime": 22.18
     },
     {
       "id": 4,
-      "speaker": "Fernanda",
+      "speaker": "Elena",
       "gender": "female",
-      "spanish": "¡Claro que no me iba a hacer pato! Ya hablé con el taller de mi tío Memo en Zapopan. Dice que mañana mismo lo pule y lo pinta por mil quinientos pesos.",
-      "english": "Of course I wasn't going to play dumb! I already spoke with my uncle Memo's body shop in Zapopan. He says tomorrow he'll buff and paint it for fifteen hundred pesos.",
-      "startTime": 32.33,
-      "endTime": 44.69
+      "spanish": "Vale, ya pasamos. O sea, ¿en qué vía está estacionado nuestro tren?",
+      "english": "Okay, we're through. I mean, which platform is our train parked on?",
+      "startTime": 22.53,
+      "endTime": 28.48
     },
     {
       "id": 5,
-      "speaker": "Diego",
+      "speaker": "Álvaro",
       "gender": "male",
-      "spanish": "Bueno, menos mal... Pero esa lana la pones tú, ¿eh? Y me llevas a mi oficina en la mañana mientras lo arreglan.",
-      "english": "Well, thank goodness... But you're paying that cash, alright? And you're driving me to my office in the morning while they fix it.",
+      "spanish": "Vía cuatro, hemos entrado por los pelos... Mira, somos el coche número tres, asientos de ventanilla.",
+      "english": "Platform four, we made it by the skin of our teeth... Look, we're car number three, window seats.",
+      "startTime": 28.83,
+      "endTime": 36.51,
       "slang": {
-        "term": "lana",
-        "literalMeaning": "wool",
-        "actualMeaning": "money / cash (Mexican slang)",
-        "example": "Ahorré una buena lana para las vacaciones."
-      },
-      "startTime": 45.12,
-      "endTime": 54.6
+        "term": "por los pelos",
+        "literalMeaning": "by the hairs",
+        "actualMeaning": "by the skin of one's teeth / just barely in time",
+        "example": "Llegamos al embarque del avión por los pelos."
+      }
     },
     {
       "id": 6,
-      "speaker": "Fernanda",
+      "speaker": "Elena",
       "gender": "female",
-      "spanish": "Trato hecho. Yo pago todo el taller y encima te compro tu torta ahogada para que se te baje el coraje.",
-      "english": "Deal. I'll pay for the whole shop and on top of that I'll buy you your drowned pork sandwich so you stop being mad.",
-      "startTime": 55.03,
-      "endTime": 63.41
+      "spanish": "¡Uf, qué alivio! En cuanto arranque el tren me pido un café en la cafetería y me echo una siesta.",
+      "english": "Phew, what a relief! As soon as the train pulls out I'm ordering a coffee in the café car and taking a nap.",
+      "startTime": 36.86,
+      "endTime": 44.32
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why is Diego upset with Fernanda at the start of the conversation?",
+      "question": "Why were Álvaro and Elena almost late for their high-speed train ('el AVE')?",
       "options": [
-        "He found a big scratch on the back bumper of his car after lending it to her",
-        "She returned his car with an empty gas tank",
-        "She forgot to pick him up from the repair shop",
-        "She parked his car in a tow-away zone"
+        "Their bus was packed and stuck in a traffic jam on La Castellana",
+        "Elena packed the wrong suitcase",
+        "They went to the wrong train station in Madrid",
+        "Their alarm clock didn't ring"
       ],
       "correctIndex": 0,
-      "explanation": "Diego saw a huge scratch ('un raspón enorme') on the rear bumper ('la defensa trasera') after lending his car to Fernanda yesterday."
+      "explanation": "Elena says: 'el autobús venía a tope por el atasco en el paseo de la Castellana.'"
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "How did the car get scratched, and what plan did Fernanda already arrange?",
+      "question": "Which platform and train car do they board, and what city are they traveling to?",
       "options": [
-        "She scraped a tight pillar on a ramp; her Uncle Memo's shop in Zapopan will buff and paint it tomorrow for 1,500 pesos",
-        "Another driver hit her in traffic; her insurance will pay 3,000 pesos",
-        "A shopping cart hit the door; she bought touch-up paint for 500 pesos",
-        "She backed into a tree; Diego's mechanic will fix it next week"
+        "Platform 4, Car 3, window seats, heading to Valencia",
+        "Platform 1, Car 1, aisle seats, heading to Barcelona",
+        "Platform 7, Car 5, dining car, heading to Seville",
+        "Platform 2, Car 2, window seats, heading to Toledo"
       ],
       "correctIndex": 0,
-      "explanation": "Fernanda scraped a tight pillar on a ramp and arranged for her Uncle Memo's body shop in Zapopan to buff and paint it tomorrow for 1,500 pesos."
+      "explanation": "Álvaro says the train to Valencia is on 'Vía cuatro... coche número tres, asientos de ventanilla.'"
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "In addition to Fernanda paying for the repair, what else does Diego demand—and what food does Fernanda offer him?",
+      "question": "How much time was left before baggage security closed when they arrived?",
       "options": [
-        "She must drive him to his office in the morning, and she offers to buy him a 'torta ahogada'",
-        "She must wash his car, and she offers him street tacos",
-        "She must lend him her bicycle, and she offers to buy him coffee",
-        "She must pay his parking fee, and she offers to cook dinner"
+        "3 minutes",
+        "15 minutes",
+        "30 minutes",
+        "1 hour"
       ],
       "correctIndex": 0,
-      "explanation": "Diego insists she pay the cash ('esa lana la pones tú') and drive him to his office in the morning, and she offers him a 'torta ahogada'."
+      "explanation": "Álvaro shouts: 'el control de equipaje del AVE a Valencia cierra en tres minutos!'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: What do the Mexican idioms 'hacerse pato', 'la chamba', and 'la lana' mean?",
+      "question": "Slang Side Quest: In Spain, what do 'venir a tope' and 'por los pelos' mean?",
       "options": [
-        "'Hacerse pato' = play dumb; 'la chamba' = work/job; 'la lana' = money/cash",
-        "'Hacerse pato' = drive fast; 'la chamba' = party; 'la lana' = sweater",
-        "'Hacerse pato' = apologize; 'la chamba' = garage; 'la lana' = paint",
-        "'Hacerse pato' = get angry; 'la chamba' = school; 'la lana' = debt"
+        "'A tope' = packed full / to the max; 'por los pelos' = by the skin of our teeth / just barely",
+        "'A tope' = very slowly; 'por los pelos' = without luggage",
+        "'A tope' = empty; 'por los pelos' = with messy hair",
+        "'A tope' = broken down; 'por los pelos' = way too early"
       ],
       "correctIndex": 0,
-      "explanation": "In Mexican Spanish, 'hacerse pato' means to play dumb, 'la chamba' is work/job, and 'la lana' is money/cash!"
+      "explanation": "'A tope' means packed full / at maximum capacity, and 'por los pelos' means just barely / by a hair!"
     }
   ]
 }

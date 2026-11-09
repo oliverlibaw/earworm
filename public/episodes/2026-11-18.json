@@ -1,115 +1,139 @@
 {
-  "id": "ep-013",
-  "episodeNumber": 13,
+  "id": "ep-014",
+  "episodeNumber": 14,
   "date": "2026-11-18",
-  "title": "Rumba y trancones en Chapinero",
-  "region": "Colombia",
-  "regionFlag": "🇨🇴",
-  "ambientType": "transit",
+  "title": "El boleto falso afuera del Foro Sol",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "street",
   "audioUrl": "/earworm/episodes/2026-11-18.mp3",
-  "durationSeconds": 31.92,
+  "durationSeconds": 45.46,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Valentina",
-      "gender": "female",
-      "spanish": "¡Aló, Pipe! ¿Dónde vienen? Llevamos media hora haciendo fila en la entrada del bar.",
-      "english": "Hello, Pipe! Where are you guys? We've been waiting in line at the bar entrance for half an hour.",
-      "startTime": 0.14,
-      "endTime": 7.42
+      "speaker": "Paco",
+      "gender": "male",
+      "spanish": "¡No manches, Mariana! El lector de códigos aquí en la puerta del Foro Sol acaba de prender en rojo con mi boleto.",
+      "english": "No way, Mariana! The barcode scanner right here at the Foro Sol gate just flashed red on my ticket.",
+      "startTime": 0.5,
+      "endTime": 8.85
     },
     {
       "id": 2,
-      "speaker": "Pipe",
-      "gender": "male",
-      "spanish": "¡Ay, qué pena con vos, Vale! Nos cogió un trancón horrible por la carrera Séptima.",
-      "english": "Oh, I'm so sorry, Vale! We got caught in a terrible traffic jam on Seventh Avenue.",
+      "speaker": "Mariana",
+      "gender": "female",
+      "spanish": "¡No me digas eso! Pues te advertí que ese revendedor de internet se veía súper chafa, Paco.",
+      "english": "Don't tell me that! Well I warned you that online reseller looked super sketchy, Paco.",
+      "startTime": 9.2,
+      "endTime": 15.99,
       "slang": {
-        "term": "trancón",
-        "literalMeaning": "big bolt / blockage",
-        "actualMeaning": "a massive traffic jam / gridlock (Colombian Spanish)",
-        "example": "Salí temprano pero había un trancón monumental en la autopista."
-      },
-      "startTime": 7.85,
-      "endTime": 15.43
+        "term": "súper chafa",
+        "literalMeaning": "super shoddy / low-grade",
+        "actualMeaning": "sketchy, fake, or low-quality (Mexican slang)",
+        "example": "Compré unos audífonos baratos pero salieron súper chafas."
+      }
     },
     {
       "id": 3,
-      "speaker": "Valentina",
-      "gender": "female",
-      "spanish": "¡No me digás! Bueno, apúrense que antes de las diez no cobran cover y la rumba está buenísima.",
-      "english": "Don't tell me that! Well, hurry up because before ten o'clock there's no cover charge and the party is awesome.",
+      "speaker": "Paco",
+      "gender": "male",
+      "spanish": "Espérate, bueno, ya me puse nervioso porque me costó carísimo y me quedé sin un quinto para toda la quincena.",
+      "english": "Wait a second, well, now I'm nervous because it cost me a fortune and left me without a cent for the whole two-week pay period.",
+      "startTime": 16.34,
+      "endTime": 24.38,
       "slang": {
-        "term": "la rumba",
-        "literalMeaning": "the rumba dance",
-        "actualMeaning": "the party / night out dancing (standard in Colombia)",
-        "example": "Este viernes se armó la rumba en Chapinero."
-      },
-      "startTime": 15.86,
-      "endTime": 24.19
+        "term": "sin un quinto",
+        "literalMeaning": "without a five-cent coin",
+        "actualMeaning": "penniless / without a single cent left",
+        "example": "Después de pagar la renta me quedé sin un quinto."
+      }
     },
     {
       "id": 4,
-      "speaker": "Pipe",
+      "speaker": "Mariana",
+      "gender": "female",
+      "spanish": "A ver, enséñame la pantalla de tu celular... ¡Ay, Paco, o sea, estás bien dormido!",
+      "english": "Hold on, show me your phone screen... Oh, Paco, I mean, you're half asleep!",
+      "startTime": 24.73,
+      "endTime": 31.62
+    },
+    {
+      "id": 5,
+      "speaker": "Paco",
       "gender": "male",
-      "spanish": "Ya nos bajamos del taxi a dos cuadras y vamos corriendo. ¡Guardanos puesto en la mesa!",
-      "english": "We just got out of the taxi two blocks away and we're running over. Save us a spot at the table!",
-      "startTime": 24.62,
-      "endTime": 31.68
+      "spanish": "¿Por qué? ¡Ah, qué oso hice con el guardia! Estaba enseñando el código QR del estacionamiento en vez del concierto.",
+      "english": "Why? Oh, how embarrassing in front of the guard! I was showing the QR code for the parking lot instead of the concert.",
+      "startTime": 31.97,
+      "endTime": 40.51,
+      "slang": {
+        "term": "qué oso",
+        "literalMeaning": "what a bear",
+        "actualMeaning": "How embarrassing! / What a blunder!",
+        "example": "¡Qué oso cuando me tropecé frente a toda la oficina!"
+      }
+    },
+    {
+      "id": 6,
+      "speaker": "Mariana",
+      "gender": "female",
+      "spanish": "Mira, ya se puso en verde. ¡Córrele que la banda está por tocar la primera rola y nos toca hasta la pista!",
+      "english": "Look, it just turned green. Run now, the band is about to play their first song and our spot is all the way down on the floor!",
+      "startTime": 40.86,
+      "endTime": 48.13
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why is Pipe running late to meet Valentina at the bar?",
+      "question": "Why do Paco and Mariana panic when they arrive at the entrance to the Foro Sol concert venue?",
       "options": [
-        "His taxi got stuck in a terrible traffic jam ('un trancón') on Seventh Avenue",
-        "He forgot his ID card at home",
-        "He went to the wrong neighborhood",
-        "His phone battery died"
+        "The ticket scanner flashes red on Paco's ticket, making them fear he bought a fake ticket",
+        "Paco forgot his cell phone in the parking lot",
+        "The concert was canceled due to rain",
+        "Mariana bought tickets for the wrong date"
       ],
       "correctIndex": 0,
-      "explanation": "Pipe says: 'Nos cogió un trancón horrible por la carrera Séptima.'"
+      "explanation": "The scanner flashes red ('acaba de prender en rojo'), making them fear the online reseller sold Paco a fake ticket."
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "Why is it important that Pipe arrive before 10:00 PM?",
+      "question": "What silly mistake does Mariana discover when she looks at Paco's phone screen?",
       "options": [
-        "There is no cover charge before 10:00 PM",
-        "The kitchen closes at 10:00 PM",
-        "Valentina has to leave at 10:00 PM",
-        "Drinks are half-price until 10:00 PM"
+        "He was showing the QR code for the parking lot instead of the concert ticket",
+        "His screen brightness was turned all the way down",
+        "He was showing an old movie ticket",
+        "His phone battery had died"
       ],
       "correctIndex": 0,
-      "explanation": "Valentina says: 'antes de las diez no cobran cover y la rumba está buenísima.'"
+      "explanation": "Paco realizes: 'Estaba enseñando el código QR del estacionamiento en vez del concierto.'"
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "What did Pipe and his friends do to get there faster?",
+      "question": "Why do they have to run once the real ticket scans green?",
       "options": [
-        "They hopped out of the taxi two blocks away and are running the rest of the way",
-        "They rented electric scooters",
-        "They took the subway",
-        "They asked the driver to take a shortcut"
+        "The band is about to play their first song ('la primera rola') and their spot is down on the floor ('la pista')",
+        "The stadium gates are closing in one minute",
+        "It is starting to rain heavily",
+        "They need to meet their friends at the merchandise booth"
       ],
       "correctIndex": 0,
-      "explanation": "Pipe says: 'Ya nos bajamos del taxi a dos cuadras y vamos corriendo.'"
+      "explanation": "Mariana says: 'la banda está por tocar la primera rola y nos toca hasta la pista.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: In Colombia, what do '¡Qué pena con vos!', 'un trancón', and 'la rumba' mean?",
+      "question": "Slang Side Quest: What do 'súper chafa', 'sin un quinto', and '¡qué oso!' mean in Mexican slang?",
       "options": [
-        "'¡Qué pena!' = I'm so sorry / excuse me; 'un trancón' = a traffic jam; 'la rumba' = the party / night out",
-        "'¡Qué pena!' = How sad; 'un trancón' = a big drink; 'la rumba' = the band",
-        "'¡Qué pena!' = How embarrassing; 'un trancón' = a rainstorm; 'la rumba' = the street",
-        "'¡Qué pena!' = What a pity; 'un trancón' = a police checkpoint; 'la rumba' = the line"
+        "'Súper chafa' = sketchy/low-quality; 'sin un quinto' = penniless; 'qué oso' = how embarrassing",
+        "'Súper chafa' = polite; 'sin un quinto' = five minutes late; 'qué oso' = how lucky",
+        "'Súper chafa' = expensive; 'sin un quinto' = without a ticket; 'qué oso' = how scary",
+        "'Súper chafa' = famous; 'sin un quinto' = alone; 'qué oso' = how funny"
       ],
       "correctIndex": 0,
-      "explanation": "In Colombia, '¡Qué pena (con vos/usted)!' is the polite way to say 'I'm so sorry / excuse me', 'un trancón' is a traffic jam, and 'la rumba' is a party/night out!"
+      "explanation": "In Mexico City slang, 'chafa' is sketchy/shoddy, 'sin un quinto' is penniless, and '¡qué oso!' means 'how embarrassing!'"
     }
   ]
 }

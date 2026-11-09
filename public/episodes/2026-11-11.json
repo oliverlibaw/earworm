@@ -1,127 +1,139 @@
 {
-  "id": "ep-006",
-  "episodeNumber": 6,
+  "id": "ep-007",
+  "episodeNumber": 7,
   "date": "2026-11-11",
-  "title": "Tapas de última hora en Lavapiés",
-  "region": "Spain",
-  "regionFlag": "🇪🇸",
-  "ambientType": "street",
+  "title": "Asado del domingo en San Telmo",
+  "region": "Argentina",
+  "regionFlag": "🇦🇷",
+  "ambientType": "market",
   "audioUrl": "/earworm/episodes/2026-11-11.mp3",
-  "durationSeconds": 31.61,
+  "durationSeconds": 42.77,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Lucía",
-      "gender": "female",
-      "spanish": "¡Hola, Javi! ¿Qué tal el curro hoy? Te veo con una cara de cansado impresionante.",
-      "english": "Hi, Javi! How was work today? You look completely exhausted.",
-      "slang": {
-        "term": "el curro",
-        "literalMeaning": "the job / work",
-        "actualMeaning": "work / job (everyday colloquial word in Spain)",
-        "example": "Salgo del curro a las seis y nos vemos en el centro."
-      },
-      "startTime": 0.14,
-      "endTime": 7.63
+      "speaker": "Martín",
+      "gender": "male",
+      "spanish": "Che, Flor, mirá qué suerte: acá en la carnicería del mercado queda el último kilo de vacío para el asado.",
+      "english": "Hey, Flor, look how lucky: right here at the market butcher shop they have the last kilo of flank steak for the barbecue.",
+      "startTime": 0.5,
+      "endTime": 9.26
     },
     {
       "id": 2,
-      "speaker": "Javi",
-      "gender": "male",
-      "spanish": "Uf, ni me hables, tía. Estuve liado con un informe toda la tarde, pero ya tengo hambre.",
-      "english": "Phew, don't even get me started, girl. I was tied up with a report all afternoon, but now I'm hungry.",
+      "speaker": "Flor",
+      "gender": "female",
+      "spanish": "¡Qué joya! Bueno, llevate también cuatro chorizos criollos y una bolsa grande de carbón antes de que se acabe.",
+      "english": "What a gem! Well, grab four sausages and a big bag of charcoal too before it sells out.",
+      "startTime": 9.61,
+      "endTime": 17.6,
       "slang": {
-        "term": "liado",
-        "literalMeaning": "tied / wrapped up",
-        "actualMeaning": "swamped / super busy with something",
-        "example": "Perdona que no te llamara, anduve muy liado toda la mañana."
-      },
-      "startTime": 8.06,
-      "endTime": 16.18
+        "term": "Qué joya",
+        "literalMeaning": "what a jewel",
+        "actualMeaning": "Awesome! / Fantastic! / Great news! (Argentine slang)",
+        "example": "¿Conseguiste entradas para el partido? ¡Qué joya!"
+      }
     },
     {
       "id": 3,
-      "speaker": "Lucía",
-      "gender": "female",
-      "spanish": "Venga, entremos a esta taberna que ponen unas patatas bravas que flipas por cinco euros.",
-      "english": "Come on, let's go into this tavern—they serve mind-blowing patatas bravas for five euros.",
+      "speaker": "Martín",
+      "gender": "male",
+      "spanish": "Dale, el carnicero dice que son doce mil mangos en total por la carne y el carbón.",
+      "english": "Sounds good, the butcher says it's twelve thousand pesos total for the meat and charcoal.",
+      "startTime": 17.95,
+      "endTime": 24.41,
       "slang": {
-        "term": "que flipas",
-        "literalMeaning": "that you flip out",
-        "actualMeaning": "mind-blowing / incredible / amazing (Spain slang)",
-        "example": "Hicieron una paella que flipas."
-      },
-      "startTime": 16.61,
-      "endTime": 24.02
+        "term": "mangos",
+        "literalMeaning": "mangoes / handles",
+        "actualMeaning": "bucks / pesos (classic Argentine slang for money)",
+        "example": "Esta campera me salió veinte mil mangos."
+      }
     },
     {
       "id": 4,
-      "speaker": "Javi",
+      "speaker": "Flor",
+      "gender": "female",
+      "spanish": "O sea, está re bien. ¿Ponemos mitad y mitad ahora o preferís que yo compre las bebidas?",
+      "english": "I mean, that's really good. Should we split it fifty-fifty now or do you prefer I buy the drinks?",
+      "startTime": 24.76,
+      "endTime": 31.38
+    },
+    {
+      "id": 5,
+      "speaker": "Martín",
       "gender": "male",
-      "spanish": "¡De lujo! Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.",
-      "english": "Awesome! You order two ice-cold draft beers while I look for an empty table in the back.",
+      "spanish": "Mejor comprá vos el vino tinto, el pan francés y los tomates para la ensalada en la verdulería.",
+      "english": "Better yet, you buy the red wine, French bread, and tomatoes for the salad at the produce stand.",
+      "startTime": 31.73,
+      "endTime": 38.55
+    },
+    {
+      "id": 6,
+      "speaker": "Flor",
+      "gender": "female",
+      "spanish": "De una, yo me encargo de eso acá al lado. ¡Nos va a quedar re copado el almuerzo en la terraza!",
+      "english": "Deal, I'll take care of that right next door. Lunch on the rooftop is going to turn out super cool!",
+      "startTime": 38.9,
+      "endTime": 45.45,
       "slang": {
-        "term": "dos cañas",
-        "literalMeaning": "two reeds / canes",
-        "actualMeaning": "two small glasses of draft beer (standard across Spain)",
-        "example": "Nos tomamos dos cañas con unas aceitunas en la plaza."
-      },
-      "startTime": 24.46,
-      "endTime": 31.37
+        "term": "re copado",
+        "literalMeaning": "very topped / filled",
+        "actualMeaning": "super cool / awesome (Argentine 're' + 'copado')",
+        "example": "El lugar nuevo en Palermo está re copado."
+      }
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why does Javi look so tired when he meets Lucía?",
+      "question": "What items do Martín and Flor buy at the butcher shop for Sunday's barbecue?",
       "options": [
-        "He was swamped working on a report all afternoon",
-        "He walked all the way across Madrid in the rain",
-        "He stayed up late watching a soccer match",
-        "He just came back from the gym"
+        "The last kilo of 'vacío' (flank steak), four sausages ('chorizos'), and charcoal",
+        "Two chickens, potatoes, and salad greens",
+        "Fish fillets, lemons, and white wine",
+        "Pork ribs and a dozen empanadas"
       ],
       "correctIndex": 0,
-      "explanation": "Javi explains: 'Estuve liado con un informe toda la tarde' (he was swamped with a report all afternoon)."
+      "explanation": "Martín spots 'el último kilo de vacío' and Flor tells him to grab 'cuatro chorizos criollos y una bolsa grande de carbón.'"
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "What food does Lucía recommend at the tavern, and how much does it cost?",
+      "question": "How much does the butcher shop order cost in total?",
       "options": [
-        "Patatas bravas for 5 euros",
-        "Spanish tortilla for 10 euros",
-        "Calamari sandwiches for 8 euros",
-        "Ham croquettes for 12 euros"
+        "5,000 pesos",
+        "8,000 pesos",
+        "12,000 pesos ('doce mil mangos')",
+        "20,000 pesos"
       ],
-      "correctIndex": 0,
-      "explanation": "Lucía says: 'ponen unas patatas bravas que flipas por cinco euros.'"
+      "correctIndex": 2,
+      "explanation": "Martín says: 'el carnicero dice que son doce mil mangos en total' (12,000 pesos total)."
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "What does Javi ask Lucía to order while he looks for a table in the back?",
+      "question": "How do they divide the expenses for the barbecue?",
       "options": [
-        "Two cold draft beers ('dos cañas bien frías')",
-        "A pitcher of sangria",
-        "Two bottles of sparkling water",
-        "Two cups of espresso"
+        "Martín pays for the meat/charcoal, and Flor buys the red wine, bread, and tomatoes next door",
+        "Flor pays for everything with her credit card",
+        "They ask their friends to transfer money first",
+        "They decide to eat at a restaurant instead"
       ],
       "correctIndex": 0,
-      "explanation": "Javi says: 'Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.'"
+      "explanation": "Martín asks Flor to buy the red wine, French bread, and tomatoes next door while he pays the butcher."
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: In Spain, what do 'el curro', 'estar liado', and 'que flipas' mean?",
+      "question": "Slang Side Quest: In Argentina, what do '¡Qué joya!', 'doce mil mangos', and 're copado' mean?",
       "options": [
-        "'El curro' = work/job; 'estar liado' = to be swamped/busy; 'que flipas' = mind-blowing/amazing",
-        "'El curro' = the bus; 'estar liado' = to be lost; 'que flipas' = overpriced",
-        "'El curro' = the boss; 'estar liado' = to be hungry; 'que flipas' = very spicy",
-        "'El curro' = the gym; 'estar liado' = to be sleepy; 'que flipas' = frozen"
+        "'Qué joya' = Fantastic!; 'mangos' = pesos/bucks; 're copado' = super cool",
+        "'Qué joya' = How expensive!; 'mangos' = tropical fruit; 're copado' = too crowded",
+        "'Qué joya' = What a ring!; 'mangos' = coins; 're copado' = burnt on the grill",
+        "'Qué joya' = Hurry up!; 'mangos' = grams; 're copado' = very late"
       ],
       "correctIndex": 0,
-      "explanation": "In Spain, 'el curro' means work, 'estar liado' means to be busy/swamped, and 'que flipas' means amazing/mind-blowing!"
+      "explanation": "In Argentine Spanish, '¡Qué joya!' is 'Fantastic!', 'mangos' means pesos/bucks, and 're copado' means super cool!"
     }
   ]
 }

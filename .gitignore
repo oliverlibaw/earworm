@@ -41,3 +41,6 @@ next-env.d.ts
 
 # convex local state
 .convex/
+
+# CLI episode generator temp files
+/tmp/

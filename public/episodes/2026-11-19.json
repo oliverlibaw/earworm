@@ -1,145 +1,133 @@
 {
-  "id": "ep-014",
-  "episodeNumber": 14,
+  "id": "ep-015",
+  "episodeNumber": 15,
   "date": "2026-11-19",
-  "title": "El boleto falso afuera del Foro Sol",
-  "region": "Mexico",
-  "regionFlag": "🇲🇽",
-  "ambientType": "street",
+  "title": "Regateando una cazadora en El Rastro",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "market",
   "audioUrl": "/earworm/episodes/2026-11-19.mp3",
-  "durationSeconds": 64.49,
+  "durationSeconds": 40.06,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Paco",
-      "gender": "male",
-      "spanish": "¡No mames, Mariana! El lector de códigos aquí en la puerta del Foro Sol acaba de prender en rojo con mi boleto, güey.",
-      "english": "No freaking way, Mariana! The barcode scanner right here at the Foro Sol gate just flashed red on my ticket, dude.",
-      "startTime": 0.14,
-      "endTime": 10.54
+      "speaker": "Marta",
+      "gender": "female",
+      "spanish": "¡Oye, Dani, mira qué cazadora de cuero tan chula tienen colgada en este puesto del Rastro!",
+      "english": "Hey, Dani, look what a cool leather jacket they have hanging at this stall in El Rastro!",
+      "startTime": 0.5,
+      "endTime": 7.72,
+      "slang": {
+        "term": "tan chula",
+        "literalMeaning": "so cocky / cute",
+        "actualMeaning": "so cool / stylish / pretty (everyday Spain slang)",
+        "example": "¡Qué zapatillas tan chulas te has comprado!"
+      }
     },
     {
       "id": 2,
-      "speaker": "Mariana",
-      "gender": "female",
-      "spanish": "¡No me digas eso! Te advertí que ese revendedor de Facebook se veía súper chafa, Paco. ¡Se pasó de lanza el tipo si nos vendió uno clonado!",
-      "english": "Don't tell me that! I warned you that Facebook reseller looked super sketchy, Paco. That guy totally ripped us off if he sold us a cloned ticket!",
-      "slang": {
-        "term": "chafa",
-        "literalMeaning": "shoddy / low-grade",
-        "actualMeaning": "sketchy, fake, or low-quality (Mexican slang)",
-        "example": "Compré unos audífonos baratos pero salieron bien chafas."
-      },
-      "startTime": 10.97,
-      "endTime": 22.78
+      "speaker": "Dani",
+      "gender": "male",
+      "spanish": "Pues te queda genial de talla, tía. Pregúntale al chico cuánto pide por ella.",
+      "english": "Well it fits you great, girl. Ask the guy how much he's asking for it.",
+      "startTime": 8.07,
+      "endTime": 13.59
     },
     {
       "id": 3,
-      "speaker": "Paco",
-      "gender": "male",
-      "spanish": "Espérate, ya me puse nervioso porque me costó un ojo de la cara y me quedé sin un quinto para toda la quincena.",
-      "english": "Wait a second, now I'm nervous because it cost me an arm and a leg and left me without a cent for the whole two-week pay period.",
+      "speaker": "Marta",
+      "gender": "female",
+      "spanish": "Bueno, dice que son sesenta pavos, pero tiene un pequeño roce aquí en el bolsillo.",
+      "english": "Well, he says it's sixty bucks, but it has a small scuff right here on the pocket.",
+      "startTime": 13.94,
+      "endTime": 20.4,
       "slang": {
-        "term": "sin un quinto",
-        "literalMeaning": "without a five-cent coin",
-        "actualMeaning": "penniless / without a single cent left",
-        "example": "Después de pagar la renta me quedé sin un quinto."
-      },
-      "startTime": 23.21,
-      "endTime": 31.82
+        "term": "sesenta pavos",
+        "literalMeaning": "sixty turkeys",
+        "actualMeaning": "sixty euros / bucks (colloquial Spain slang for euros)",
+        "example": "La entrada del festival me costó cincuenta pavos."
+      }
     },
     {
       "id": 4,
-      "speaker": "Mariana",
-      "gender": "female",
-      "spanish": "A ver, enséñame tu celular... ¡Ay, Paco, estás bien dormido! Estabas enseñando el código QR del estacionamiento en vez del boleto del concierto.",
-      "english": "Hold on, show me your phone... Oh, Paco, you're half asleep! You were showing the QR code for the parking lot instead of the concert ticket.",
-      "startTime": 32.26,
-      "endTime": 45.43
+      "speaker": "Dani",
+      "gender": "male",
+      "spanish": "O sea, sesenta es un poco caro para ser de segunda mano. Dile que le das cuarenta en efectivo ahora mismo.",
+      "english": "I mean, sixty is a bit pricey for secondhand. Tell him you'll give him forty in cash right now.",
+      "startTime": 20.75,
+      "endTime": 28.77
     },
     {
       "id": 5,
-      "speaker": "Paco",
-      "gender": "male",
-      "spanish": "¿Neta? ¡Qué oso hice con el de seguridad! Mira, ya escaneó el bueno y se puso en verde.",
-      "english": "For real? How embarrassing in front of the security guard! Look, he just scanned the right one and it turned green.",
-      "slang": {
-        "term": "Qué oso",
-        "literalMeaning": "what a bear",
-        "actualMeaning": "How embarrassing! / What a blunder!",
-        "example": "¡Qué oso cuando me caí frente a toda la clase!"
-      },
-      "startTime": 45.86,
-      "endTime": 53.62
+      "speaker": "Marta",
+      "gender": "female",
+      "spanish": "Vale, hemos cerrado el trato en cuarenta y cinco euros y me regala este pañuelo de seda.",
+      "english": "Okay, we closed the deal at forty-five euros and he's throwing in this silk scarf for free.",
+      "startTime": 29.12,
+      "endTime": 35.55
     },
     {
       "id": 6,
-      "speaker": "Mariana",
-      "gender": "female",
-      "spanish": "¡A huevo! Casi me da el patatús. Ya córrele que la banda está a punto de tocar la primera rola y nos toca hasta la pista.",
-      "english": "Hell yeah! I almost had a heart attack. Run now, the band is about to play their first song and our spot is all the way down on the floor.",
-      "slang": {
-        "term": "rola",
-        "literalMeaning": "roll",
-        "actualMeaning": "song / music track (Mexican slang)",
-        "example": "Esa banda acaba de sacar una rola buenísima."
-      },
-      "startTime": 54.05,
-      "endTime": 64.25
+      "speaker": "Dani",
+      "gender": "male",
+      "spanish": "¡Qué triunfada, tía! Venga, vamos a tomar un vermut con aceitunas en la plaza de Cascorro.",
+      "english": "What a score, girl! Come on, let's go grab a vermouth with olives at Cascorro square.",
+      "startTime": 35.9,
+      "endTime": 42.69
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why do Paco and Mariana panic when they arrive at the entrance to the Foro Sol concert venue?",
+      "question": "What item is Marta buying at El Rastro flea market in Madrid?",
       "options": [
-        "The ticket scanner flashes red on Paco's ticket, making them fear he bought a fake ticket",
-        "Paco forgot his cell phone in the parking lot",
-        "The concert was canceled due to rain",
-        "Mariana bought tickets for the wrong date"
+        "A secondhand leather jacket ('una cazadora de cuero')",
+        "A pair of vintage boots",
+        "An antique wooden chair",
+        "An acoustic guitar"
       ],
       "correctIndex": 0,
-      "explanation": "The scanner flashes red ('acaba de prender en rojo'), making them fear the Facebook reseller sold Paco a cloned ticket."
+      "explanation": "Marta spots 'qué cazadora de cuero tan chula' hanging at the market stall."
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "What silly mistake does Mariana discover when she looks at Paco's phone screen?",
+      "question": "What was the seller's initial price, and what final price do they agree on?",
       "options": [
-        "He was showing the QR code for the parking lot instead of the concert ticket",
-        "His screen brightness was turned all the way down",
-        "He was showing an old movie ticket",
-        "His phone battery had died"
+        "Initially 60 euros; they settle on 45 euros plus a free silk scarf",
+        "Initially 100 euros; they settle on 80 euros",
+        "Initially 40 euros; Marta pays the full 40 euros",
+        "Initially 50 euros; they settle on 25 euros"
       ],
       "correctIndex": 0,
-      "explanation": "Mariana sees he was showing 'el código QR del estacionamiento en vez del boleto del concierto.'"
+      "explanation": "The seller initially asks for 'sesenta pavos' (60 euros), and Marta bargains down to 45 euros plus a silk scarf."
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "Why do they have to run once the real ticket scans green?",
+      "question": "Where do Dani and Marta head after buying the jacket?",
       "options": [
-        "The band is about to play their first song ('la primera rola') and their spot is down on the floor ('la pista')",
-        "The stadium gates are closing in one minute",
-        "It is starting to rain heavily",
-        "They need to meet their friends at the merchandise booth"
+        "To Cascorro square to have vermouth and olives",
+        "To the subway station to go home",
+        "To a shoe store on Gran Vía",
+        "To the Prado Museum"
       ],
       "correctIndex": 0,
-      "explanation": "Mariana says: 'la banda está a punto de tocar la primera rola y nos toca hasta la pista.'"
+      "explanation": "Dani says: 'vamos a tomar un vermut con aceitunas en la plaza de Cascorro.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: What do 'chafa', 'sin un quinto', '¡qué oso!', and 'la rola' mean in Mexican slang?",
+      "question": "Slang Side Quest: In Spain, what do 'tan chula' and 'sesenta pavos' mean?",
       "options": [
-        "'Chafa' = sketchy/low-quality; 'sin un quinto' = penniless; 'qué oso' = how embarrassing; 'la rola' = the song",
-        "'Chafa' = polite; 'sin un quinto' = five minutes late; 'qué oso' = how lucky; 'la rola' = the stage",
-        "'Chafa' = expensive; 'sin un quinto' = without a ticket; 'qué oso' = how scary; 'la rola' = the guitar",
-        "'Chafa' = famous; 'sin un quinto' = alone; 'qué oso' = how funny; 'la rola' = the exit"
+        "'Tan chula' = so cool/stylish; 'sesenta pavos' = 60 euros (bucks)",
+        "'Tan chula' = so heavy; 'sesenta pavos' = 60 turkeys",
+        "'Tan chula' = so warm; 'sesenta pavos' = 60 minutes",
+        "'Tan chula' = so old; 'sesenta pavos' = 60 cents"
       ],
       "correctIndex": 0,
-      "explanation": "In Mexico City slang, 'chafa' is sketchy/shoddy, 'sin un quinto' is penniless, '¡qué oso!' is 'how embarrassing!', and 'la rola' is the song!"
+      "explanation": "In Spain, 'chulo/chula' means cool or stylish, and 'pavos' (literally turkeys) is slang for euros/bucks!"
     }
   ]
 }

@@ -1,121 +1,139 @@
 {
-  "id": "ep-005",
-  "episodeNumber": 5,
+  "id": "ep-006",
+  "episodeNumber": 6,
   "date": "2026-11-10",
-  "title": "El café de olla y el pan dulce en Coyoacán",
-  "region": "Mexico",
-  "regionFlag": "🇲🇽",
-  "ambientType": "cafe",
+  "title": "Tapas de última hora en Lavapiés",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "street",
   "audioUrl": "/earworm/episodes/2026-11-10.mp3",
-  "durationSeconds": 34.37,
+  "durationSeconds": 40.56,
   "dialogue": [
     {
       "id": 1,
-      "speaker": "Sofía",
+      "speaker": "Lucía",
       "gender": "female",
-      "spanish": "Oye, Luis, ¿pedimos dos cafés de olla aquí en la panadería antes de tomar el camión?",
-      "english": "Hey, Luis, should we order two spiced pot coffees here at the bakery before taking the bus?",
+      "spanish": "¡Hola, Javi! Bueno, ¿qué tal el curro hoy? Te veo con una cara de cansado impresionante.",
+      "english": "Hi, Javi! Well, how was work today? You look completely exhausted.",
+      "startTime": 0.5,
+      "endTime": 7.56,
       "slang": {
-        "term": "camión",
-        "literalMeaning": "truck",
-        "actualMeaning": "city passenger bus (standard everyday word in Mexico)",
-        "example": "El camión al centro pasa cada diez minutos."
-      },
-      "startTime": 0.14,
-      "endTime": 7.27
+        "term": "el curro",
+        "literalMeaning": "the job / gig",
+        "actualMeaning": "work / job (everyday colloquial word in Spain)",
+        "example": "Salgo del curro a las seis y nos vemos en el centro."
+      }
     },
     {
       "id": 2,
-      "speaker": "Luis",
+      "speaker": "Javi",
       "gender": "male",
-      "spanish": "¿Mande? Perdón, estaba viendo mi celular. Sí, buena idea, hace bastante frío esta mañana.",
-      "english": "Pardon? Sorry, I was looking at my phone. Yes, good idea, it's pretty cold this morning.",
+      "spanish": "Uf, ni me hables, tía. Pues estuve súper liado con un informe toda la tarde, pero ya me muero de hambre.",
+      "english": "Phew, don't even get me started, girl. Well I was super tied up with a report all afternoon, but now I'm starving.",
+      "startTime": 7.91,
+      "endTime": 15.78,
       "slang": {
-        "term": "¿Mande?",
-        "literalMeaning": "command me?",
-        "actualMeaning": "Pardon? / What did you say? (Polite Mexican way to ask someone to repeat)",
-        "example": "¿Mande, abuelita? No te escuché bien."
-      },
-      "startTime": 7.7,
-      "endTime": 16.32
+        "term": "súper liado",
+        "literalMeaning": "super tied / wrapped up",
+        "actualMeaning": "swamped / super busy with something",
+        "example": "Perdona que no te llamara, anduve súper liado toda la mañana."
+      }
     },
     {
       "id": 3,
-      "speaker": "Sofía",
+      "speaker": "Lucía",
       "gender": "female",
-      "spanish": "También voy a llevar dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.",
-      "english": "I'm also going to get two vanilla sweet breads to eat for breakfast at the office. It's thirty-five pesos total.",
-      "startTime": 16.75,
-      "endTime": 25.58
+      "spanish": "Venga, entremos a esta taberna de la esquina que ponen unas patatas bravas que flipas por cinco euros.",
+      "english": "Come on, let's go into this corner tavern—they serve mind-blowing patatas bravas for five euros.",
+      "startTime": 16.13,
+      "endTime": 23.67,
+      "slang": {
+        "term": "que flipas",
+        "literalMeaning": "that you flip out",
+        "actualMeaning": "mind-blowing / incredible / amazing (Spain slang)",
+        "example": "En ese bar hacen una tortilla de patatas que flipas."
+      }
     },
     {
       "id": 4,
-      "speaker": "Luis",
+      "speaker": "Javi",
       "gender": "male",
-      "spanish": "Yo invito hoy, Sofía. Pero apúrate porque nuestro camión pasa en ocho minutos por la avenida.",
-      "english": "It's my treat today, Sofía. But hurry up because our bus comes down the avenue in eight minutes.",
-      "slang": {
-        "term": "Yo invito",
-        "literalMeaning": "I invite",
-        "actualMeaning": "It's my treat / I'm paying for both of us",
-        "example": "Guarda tu cartera, hoy yo invito los tacos."
-      },
-      "startTime": 26.02,
-      "endTime": 34.13
+      "spanish": "¡Ostras, qué buena pinta! O sea, ¿también tienen croquetas caseras de jamón?",
+      "english": "Whoa, that sounds great! I mean, do they also have homemade ham croquettes?",
+      "startTime": 24.02,
+      "endTime": 29.64
+    },
+    {
+      "id": 5,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Sí, la ración de seis croquetas sale a ocho euros y viene con pan recién tostado.",
+      "english": "Yes, a plate of six croquettes is eight euros and comes with freshly toasted bread.",
+      "startTime": 29.99,
+      "endTime": 36.45
+    },
+    {
+      "id": 6,
+      "speaker": "Javi",
+      "gender": "male",
+      "spanish": "¡De lujo! Pide tú dos cañas bien frías en la barra mientras busco una mesa libre al fondo.",
+      "english": "Awesome! You order two ice-cold draft beers at the bar while I look for an empty table in the back.",
+      "startTime": 36.8,
+      "endTime": 43.21
     }
   ],
   "questions": [
     {
       "id": "q1",
       "type": "comprehension",
-      "question": "Why does Luis say '¿Mande?' when Sofía first speaks to him?",
+      "question": "Why does Javi look so tired when he meets Lucía?",
       "options": [
-        "He was looking at his phone and didn't catch what she said",
-        "He doesn't like spiced coffee",
-        "He forgot his wallet at home",
-        "The bakery music is too loud"
+        "He was swamped working on a report all afternoon",
+        "He walked all the way across Madrid in the rain",
+        "He stayed up late watching a soccer match",
+        "He just came back from the gym"
       ],
       "correctIndex": 0,
-      "explanation": "Luis replies: '¿Mande? Perdón, estaba viendo mi celular.'"
+      "explanation": "Javi explains: 'estuve súper liado con un informe toda la tarde' (he was swamped with a report all afternoon)."
     },
     {
       "id": "q2",
       "type": "comprehension",
-      "question": "What does Sofía pick up to eat at the office, and how much is the total?",
+      "question": "What two dishes do they plan to order at the tavern, and what do they cost?",
       "options": [
-        "Two vanilla conchas (sweet breads) for 35 pesos total",
-        "Three churros for 50 pesos total",
-        "One ham sandwich for 45 pesos total",
-        "Two tamales for 30 pesos total"
+        "Patatas bravas for 5 euros and six ham croquettes for 8 euros",
+        "Spanish tortilla for 10 euros and calamari for 12 euros",
+        "Two bocadillos for 6 euros each",
+        "Olives for 3 euros and paella for 18 euros"
       ],
       "correctIndex": 0,
-      "explanation": "Sofía gets 'dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.'"
+      "explanation": "Lucía mentions patatas bravas for 5 euros and a plate of six ham croquettes for 8 euros."
     },
     {
       "id": "q3",
       "type": "comprehension",
-      "question": "Why does Luis tell Sofía to hurry up at the end?",
+      "question": "What does Javi ask Lucía to order at the bar while he looks for a table?",
       "options": [
-        "Their bus ('el camión') comes down the avenue in 8 minutes",
-        "The bakery is about to close",
-        "It is starting to rain outside",
-        "Their boss just called on his cell phone"
+        "Two cold draft beers ('dos cañas bien frías')",
+        "A pitcher of sangria",
+        "Two bottles of sparkling water",
+        "Two cups of espresso"
       ],
       "correctIndex": 0,
-      "explanation": "Luis says: 'apúrate porque nuestro camión pasa en ocho minutos por la avenida.'"
+      "explanation": "Javi says: 'Pide tú dos cañas bien frías en la barra mientras busco una mesa libre al fondo.'"
     },
     {
       "id": "q4",
       "type": "slang",
-      "question": "Slang Side Quest: In Mexican Spanish, what do '¿Mande?', 'el camión', and 'Yo invito' mean?",
+      "question": "Slang Side Quest: In Spain, what do 'el curro', 'estar súper liado', and 'que flipas' mean?",
       "options": [
-        "'¿Mande?' = Pardon?; 'el camión' = the city bus; 'Yo invito' = It's my treat",
-        "'¿Mande?' = Send it; 'el camión' = the subway; 'Yo invito' = Come to my party",
-        "'¿Mande?' = Hurry up; 'el camión' = the bicycle; 'Yo invito' = Let's split it",
-        "'¿Mande?' = Excuse me; 'el camión' = the taxi; 'Yo invito' = You pay today"
+        "'El curro' = work/job; 'súper liado' = swamped/busy; 'que flipas' = mind-blowing/amazing",
+        "'El curro' = the bus; 'súper liado' = lost; 'que flipas' = overpriced",
+        "'El curro' = the boss; 'súper liado' = hungry; 'que flipas' = very spicy",
+        "'El curro' = the gym; 'súper liado' = sleepy; 'que flipas' = frozen"
       ],
       "correctIndex": 0,
-      "explanation": "In Mexico, '¿Mande?' is the polite way to say 'Pardon?', 'el camión' is the passenger bus, and 'Yo invito' means 'My treat!'"
+      "explanation": "In Spain, 'el curro' means work, 'estar liado' means to be busy/swamped, and 'que flipas' means amazing/mind-blowing!"
     }
   ]
 }

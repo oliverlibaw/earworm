@@ -1,0 +1,145 @@
+{
+  "id": "ep-001",
+  "episodeNumber": 1,
+  "date": "2026-11-05",
+  "title": "Tacos de canasta afuera del metro",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "street",
+  "audioUrl": "/earworm/episodes/2026-11-05.mp3",
+  "durationSeconds": 45.05,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Carlos",
+      "gender": "male",
+      "spanish": "Oye, Valeria, pues tengo muchísima hambre. ¿Vamos por unos tacos de canasta aquí afuera del metro?",
+      "english": "Hey, Valeria, well I'm super hungry. Shall we get some basket tacos right outside the subway?",
+      "startTime": 0.5,
+      "endTime": 7.56,
+      "slang": {
+        "term": "tacos de canasta",
+        "literalMeaning": "basket tacos",
+        "actualMeaning": "Steamed street tacos kept warm in a cloth-lined basket, often sold from a bicycle",
+        "example": "En la esquina del metro venden tacos de canasta buenísimos."
+      }
+    },
+    {
+      "id": 2,
+      "speaker": "Valeria",
+      "gender": "female",
+      "spanish": "¡Ay, sí, qué rico! Pero espera, o sea, ¿traes efectivo? Porque el señor de la bicicleta no acepta tarjeta.",
+      "english": "Oh, yes, delicious! But wait, I mean, do you have cash on you? Because the guy with the bicycle doesn't take cards.",
+      "startTime": 7.91,
+      "endTime": 16.69
+    },
+    {
+      "id": 3,
+      "speaker": "Carlos",
+      "gender": "male",
+      "spanish": "Híjole, bueno, solo traigo un billete de cincuenta pesos en la cartera. ¿Cuánto cuesta la orden?",
+      "english": "Shoot, well, I only have a fifty-peso bill in my wallet. How much does an order cost?",
+      "startTime": 17.04,
+      "endTime": 24.12,
+      "slang": {
+        "term": "Híjole",
+        "literalMeaning": "little son (altered exclamation)",
+        "actualMeaning": "Shoot! / Gosh! / Oh man! (classic Mexican exclamation of surprise)",
+        "example": "¡Híjole, se me olvidaron las llaves adentro de la casa!"
+      }
+    },
+    {
+      "id": 4,
+      "speaker": "Valeria",
+      "gender": "female",
+      "spanish": "Pues la orden de cinco tacos sale en cuarenta pesos. Y yo tengo veinte pesos en monedas para dos refrescos.",
+      "english": "Well an order of five tacos comes to forty pesos. And I have twenty pesos in coins for two sodas.",
+      "startTime": 24.47,
+      "endTime": 32.1
+    },
+    {
+      "id": 5,
+      "speaker": "Carlos",
+      "gender": "male",
+      "spanish": "¡Ah, qué chido! Entonces compartimos la orden ahorita y en la tarde te paso mi parte por transferencia.",
+      "english": "Oh, awesome! Then let's share the order right now and this afternoon I'll send you my share by bank transfer.",
+      "startTime": 32.45,
+      "endTime": 39.99,
+      "slang": {
+        "term": "qué chido",
+        "literalMeaning": "how cool",
+        "actualMeaning": "How awesome / great / cool (classic Mexican slang)",
+        "example": "¡Qué chido que pudiste venir a la fiesta!"
+      }
+    },
+    {
+      "id": 6,
+      "speaker": "Valeria",
+      "gender": "female",
+      "spanish": "Sale, pide dos de papa con chorizo y tres de frijol. ¡Pero aguas con la salsa verde que pica un montón!",
+      "english": "Deal, order two potato-and-chorizo ones and three bean ones. But watch out for the green salsa—it's super spicy!",
+      "startTime": 40.34,
+      "endTime": 47.73,
+      "slang": {
+        "term": "pica un montón",
+        "literalMeaning": "it bites a pile",
+        "actualMeaning": "It's super spicy / has a lot of chili heat",
+        "example": "No le pongas tanta salsa habanera porque pica un montón."
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "What are Carlos and Valeria trying to figure out outside the subway station?",
+      "options": [
+        "Whether they have enough cash to buy street tacos and sodas",
+        "Which subway line they need to take to get to a restaurant",
+        "Where to find an ATM because they lost their wallets",
+        "How to cook potato and bean tacos at home tonight"
+      ],
+      "correctIndex": 0,
+      "explanation": "Carlos is hungry for tacos de canasta outside the metro, and Valeria checks if they have enough cash since the vendor doesn't take cards."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "How much money does Carlos have on him, and how much does an order of 5 tacos cost?",
+      "options": [
+        "He has a 20-peso bill, and the tacos cost 50 pesos",
+        "He has a 50-peso bill, and the 5 tacos cost 40 pesos",
+        "He has 100 pesos in coins, and the tacos cost 60 pesos",
+        "He has no cash at all, so Valeria pays 40 pesos by card"
+      ],
+      "correctIndex": 1,
+      "explanation": "Carlos says 'solo traigo un billete de cincuenta pesos' (50-peso bill), and Valeria says 'la orden de cinco tacos sale en cuarenta pesos' (40 pesos)."
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "Which taco fillings does Valeria ask Carlos to order for them to share?",
+      "options": [
+        "Five pork tacos with red salsa",
+        "Three chicken tacos and two cheese tacos",
+        "Two potato-with-chorizo and three bean tacos",
+        "Four steak tacos and one potato taco"
+      ],
+      "correctIndex": 2,
+      "explanation": "Valeria says: 'Sale, pide dos de papa con chorizo y tres de frijol' (two potato-with-chorizo and three bean tacos)."
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: When Carlos says 'Híjole' and '¡qué chido!', and Valeria warns the salsa 'pica un montón', what do those expressions mean?",
+      "options": [
+        "'Híjole' = shoot/oh man; 'qué chido' = how awesome; 'pica un montón' = it's super spicy",
+        "'Híjole' = hurry up; 'qué chido' = how expensive; 'pica un montón' = it costs extra",
+        "'Híjole' = excuse me; 'qué chido' = how cold; 'pica un montón' = it's sour",
+        "'Híjole' = thank you; 'qué chido' = how small; 'pica un montón' = it's very hot"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Mexican Spanish, 'híjole' is 'shoot/oh man', 'qué chido' is 'how cool/awesome', and 'pica un montón' means 'it's super spicy!'"
+    }
+  ]
+}

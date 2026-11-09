@@ -7,7 +7,19 @@ import type {
 } from "@/lib/staticLessons";
 import type { Episode } from "@/types/episode";
 
-function getPublicBasePath(): string {
+export interface DailyDateResult {
+  date: string; // YYYY-MM-DD
+  episodeId: string;
+  status: "completed" | "in_progress";
+  correctCount: number;
+  totalQuestions: number;
+  scoreOutOf5: number;
+  updatedAt: number;
+}
+
+export const DAILY_RESULTS_STORAGE_KEY = "earshot_daily_results_by_date";
+
+export function getPublicBasePath(): string {
   return process.env.NEXT_PUBLIC_BASE_PATH || "";
 }
 
@@ -22,7 +34,16 @@ export function resolveEpisodeAudioUrl(audioUrl: string): string {
 }
 
 /**
- * Returns the 14-day content buffer of episodes with basePath-resolved `audioUrl`s.
+ * Resolves any public asset path (e.g. `/episodes/manifest.json`) with Next.js `basePath`.
+ */
+export function resolvePublicAssetUrl(relativePath: string): string {
+  const basePath = getPublicBasePath();
+  const clean = relativePath.replace(/^\/earworm/, "");
+  return `${basePath}${clean.startsWith("/") ? "" : "/"}${clean}`;
+}
+
+/**
+ * Returns all episodes in the 14-day content buffer with basePath-resolved `audioUrl`s.
  */
 export function getAllBufferEpisodes(): Episode[] {
   return EPISODES_14_DAY_BUFFER.map((ep) => ({
@@ -32,9 +53,11 @@ export function getAllBufferEpisodes(): Episode[] {
 }
 
 export interface ArchiveDaySlot {
-  relativeDays: number; // 0 = Today, -1 = Yesterday, -2 = 2 Days Ago, -3 = 3 Days Ago
+  relativeDays: number; // 0 = Today, -1 = Yesterday, -2 = 2 Days Ago, -3 = 3 Days Ago, <= -4 = Expired
   relativeLabel: string;
   dateStr: string;
+  isLocked: boolean;
+  lockReason?: string;
   episode: Episode;
 }
 
@@ -47,42 +70,83 @@ function addDaysToDateStr(baseDateStr: string, offsetDays: number): string {
 }
 
 /**
- * Returns Today's episode + the Past 3 Days' episodes (`[0, -1, -2, -3]`) for the
- * 3-Day Archive Drawer. If `todayStr` matches an episode in the buffer (e.g. `2026-11-09`),
- * uses the exact matching dates (`2026-11-09`, `2026-11-08`, `2026-11-07`, `2026-11-06`).
- * Otherwise maps Today and the past 3 days cleanly onto `ep-004`, `ep-003`, `ep-002`, `ep-001`.
+ * Returns the 4 playable days (Today + previous 3 days) plus older expired archive days
+ * so the 3-Day Archive Drawer can display both the 4 unlocked days and locked ("Archive expired")
+ * older days to preserve the daily habit loop.
  */
-export function getThreeDayArchiveSlots(todayStr: string): ArchiveDaySlot[] {
+export function getArchiveWindowSlots(
+  todayStr: string
+): {
+  playableSlots: ArchiveDaySlot[];
+  expiredSlots: ArchiveDaySlot[];
+} {
   const all = getAllBufferEpisodes();
   const exactTodayIdx = all.findIndex((ep) => ep.date === todayStr);
-  const anchorIdx = exactTodayIdx >= 3 ? exactTodayIdx : 3; // ep-004 is index 3
+  const anchorIdx = exactTodayIdx >= 4 ? exactTodayIdx : 4; // ep-005 (2026-11-09) is index 4
 
-  const offsets = [
+  const playableOffsets = [
     { relativeDays: 0, relativeLabel: "Today" },
     { relativeDays: -1, relativeLabel: "Yesterday" },
     { relativeDays: -2, relativeLabel: "2 Days Ago" },
     { relativeDays: -3, relativeLabel: "3 Days Ago" },
   ];
 
-  return offsets.map(({ relativeDays, relativeLabel }) => {
-    const targetDateStr = addDaysToDateStr(todayStr, relativeDays);
-    const exactMatch = all.find((ep) => ep.date === targetDateStr);
-    const fallbackEp =
-      all[
-        Math.max(0, Math.min(all.length - 1, anchorIdx + relativeDays))
-      ] ?? all[0];
-    const chosen = exactMatch ?? fallbackEp;
+  const playableSlots: ArchiveDaySlot[] = playableOffsets.map(
+    ({ relativeDays, relativeLabel }) => {
+      const targetDateStr = addDaysToDateStr(todayStr, relativeDays);
+      const exactMatch = all.find((ep) => ep.date === targetDateStr);
+      const fallbackEp =
+        all[
+          Math.max(0, Math.min(all.length - 1, anchorIdx + relativeDays))
+        ] ?? all[0];
+      const chosen = exactMatch ?? fallbackEp;
 
-    return {
-      relativeDays,
-      relativeLabel,
-      dateStr: targetDateStr,
-      episode: {
-        ...chosen,
-        date: targetDateStr,
-      },
-    };
-  });
+      return {
+        relativeDays,
+        relativeLabel,
+        dateStr: targetDateStr,
+        isLocked: false,
+        episode: {
+          ...chosen,
+          date: targetDateStr,
+        },
+      };
+    }
+  );
+
+  // Older episodes beyond the 3-day window (-4 and -5 days ago) are locked ("Archive expired")
+  const expiredOffsets = [
+    { relativeDays: -4, relativeLabel: "4 Days Ago" },
+    { relativeDays: -5, relativeLabel: "5 Days Ago" },
+  ];
+
+  const expiredSlots: ArchiveDaySlot[] = expiredOffsets.map(
+    ({ relativeDays, relativeLabel }, idx) => {
+      const targetDateStr = addDaysToDateStr(todayStr, relativeDays);
+      const exactMatch = all.find((ep) => ep.date === targetDateStr);
+      const fallbackEp =
+        all[idx] ?? all[all.length - 1 - idx] ?? all[0];
+      const chosen = exactMatch ?? fallbackEp;
+
+      return {
+        relativeDays,
+        relativeLabel,
+        dateStr: targetDateStr,
+        isLocked: true,
+        lockReason: "Archive expired (older than 3 days)",
+        episode: {
+          ...chosen,
+          date: targetDateStr,
+        },
+      };
+    }
+  );
+
+  return { playableSlots, expiredSlots };
+}
+
+export function getThreeDayArchiveSlots(todayStr: string): ArchiveDaySlot[] {
+  return getArchiveWindowSlots(todayStr).playableSlots;
 }
 
 /**
@@ -140,8 +204,7 @@ export function episodeToStaticLesson(
       options: paddedOptions,
       correctOptionIndex: q.correctIndex,
       explanation: q.explanation,
-      idealAnswerRubric:
-        q.options[q.correctIndex] ?? q.explanation,
+      idealAnswerRubric: q.options[q.correctIndex] ?? q.explanation,
     };
   });
 
