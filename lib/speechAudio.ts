@@ -2,17 +2,140 @@
 
 let sharedSegmentAudio: HTMLAudioElement | null = null;
 let segmentStopTimeout: ReturnType<typeof setTimeout> | null = null;
+let segmentRafId: number | null = null;
+
+export function stopAudioSlice(): void {
+  if (segmentStopTimeout) {
+    clearTimeout(segmentStopTimeout);
+    segmentStopTimeout = null;
+  }
+  if (segmentRafId !== null && typeof window !== "undefined") {
+    window.cancelAnimationFrame(segmentRafId);
+    segmentRafId = null;
+  }
+  if (sharedSegmentAudio) {
+    sharedSegmentAudio.pause();
+    sharedSegmentAudio.ontimeupdate = null;
+    sharedSegmentAudio.onended = null;
+  }
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      // ignore
+    }
+  }
+}
 
 /**
- * Speaks a Spanish word, slang phrase, or sentence using the browser's
- * native SpeechSynthesis (preferring Mexican / Latin American Spanish `es-MX`),
- * or falls back to playing the corresponding time slice of the dialog MP3.
+ * Plays an exact [startTime, endTime] slice (in seconds) of an episode MP3 file.
+ * Automatically stops playback as soon as `currentTime >= endTime`.
+ */
+export function playAudioSlice(
+  audioUrl: string,
+  startTime: number,
+  endTime: number,
+  options?: {
+    playbackRate?: number;
+    onEnd?: () => void;
+    onError?: () => void;
+  }
+): void {
+  if (typeof window === "undefined") return;
+  stopAudioSlice();
+
+  try {
+    if (!sharedSegmentAudio) {
+      sharedSegmentAudio = new Audio();
+      sharedSegmentAudio.preload = "auto";
+    }
+    const audio = sharedSegmentAudio;
+    const rate = options?.playbackRate ?? 1.0;
+
+    const startPlayback = () => {
+      try {
+        audio.playbackRate = rate;
+        audio.currentTime = Math.max(0, startTime);
+
+        const finishSlice = () => {
+          stopAudioSlice();
+          options?.onEnd?.();
+        };
+
+        const checkProgress = () => {
+          if (!sharedSegmentAudio || sharedSegmentAudio.paused) return;
+          if (sharedSegmentAudio.currentTime >= endTime - 0.03) {
+            finishSlice();
+            return;
+          }
+          segmentRafId = window.requestAnimationFrame(checkProgress);
+        };
+
+        audio.ontimeupdate = () => {
+          if (audio.currentTime >= endTime - 0.03) {
+            finishSlice();
+          }
+        };
+        audio.onended = () => {
+          finishSlice();
+        };
+
+        const durationMs =
+          (Math.max(0.4, endTime - startTime) / Math.max(0.5, rate)) * 1000 +
+          250;
+        segmentStopTimeout = setTimeout(finishSlice, durationMs);
+
+        void audio
+          .play()
+          .then(() => {
+            segmentRafId = window.requestAnimationFrame(checkProgress);
+          })
+          .catch(() => {
+            options?.onError?.();
+            options?.onEnd?.();
+          });
+      } catch {
+        options?.onError?.();
+        options?.onEnd?.();
+      }
+    };
+
+    const resolvedTarget = new URL(audioUrl, window.location.origin).href;
+    if (audio.src === resolvedTarget && audio.readyState >= 1) {
+      startPlayback();
+    } else {
+      audio.src = audioUrl;
+      audio.onloadedmetadata = () => {
+        audio.onloadedmetadata = null;
+        startPlayback();
+      };
+      audio.onerror = () => {
+        audio.onerror = null;
+        options?.onError?.();
+        options?.onEnd?.();
+      };
+      audio.load();
+    }
+  } catch {
+    options?.onError?.();
+    options?.onEnd?.();
+  }
+}
+
+/**
+ * Speaks a Spanish word, slang phrase, or sentence.
+ * If exact `startTime` and `endTime` along with `fallbackAudioUrl` are provided,
+ * plays that exact slice from the episode MP3 file first!
+ * Otherwise uses the browser's native SpeechSynthesis (preferring `es-MX`),
+ * or falls back to proportional MP3 slicing.
  */
 export function speakSpanishText(
   text: string,
   options?: {
     rate?: number;
     fallbackAudioUrl?: string;
+    startTime?: number;
+    endTime?: number;
     turnIndex?: number;
     totalTurns?: number;
     onEnd?: () => void;
@@ -20,15 +143,24 @@ export function speakSpanishText(
 ): void {
   if (typeof window === "undefined") return;
 
-  // Stop any currently playing segment audio
-  if (segmentStopTimeout) {
-    clearTimeout(segmentStopTimeout);
-    segmentStopTimeout = null;
-  }
-  if (sharedSegmentAudio) {
-    sharedSegmentAudio.pause();
+  stopAudioSlice();
+
+  // 1. If exact line timestamps (`startTime` and `endTime`) + `fallbackAudioUrl` are provided,
+  // slice the actual episode MP3 directly!
+  if (
+    options?.fallbackAudioUrl &&
+    typeof options.startTime === "number" &&
+    typeof options.endTime === "number" &&
+    options.endTime > options.startTime
+  ) {
+    playAudioSlice(options.fallbackAudioUrl, options.startTime, options.endTime, {
+      playbackRate: options.rate && options.rate < 0.85 ? options.rate : 1.0,
+      onEnd: options.onEnd,
+    });
+    return;
   }
 
+  // 2. Otherwise use Web Speech API (for single vocab words / slang terms)
   const synth = window.speechSynthesis;
   if (synth) {
     try {
@@ -63,7 +195,7 @@ export function speakSpanishText(
     }
   }
 
-  // Fallback: play the proportional segment of the dialog MP3 file
+  // 3. Fallback: play the proportional segment of the dialog MP3 file
   if (options?.fallbackAudioUrl) {
     try {
       if (!sharedSegmentAudio) {
@@ -77,12 +209,10 @@ export function speakSpanishText(
       audio.onloadedmetadata = () => {
         const dur = Number.isFinite(audio.duration) ? audio.duration : 28;
         const sliceSec = dur / total;
-        audio.currentTime = Math.max(0, turnIdx * sliceSec);
-        void audio.play();
-        segmentStopTimeout = setTimeout(() => {
-          audio.pause();
-          options.onEnd?.();
-        }, Math.max(3500, sliceSec * 1000));
+        const startSec = Math.max(0, turnIdx * sliceSec);
+        playAudioSlice(options.fallbackAudioUrl!, startSec, startSec + sliceSec, {
+          onEnd: options.onEnd,
+        });
       };
       audio.load();
       return;

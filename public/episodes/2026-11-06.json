@@ -1,0 +1,121 @@
+{
+  "id": "ep-001",
+  "episodeNumber": 1,
+  "date": "2026-11-06",
+  "title": "La cuenta dividida en el café de Madrid",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "cafe",
+  "audioUrl": "/earworm/episodes/2026-11-06.mp3",
+  "durationSeconds": 29.69,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Carmen",
+      "gender": "female",
+      "spanish": "Oye, Pablo, el camarero dice que no nos divide la cuenta en la terraza.",
+      "english": "Hey, Pablo, the waiter says he won't split the bill for us on the patio.",
+      "startTime": 0.14,
+      "endTime": 6.53
+    },
+    {
+      "id": 2,
+      "speaker": "Pablo",
+      "gender": "male",
+      "spanish": "¡Qué fuerte! Bueno, no pasa nada, pago yo todo con tarjeta porque andas sin pasta.",
+      "english": "That's wild! Well, no worries, I'll pay the whole thing by card since you're out of cash.",
+      "slang": {
+        "term": "pasta",
+        "literalMeaning": "pasta / dough",
+        "actualMeaning": "money / cash (very common slang across Spain)",
+        "example": "No salgo este finde porque no tengo nada de pasta."
+      },
+      "startTime": 6.96,
+      "endTime": 14.42
+    },
+    {
+      "id": 3,
+      "speaker": "Carmen",
+      "gender": "female",
+      "spanish": "Mil gracias, tío. Te hago un Bizum de doce euros ahora mismo por mis tostadas y el cortado.",
+      "english": "Thanks a million, dude. I'll send you a 12-euro Bizum transfer right now for my toast and espresso.",
+      "slang": {
+        "term": "tío",
+        "literalMeaning": "uncle",
+        "actualMeaning": "dude / mate / guy (everyday Spanish friend address)",
+        "example": "¡Gracias por esperarme, tío!"
+      },
+      "startTime": 14.86,
+      "endTime": 22.99
+    },
+    {
+      "id": 4,
+      "speaker": "Pablo",
+      "gender": "male",
+      "spanish": "Vale, genial. Vámonos pitando que el metro cierra en veinte minutos.",
+      "english": "Okay, great. Let's get out of here fast because the metro closes in twenty minutes.",
+      "slang": {
+        "term": "pitando",
+        "literalMeaning": "whistling / honking",
+        "actualMeaning": "in a big hurry / right away (irse pitando)",
+        "example": "Salí pitando de la oficina para no perder el tren."
+      },
+      "startTime": 23.42,
+      "endTime": 29.45
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "What problem do Carmen and Pablo run into at the Madrid café?",
+      "options": [
+        "The waiter says he won't split the bill on the patio",
+        "The credit card machine is broken",
+        "The kitchen ran out of toast and coffee",
+        "They forgot their phones at home"
+      ],
+      "correctIndex": 0,
+      "explanation": "Carmen says: 'el camarero dice que no nos divide la cuenta en la terraza' (the waiter won't split the bill)."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "How does Carmen pay Pablo back for her share?",
+      "options": [
+        "She gives him a 20-euro bill in cash",
+        "She sends him a 12-euro Bizum mobile transfer",
+        "She buys his metro ticket at the station",
+        "She promises to buy breakfast tomorrow"
+      ],
+      "correctIndex": 1,
+      "explanation": "Carmen says: 'Te hago un Bizum de doce euros ahora mismo por mis tostadas y el cortado.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "Why do they need to leave the café quickly at the end?",
+      "options": [
+        "It is starting to rain on the patio",
+        "The metro closes in 20 minutes",
+        "They have a movie reservation at eight",
+        "The café is closing its terrace"
+      ],
+      "correctIndex": 1,
+      "explanation": "Pablo says: 'Vámonos pitando que el metro cierra en veinte minutos.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: When Pablo says 'andas sin pasta' and 'vámonos pitando', what do 'pasta' and 'irse pitando' mean in Spain?",
+      "options": [
+        "'Pasta' = money/cash; 'irse pitando' = to leave in a hurry",
+        "'Pasta' = Italian food; 'irse pitando' = to whistle a song",
+        "'Pasta' = patience; 'irse pitando' = to take a taxi",
+        "'Pasta' = battery; 'irse pitando' = to argue with the waiter"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Spain, 'pasta' is slang for money/cash, and 'irse pitando' means to leave in a rush!"
+    }
+  ]
+}

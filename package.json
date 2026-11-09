@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:episode": "node scripts/generate-episode.mjs",
+    "generate:buffer": "node scripts/generate-episode.mjs --buffer"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",

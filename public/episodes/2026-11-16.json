@@ -1,0 +1,109 @@
+{
+  "id": "ep-011",
+  "episodeNumber": 11,
+  "date": "2026-11-16",
+  "title": "Mate y facturas en la costanera",
+  "region": "Argentina",
+  "regionFlag": "🇦🇷",
+  "ambientType": "street",
+  "audioUrl": "/earworm/episodes/2026-11-16.mp3",
+  "durationSeconds": 32.93,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Micaela",
+      "gender": "female",
+      "spanish": "Che, Nico, ¡qué lindo solcito hay hoy en la costanera! ¿Trajiste el termo con agua caliente?",
+      "english": "Hey, Nico, what lovely sunshine on the waterfront today! Did you bring the thermos with hot water?",
+      "startTime": 0.14,
+      "endTime": 8.28
+    },
+    {
+      "id": 2,
+      "speaker": "Nico",
+      "gender": "male",
+      "spanish": "¡Olvidate! Está a punto para cebar unos buenos mates. Y compré media docena de facturas con dulce de leche.",
+      "english": "You bet! It's at the perfect temperature to brew some good mates. And I bought half a dozen pastries with dulce de leche.",
+      "slang": {
+        "term": "facturas",
+        "literalMeaning": "invoices / bills",
+        "actualMeaning": "sweet bakery pastries (in Argentina, 'facturas' at a bakery are pastries!)",
+        "example": "Traje una docena de facturas para tomar el mate en la tarde."
+      },
+      "startTime": 8.71,
+      "endTime": 17.64
+    },
+    {
+      "id": 3,
+      "speaker": "Micaela",
+      "gender": "female",
+      "spanish": "¡Sos un genio! Sentémonos en ese banco frente al río que corre una brisa divina.",
+      "english": "You're a legend! Let's sit on that bench facing the river where there's a lovely breeze.",
+      "startTime": 18.07,
+      "endTime": 25.2
+    },
+    {
+      "id": 4,
+      "speaker": "Nico",
+      "gender": "male",
+      "spanish": "Dale, pero ojo con el primer mate que siempre sale un poco fuerte, ¿viste?",
+      "english": "Sure, just watch out for the first mate since it always comes out a bit strong, you know?",
+      "startTime": 25.63,
+      "endTime": 32.69
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Where are Micaela and Nico spending the afternoon?",
+      "options": [
+        "On a bench facing the river along the waterfront ('la costanera')",
+        "Inside a shopping mall downtown",
+        "At Nico's office",
+        "On a long-distance bus"
+      ],
+      "correctIndex": 0,
+      "explanation": "They are at 'la costanera' (the waterfront) and sit on 'ese banco frente al río' (that bench facing the river)."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "What did Nico bring along with his thermos of hot water?",
+      "options": [
+        "Half a dozen pastries ('facturas') with dulce de leche",
+        "Two ham and cheese sandwiches",
+        "A bag of apples and oranges",
+        "A box of pizza"
+      ],
+      "correctIndex": 0,
+      "explanation": "Nico says: 'compré media docena de facturas con dulce de leche.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What does Nico warn Micaela about at the end?",
+      "options": [
+        "The first mate always comes out a bit strong/bitter",
+        "The water in the thermos is already cold",
+        "The seagulls might steal their pastries",
+        "The park closes at five o'clock"
+      ],
+      "correctIndex": 0,
+      "explanation": "Nico warns: 'ojo con el primer mate que siempre sale un poco fuerte.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: When Nico says '¡Olvidate!' and 'compré media docena de facturas', what do '¡Olvidate!' and 'facturas' mean in Argentina?",
+      "options": [
+        "'¡Olvidate!' = You bet / Of course!; 'facturas' = sweet bakery pastries",
+        "'¡Olvidate!' = I forgot it!; 'facturas' = electricity bills",
+        "'¡Olvidate!' = Never mind; 'facturas' = bus tickets",
+        "'¡Olvidate!' = Wait for me; 'facturas' = tea bags"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Argentina, '¡Olvidate!' is an enthusiastic 'You bet / Of course!' (not 'I forgot!'), and 'facturas' are bakery pastries!"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": "ep-003",
+  "episodeNumber": 3,
+  "date": "2026-11-08",
+  "title": "Fruta fresca en la plaza de Medellín",
+  "region": "Colombia",
+  "regionFlag": "🇨🇴",
+  "ambientType": "market",
+  "audioUrl": "/earworm/episodes/2026-11-08.mp3",
+  "durationSeconds": 28.15,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Camila",
+      "gender": "female",
+      "spanish": "¡Quiubo, parcero! Mirá qué lulos tan bonitos tienen en este puesto de la plaza.",
+      "english": "What's up, buddy! Look how nice the lulo fruits are at this market stall.",
+      "slang": {
+        "term": "parcero",
+        "literalMeaning": "partner / sharecropper",
+        "actualMeaning": "buddy / close friend (iconic Colombian slang)",
+        "example": "Ese man es mi parcero desde el colegio."
+      },
+      "startTime": 0.14,
+      "endTime": 7.01
+    },
+    {
+      "id": 2,
+      "speaker": "Sebastián",
+      "gender": "male",
+      "spanish": "¡Están una chimba! Llevemos una bolsa para hacer jugo frío en la casa.",
+      "english": "They look amazing! Let's get a bag to make cold juice at home.",
+      "slang": {
+        "term": "una chimba",
+        "literalMeaning": "awesome / super cool",
+        "actualMeaning": "fantastic / amazing / top-notch (Medellín slang)",
+        "example": "¡El concierto de anoche estuvo una chimba!"
+      },
+      "startTime": 7.44,
+      "endTime": 13.46
+    },
+    {
+      "id": 3,
+      "speaker": "Camila",
+      "gender": "female",
+      "spanish": "La señora dice que la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.",
+      "english": "The lady says a dozen costs eight thousand pesos and she'll throw in two passion fruits as a free bonus.",
+      "slang": {
+        "term": "de ñapa",
+        "literalMeaning": "from the Quechua 'yapa' (addition)",
+        "actualMeaning": "as a free extra / baker's dozen bonus at a market",
+        "example": "Compré tres empanadas y me dieron una más de ñapa."
+      },
+      "startTime": 13.9,
+      "endTime": 21
+    },
+    {
+      "id": 4,
+      "speaker": "Sebastián",
+      "gender": "male",
+      "spanish": "¡De una! Pagá vos en efectivo que yo te invito las arepas de queso ahorita.",
+      "english": "Let's do it! You pay in cash and I'll treat you to cheese corn cakes right now.",
+      "startTime": 21.43,
+      "endTime": 27.91
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why do Camila and Sebastián want to buy 'lulos' at the Medellín market?",
+      "options": [
+        "To make cold juice at home",
+        "To bake a birthday cake",
+        "To bring them to their office party",
+        "To sell them at their own restaurant"
+      ],
+      "correctIndex": 0,
+      "explanation": "Sebastián says: 'Llevemos una bolsa para hacer jugo frío en la casa.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "How much does a dozen cost, and what does the vendor include for free?",
+      "options": [
+        "5,000 pesos plus free bananas",
+        "8,000 pesos plus two free passion fruits ('dos maracuyás de ñapa')",
+        "10,000 pesos plus a glass of orange juice",
+        "12,000 pesos plus a cheese arepa"
+      ],
+      "correctIndex": 1,
+      "explanation": "Camila says: 'la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What does Sebastián offer to buy for Camila if she pays cash at the fruit stand?",
+      "options": [
+        "Cheese corn cakes ('arepas de queso')",
+        "Two cups of Colombian coffee",
+        "A taxi ride home",
+        "Tickets to a soccer match"
+      ],
+      "correctIndex": 0,
+      "explanation": "Sebastián says: 'Pagá vos en efectivo que yo te invito las arepas de queso ahorita.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Colombian Spanish, what do 'parcero', 'una chimba', and 'de ñapa' mean?",
+      "options": [
+        "'Parcero' = friend/buddy; 'una chimba' = amazing/cool; 'de ñapa' = as a free bonus",
+        "'Parcero' = vendor; 'una chimba' = expensive; 'de ñapa' = on credit",
+        "'Parcero' = cousin; 'una chimba' = sour; 'de ñapa' = tomorrow",
+        "'Parcero' = neighbor; 'una chimba' = heavy; 'de ñapa' = in a bag"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Colombia, 'parcero' means friend/buddy, 'una chimba' means awesome/amazing, and 'de ñapa' is a free extra thrown in by a vendor!"
+    }
+  ]
+}

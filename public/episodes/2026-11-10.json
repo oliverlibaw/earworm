@@ -1,0 +1,121 @@
+{
+  "id": "ep-005",
+  "episodeNumber": 5,
+  "date": "2026-11-10",
+  "title": "El café de olla y el pan dulce en Coyoacán",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "cafe",
+  "audioUrl": "/earworm/episodes/2026-11-10.mp3",
+  "durationSeconds": 34.37,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Sofía",
+      "gender": "female",
+      "spanish": "Oye, Luis, ¿pedimos dos cafés de olla aquí en la panadería antes de tomar el camión?",
+      "english": "Hey, Luis, should we order two spiced pot coffees here at the bakery before taking the bus?",
+      "slang": {
+        "term": "camión",
+        "literalMeaning": "truck",
+        "actualMeaning": "city passenger bus (standard everyday word in Mexico)",
+        "example": "El camión al centro pasa cada diez minutos."
+      },
+      "startTime": 0.14,
+      "endTime": 7.27
+    },
+    {
+      "id": 2,
+      "speaker": "Luis",
+      "gender": "male",
+      "spanish": "¿Mande? Perdón, estaba viendo mi celular. Sí, buena idea, hace bastante frío esta mañana.",
+      "english": "Pardon? Sorry, I was looking at my phone. Yes, good idea, it's pretty cold this morning.",
+      "slang": {
+        "term": "¿Mande?",
+        "literalMeaning": "command me?",
+        "actualMeaning": "Pardon? / What did you say? (Polite Mexican way to ask someone to repeat)",
+        "example": "¿Mande, abuelita? No te escuché bien."
+      },
+      "startTime": 7.7,
+      "endTime": 16.32
+    },
+    {
+      "id": 3,
+      "speaker": "Sofía",
+      "gender": "female",
+      "spanish": "También voy a llevar dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.",
+      "english": "I'm also going to get two vanilla sweet breads to eat for breakfast at the office. It's thirty-five pesos total.",
+      "startTime": 16.75,
+      "endTime": 25.58
+    },
+    {
+      "id": 4,
+      "speaker": "Luis",
+      "gender": "male",
+      "spanish": "Yo invito hoy, Sofía. Pero apúrate porque nuestro camión pasa en ocho minutos por la avenida.",
+      "english": "It's my treat today, Sofía. But hurry up because our bus comes down the avenue in eight minutes.",
+      "slang": {
+        "term": "Yo invito",
+        "literalMeaning": "I invite",
+        "actualMeaning": "It's my treat / I'm paying for both of us",
+        "example": "Guarda tu cartera, hoy yo invito los tacos."
+      },
+      "startTime": 26.02,
+      "endTime": 34.13
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why does Luis say '¿Mande?' when Sofía first speaks to him?",
+      "options": [
+        "He was looking at his phone and didn't catch what she said",
+        "He doesn't like spiced coffee",
+        "He forgot his wallet at home",
+        "The bakery music is too loud"
+      ],
+      "correctIndex": 0,
+      "explanation": "Luis replies: '¿Mande? Perdón, estaba viendo mi celular.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "What does Sofía pick up to eat at the office, and how much is the total?",
+      "options": [
+        "Two vanilla conchas (sweet breads) for 35 pesos total",
+        "Three churros for 50 pesos total",
+        "One ham sandwich for 45 pesos total",
+        "Two tamales for 30 pesos total"
+      ],
+      "correctIndex": 0,
+      "explanation": "Sofía gets 'dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "Why does Luis tell Sofía to hurry up at the end?",
+      "options": [
+        "Their bus ('el camión') comes down the avenue in 8 minutes",
+        "The bakery is about to close",
+        "It is starting to rain outside",
+        "Their boss just called on his cell phone"
+      ],
+      "correctIndex": 0,
+      "explanation": "Luis says: 'apúrate porque nuestro camión pasa en ocho minutos por la avenida.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Mexican Spanish, what do '¿Mande?', 'el camión', and 'Yo invito' mean?",
+      "options": [
+        "'¿Mande?' = Pardon?; 'el camión' = the city bus; 'Yo invito' = It's my treat",
+        "'¿Mande?' = Send it; 'el camión' = the subway; 'Yo invito' = Come to my party",
+        "'¿Mande?' = Hurry up; 'el camión' = the bicycle; 'Yo invito' = Let's split it",
+        "'¿Mande?' = Excuse me; 'el camión' = the taxi; 'Yo invito' = You pay today"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Mexico, '¿Mande?' is the polite way to say 'Pardon?', 'el camión' is the passenger bus, and 'Yo invito' means 'My treat!'"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Award,
   BookOpen,
+  Calendar,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -40,9 +41,12 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
+import { ArchiveDrawer } from "@/components/ArchiveDrawer";
 import { EarwormAudioPlayer } from "@/components/EarwormAudioPlayer";
 import { InteractiveTranscript } from "@/components/InteractiveTranscript";
+import { episodeToStaticLesson } from "@/lib/episodeHelpers";
 import { speakSpanishText } from "@/lib/speechAudio";
+import type { Episode } from "@/types/episode";
 import {
   buildAudioVocabQuizQuestions,
   calculateScoreOutOf5,
@@ -383,11 +387,22 @@ function EarshotGameContent() {
     }>;
   } | null>(null);
 
-  // Authoritative Mexican Spanish lesson for the selected (level, clipNumber)
-  const lesson = useMemo(
-    () => getStaticMexicanSpanishLesson(todayStr, level, clipNumber),
-    [todayStr, level, clipNumber]
-  );
+  // 3-Day Archive Drawer & Selected Episode State
+  const [showArchiveDrawer, setShowArchiveDrawer] = useState(false);
+  const [selectedArchiveEpisode, setSelectedArchiveEpisode] =
+    useState<Episode | null>(null);
+  const [archiveSlotLabel, setArchiveSlotLabel] = useState<string | null>(null);
+  const [episodeScoresById, setEpisodeScoresById] = useState<
+    Record<string, number>
+  >({});
+
+  // Authoritative lesson for the selected (level, clipNumber) or Archive Episode
+  const lesson = useMemo(() => {
+    if (selectedArchiveEpisode) {
+      return episodeToStaticLesson(selectedArchiveEpisode, level);
+    }
+    return getStaticMexicanSpanishLesson(todayStr, level, clipNumber);
+  }, [selectedArchiveEpisode, todayStr, level, clipNumber]);
 
   // Optional Convex queries/mutations when connected locally
   const convexLesson = useQuery(api.lessons.getLessonForPuzzle, {
@@ -460,6 +475,17 @@ function EarshotGameContent() {
       const savedBoard = localStorage.getItem("earworm_local_scoreboard");
       if (savedBoard) {
         setLocalScores(JSON.parse(savedBoard) as LocalLeaderboardEntry[]);
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      const savedEpScores = localStorage.getItem("earworm_episode_scores_v1");
+      if (savedEpScores) {
+        setEpisodeScoresById(
+          JSON.parse(savedEpScores) as Record<string, number>
+        );
       }
     } catch {
       // ignore
@@ -543,7 +569,7 @@ function EarshotGameContent() {
     setRevealedSpanishTerms({});
     setShowPhoneticHint(false);
     setPracticedShadowing(false);
-  }, [level, clipNumber]);
+  }, [level, clipNumber, selectedArchiveEpisode]);
 
   // Previous days / other dialogs vocabulary list for the "Review Vocab" modal
   const previousDaysVocabList = useMemo(() => {
@@ -816,8 +842,10 @@ function EarshotGameContent() {
     });
 
     const newHistoryEntry: GameScoreHistoryEntry = {
-      id: `${todayStr}:${level}:${clipNumber}:${Date.now()}`,
-      dateStr: todayStr,
+      id: selectedArchiveEpisode
+        ? `episode:${selectedArchiveEpisode.id}:${Date.now()}`
+        : `${todayStr}:${level}:${clipNumber}:${Date.now()}`,
+      dateStr: selectedArchiveEpisode ? selectedArchiveEpisode.date : todayStr,
       level,
       clipNumber,
       scoreOutOf5: outOf5Info.scoreOutOf5,
@@ -828,6 +856,28 @@ function EarshotGameContent() {
       vocabStar: todayVocabStar,
       timestamp: Date.now(),
     };
+
+    if (selectedArchiveEpisode) {
+      setEpisodeScoresById((prev) => {
+        const prevBest = prev[selectedArchiveEpisode.id] ?? 0;
+        const next = {
+          ...prev,
+          [selectedArchiveEpisode.id]: Math.max(
+            prevBest,
+            outOf5Info.scoreOutOf5
+          ),
+        };
+        try {
+          localStorage.setItem(
+            "earworm_episode_scores_v1",
+            JSON.stringify(next)
+          );
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+    }
 
     let nextStreak = 1;
     setScoreHistory((prev) => {
@@ -2410,14 +2460,30 @@ function EarshotGameContent() {
           <Button
             type="button"
             size="lg"
-            onClick={handleStartPlay}
+            onClick={() => {
+              setSelectedArchiveEpisode(null);
+              setArchiveSlotLabel(null);
+              handleStartPlay();
+            }}
             className="mt-6 h-14 w-full rounded-full bg-zinc-900 text-lg font-black tracking-wide text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
           >
-            Play
+            Play Today&apos;s Dialog
           </Button>
 
+          <button
+            type="button"
+            onClick={() => {
+              handleStartPlay();
+              setShowArchiveDrawer(true);
+            }}
+            className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs font-extrabold text-zinc-700 hover:border-[#538d4e] hover:text-[#538d4e] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 cursor-pointer"
+          >
+            <Calendar className="h-3.5 w-3.5 text-[#538d4e]" />
+            <span>Open 3-Day Archive & Regional Buffer</span>
+          </button>
+
           <p className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
-            {todayStr} • 5 Sequential Questions + Audio Vocab Star
+            {todayStr} • Sequential Questions + Audio Vocab Star
           </p>
         </div>
       )}
@@ -2427,7 +2493,7 @@ function EarshotGameContent() {
       ===================================================================== */}
       {screen === "play" && (
         <>
-          {/* Sticky Top Navigation Bar with Review Vocab (with Star Badge) & Leaderboard */}
+          {/* Sticky Top Navigation Bar with Archive Drawer, Review Vocab & Leaderboard */}
           <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-[#121213]/95">
             <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
               {/* Left: Back to Splash / Level */}
@@ -2448,8 +2514,23 @@ function EarshotGameContent() {
                 </span>
               </div>
 
-              {/* Right: Review Vocab (+ Star), Leaderboard & Theme Toggle */}
+              {/* Right: 3-Day Archive Drawer, Review Vocab (+ Star), Leaderboard & Theme Toggle */}
               <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveDrawer(true)}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold transition-colors cursor-pointer",
+                    selectedArchiveEpisode
+                      ? "border-amber-500/50 bg-amber-500/15 text-amber-800 dark:text-amber-300"
+                      : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                  )}
+                  title="Open 3-Day Archive Drawer (Today + Past 3 Days)"
+                >
+                  <Calendar className="h-3.5 w-3.5 text-[#538d4e] dark:text-emerald-400" />
+                  <span>Archive</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setShowVocabModal(true)}
@@ -2457,7 +2538,7 @@ function EarshotGameContent() {
                   title="Audio Vocab Review & Star Challenge"
                 >
                   <BookOpen className="h-3.5 w-3.5" />
-                  <span>Review Vocab</span>
+                  <span className="hidden sm:inline">Vocab</span>
                   <span>
                     {todayVocabStar !== "none" ? activeStarInfo.icon : "⭐"}
                   </span>
@@ -2470,7 +2551,7 @@ function EarshotGameContent() {
                   title="Join Group & Leaderboard"
                 >
                   <Trophy className="h-3.5 w-3.5 text-amber-500" />
-                  <span className="hidden sm:inline">Leaderboard</span>
+                  <span className="hidden sm:inline">Friends</span>
                 </button>
 
                 <Button
@@ -2509,12 +2590,51 @@ function EarshotGameContent() {
                   )}
                 />
 
+                {/* Active Archive Episode Banner when playing from the 3-Day Archive Drawer */}
+                {selectedArchiveEpisode && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-3.5 py-2.5 text-xs">
+                    <div className="flex flex-wrap items-center gap-2 font-bold text-amber-900 dark:text-amber-200">
+                      <Calendar className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                      <span>
+                        {archiveSlotLabel ?? "Archive"} • Episode #
+                        {selectedArchiveEpisode.episodeNumber} (
+                        {selectedArchiveEpisode.date})
+                      </span>
+                      <span className="rounded-md bg-white/80 px-2 py-0.5 text-[11px] dark:bg-zinc-900/80">
+                        {selectedArchiveEpisode.regionFlag}{" "}
+                        {selectedArchiveEpisode.region} •{" "}
+                        {selectedArchiveEpisode.ambientType}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setShowArchiveDrawer(true)}
+                        className="rounded-lg border border-amber-500/40 bg-white px-2.5 py-1 text-[11px] font-bold text-amber-800 hover:bg-amber-50 dark:bg-zinc-900 dark:text-amber-200 cursor-pointer"
+                      >
+                        Switch Day
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedArchiveEpisode(null);
+                          setArchiveSlotLabel(null);
+                        }}
+                        className="rounded-lg bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer"
+                      >
+                        Level Mode
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Dialog Header Strip with Subtle Level Cues (Tempo Meter + Level Badge + Quick Switcher) */}
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-zinc-200/90 bg-white px-4 py-3 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[#538d4e] dark:text-emerald-400">
-                        🇲🇽 Mexican Spanish
+                        {lesson.regionFlag ?? "🇲🇽"} {lesson.region ?? "Mexican"}{" "}
+                        Spanish
                       </span>
                       <span
                         className={cn(
@@ -2522,7 +2642,11 @@ function EarshotGameContent() {
                           activeLevelOption.pillBadgeClass
                         )}
                       >
-                        <span>{activeLevelOption.cueBadge}</span>
+                        <span>
+                          {selectedArchiveEpisode
+                            ? `Daily Ep #${selectedArchiveEpisode.episodeNumber}`
+                            : activeLevelOption.cueBadge}
+                        </span>
                         {/* Subtle 4-bar tempo/complexity meter */}
                         <span
                           className="inline-flex items-end gap-0.5 pl-0.5"
@@ -2550,7 +2674,9 @@ function EarshotGameContent() {
                       “{lesson.title}”
                     </h2>
                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      {activeLevelOption.cueDesc}
+                      {selectedArchiveEpisode
+                        ? `${selectedArchiveEpisode.date} • ${selectedArchiveEpisode.dialogue.length} timed lines (${Math.round(selectedArchiveEpisode.durationSeconds)}s) • Ambient: ${selectedArchiveEpisode.ambientType}`
+                        : activeLevelOption.cueDesc}
                     </p>
                   </div>
 
@@ -2560,10 +2686,14 @@ function EarshotGameContent() {
                       <button
                         key={opt.id}
                         type="button"
-                        onClick={() => setLevel(opt.id)}
+                        onClick={() => {
+                          setSelectedArchiveEpisode(null);
+                          setArchiveSlotLabel(null);
+                          setLevel(opt.id);
+                        }}
                         className={cn(
                           "rounded-lg px-2 py-1 text-[11px] font-bold transition-colors cursor-pointer",
-                          level === opt.id
+                          !selectedArchiveEpisode && level === opt.id
                             ? "bg-[#538d4e] text-white"
                             : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400"
                         )}
@@ -2709,11 +2839,15 @@ function EarshotGameContent() {
                                     speakSpanishText(turn.text, {
                                       rate:
                                         level === "A1"
-                                          ? 0.8
+                                          ? 0.85
                                           : usedSlowdown
                                             ? 0.78
-                                            : 0.9,
+                                            : 1.0,
                                       fallbackAudioUrl: lesson.audioUrl,
+                                      startTime: turn.startTime,
+                                      endTime: turn.endTime,
+                                      turnIndex: idx,
+                                      totalTurns: lesson.dialogue.length,
                                       onEnd: () =>
                                         setPlayingVocabId((curr) =>
                                           curr === stepId ? null : curr
@@ -3438,6 +3572,27 @@ function EarshotGameContent() {
           </main>
         </>
       )}
+
+      {/* 3-Day Archive Drawer & 14-Day Content Buffer Explorer */}
+      <ArchiveDrawer
+        open={showArchiveDrawer}
+        onClose={() => setShowArchiveDrawer(false)}
+        todayStr={todayStr}
+        activeEpisodeId={selectedArchiveEpisode?.id ?? null}
+        scoreHistory={scoreHistory}
+        episodeScoresById={episodeScoresById}
+        onSelectEpisode={(episode, slotLabel) => {
+          setSelectedArchiveEpisode(episode);
+          setArchiveSlotLabel(slotLabel ?? null);
+          if (screen !== "play") {
+            setScreen("play");
+          }
+        }}
+        onReturnToLevelMode={() => {
+          setSelectedArchiveEpisode(null);
+          setArchiveSlotLabel(null);
+        }}
+      />
     </div>
   );
 }

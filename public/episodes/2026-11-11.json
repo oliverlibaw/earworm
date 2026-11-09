@@ -1,0 +1,127 @@
+{
+  "id": "ep-006",
+  "episodeNumber": 6,
+  "date": "2026-11-11",
+  "title": "Tapas de última hora en Lavapiés",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "street",
+  "audioUrl": "/earworm/episodes/2026-11-11.mp3",
+  "durationSeconds": 31.61,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "¡Hola, Javi! ¿Qué tal el curro hoy? Te veo con una cara de cansado impresionante.",
+      "english": "Hi, Javi! How was work today? You look completely exhausted.",
+      "slang": {
+        "term": "el curro",
+        "literalMeaning": "the job / work",
+        "actualMeaning": "work / job (everyday colloquial word in Spain)",
+        "example": "Salgo del curro a las seis y nos vemos en el centro."
+      },
+      "startTime": 0.14,
+      "endTime": 7.63
+    },
+    {
+      "id": 2,
+      "speaker": "Javi",
+      "gender": "male",
+      "spanish": "Uf, ni me hables, tía. Estuve liado con un informe toda la tarde, pero ya tengo hambre.",
+      "english": "Phew, don't even get me started, girl. I was tied up with a report all afternoon, but now I'm hungry.",
+      "slang": {
+        "term": "liado",
+        "literalMeaning": "tied / wrapped up",
+        "actualMeaning": "swamped / super busy with something",
+        "example": "Perdona que no te llamara, anduve muy liado toda la mañana."
+      },
+      "startTime": 8.06,
+      "endTime": 16.18
+    },
+    {
+      "id": 3,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Venga, entremos a esta taberna que ponen unas patatas bravas que flipas por cinco euros.",
+      "english": "Come on, let's go into this tavern—they serve mind-blowing patatas bravas for five euros.",
+      "slang": {
+        "term": "que flipas",
+        "literalMeaning": "that you flip out",
+        "actualMeaning": "mind-blowing / incredible / amazing (Spain slang)",
+        "example": "Hicieron una paella que flipas."
+      },
+      "startTime": 16.61,
+      "endTime": 24.02
+    },
+    {
+      "id": 4,
+      "speaker": "Javi",
+      "gender": "male",
+      "spanish": "¡De lujo! Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.",
+      "english": "Awesome! You order two ice-cold draft beers while I look for an empty table in the back.",
+      "slang": {
+        "term": "dos cañas",
+        "literalMeaning": "two reeds / canes",
+        "actualMeaning": "two small glasses of draft beer (standard across Spain)",
+        "example": "Nos tomamos dos cañas con unas aceitunas en la plaza."
+      },
+      "startTime": 24.46,
+      "endTime": 31.37
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why does Javi look so tired when he meets Lucía?",
+      "options": [
+        "He was swamped working on a report all afternoon",
+        "He walked all the way across Madrid in the rain",
+        "He stayed up late watching a soccer match",
+        "He just came back from the gym"
+      ],
+      "correctIndex": 0,
+      "explanation": "Javi explains: 'Estuve liado con un informe toda la tarde' (he was swamped with a report all afternoon)."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "What food does Lucía recommend at the tavern, and how much does it cost?",
+      "options": [
+        "Patatas bravas for 5 euros",
+        "Spanish tortilla for 10 euros",
+        "Calamari sandwiches for 8 euros",
+        "Ham croquettes for 12 euros"
+      ],
+      "correctIndex": 0,
+      "explanation": "Lucía says: 'ponen unas patatas bravas que flipas por cinco euros.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What does Javi ask Lucía to order while he looks for a table in the back?",
+      "options": [
+        "Two cold draft beers ('dos cañas bien frías')",
+        "A pitcher of sangria",
+        "Two bottles of sparkling water",
+        "Two cups of espresso"
+      ],
+      "correctIndex": 0,
+      "explanation": "Javi says: 'Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Spain, what do 'el curro', 'estar liado', and 'que flipas' mean?",
+      "options": [
+        "'El curro' = work/job; 'estar liado' = to be swamped/busy; 'que flipas' = mind-blowing/amazing",
+        "'El curro' = the bus; 'estar liado' = to be lost; 'que flipas' = overpriced",
+        "'El curro' = the boss; 'estar liado' = to be hungry; 'que flipas' = very spicy",
+        "'El curro' = the gym; 'estar liado' = to be sleepy; 'que flipas' = frozen"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Spain, 'el curro' means work, 'estar liado' means to be busy/swamped, and 'que flipas' means amazing/mind-blowing!"
+    }
+  ]
+}

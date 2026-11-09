@@ -1,0 +1,121 @@
+{
+  "id": "ep-007",
+  "episodeNumber": 7,
+  "date": "2026-11-12",
+  "title": "Asado del domingo en San Telmo",
+  "region": "Argentina",
+  "regionFlag": "🇦🇷",
+  "ambientType": "market",
+  "audioUrl": "/earworm/episodes/2026-11-12.mp3",
+  "durationSeconds": 31.2,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Martín",
+      "gender": "male",
+      "spanish": "Che, Flor, acá en la carnicería del mercado queda el último kilo de vacío para el asado.",
+      "english": "Hey, Flor, right here at the market butcher shop they have the last kilo of flank steak for the barbecue.",
+      "startTime": 0.14,
+      "endTime": 8.06
+    },
+    {
+      "id": 2,
+      "speaker": "Flor",
+      "gender": "female",
+      "spanish": "¡Qué joya! Llevate también cuatro chorizos y una bolsa de carbón antes de que se acabe.",
+      "english": "What a gem! Grab four sausages and a bag of charcoal too before it sells out.",
+      "slang": {
+        "term": "joya",
+        "literalMeaning": "jewel",
+        "actualMeaning": "awesome / fantastic / great news (Argentine slang)",
+        "example": "¿Conseguiste entradas para el partido? ¡Joya!"
+      },
+      "startTime": 8.5,
+      "endTime": 15.7
+    },
+    {
+      "id": 3,
+      "speaker": "Martín",
+      "gender": "male",
+      "spanish": "Dale, son doce mil mangos en total. ¿Ponemos mitad y mitad o pagás vos las bebidas?",
+      "english": "Sounds good, it's twelve thousand pesos total. Should we split it fifty-fifty or do you want to buy the drinks?",
+      "slang": {
+        "term": "mangos",
+        "literalMeaning": "mangoes / handles",
+        "actualMeaning": "bucks / pesos (classic Argentine slang for money)",
+        "example": "Esta campera me salió veinte mil mangos."
+      },
+      "startTime": 16.13,
+      "endTime": 23.71
+    },
+    {
+      "id": 4,
+      "speaker": "Flor",
+      "gender": "female",
+      "spanish": "Yo compro el vino tinto y el pan acá al lado. ¡Nos va a quedar re copado el almuerzo!",
+      "english": "I'll buy the red wine and bread right next door. Lunch is going to turn out super cool!",
+      "slang": {
+        "term": "re copado",
+        "literalMeaning": "very topped / filled",
+        "actualMeaning": "super cool / awesome (Argentine 're' + 'copado')",
+        "example": "El lugar nuevo en Palermo está re copado."
+      },
+      "startTime": 24.14,
+      "endTime": 30.96
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "What items do Martín and Flor buy at the butcher shop for Sunday's barbecue?",
+      "options": [
+        "The last kilo of 'vacío' (flank steak), four sausages ('chorizos'), and charcoal",
+        "Two chickens, potatoes, and salad greens",
+        "Fish fillets, lemons, and white wine",
+        "Pork ribs and a dozen empanadas"
+      ],
+      "correctIndex": 0,
+      "explanation": "Martín spots 'el último kilo de vacío' and Flor tells him: 'Llevate también cuatro chorizos y una bolsa de carbón.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "How much does the butcher shop order cost in total?",
+      "options": [
+        "5,000 pesos",
+        "8,000 pesos",
+        "12,000 pesos ('doce mil mangos')",
+        "20,000 pesos"
+      ],
+      "correctIndex": 2,
+      "explanation": "Martín says: 'Dale, son doce mil mangos en total' (12,000 pesos total)."
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "How do they divide the expenses for the barbecue?",
+      "options": [
+        "Martín pays for the meat/charcoal, and Flor buys the red wine and bread next door",
+        "Flor pays for everything with her credit card",
+        "They ask their friends to transfer money first",
+        "They decide to eat at a restaurant instead"
+      ],
+      "correctIndex": 0,
+      "explanation": "Flor says: 'Yo compro el vino tinto y el pan acá al lado.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Argentina, what do 'doce mil mangos' and 're copado' mean?",
+      "options": [
+        "'Mangos' = pesos/bucks; 're copado' = super cool / awesome",
+        "'Mangos' = tropical fruit; 're copado' = way too crowded",
+        "'Mangos' = coins; 're copado' = burnt on the grill",
+        "'Mangos' = grams; 're copado' = very expensive"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Argentine Spanish, 'mangos' means pesos/bucks, and 're copado' means super cool or awesome!"
+    }
+  ]
+}

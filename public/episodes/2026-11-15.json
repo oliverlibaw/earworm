@@ -1,0 +1,115 @@
+{
+  "id": "ep-010",
+  "episodeNumber": 10,
+  "date": "2026-11-15",
+  "title": "Perdiendo el AVE en Atocha",
+  "region": "Spain",
+  "regionFlag": "🇪🇸",
+  "ambientType": "transit",
+  "audioUrl": "/earworm/episodes/2026-11-15.mp3",
+  "durationSeconds": 29.3,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Álvaro",
+      "gender": "male",
+      "spanish": "¡Corre, Elena, que el control de equipaje del AVE cierra en tres minutos!",
+      "english": "Run, Elena, the baggage check for the high-speed train closes in three minutes!",
+      "startTime": 0.14,
+      "endTime": 6.6
+    },
+    {
+      "id": 2,
+      "speaker": "Elena",
+      "gender": "female",
+      "spanish": "¡Madre mía, qué agobio! Es que el autobús venía a tope por el atasco en la Castellana.",
+      "english": "Oh my goodness, how stressful! The bus was packed to the gills because of the traffic jam on La Castellana.",
+      "slang": {
+        "term": "a tope",
+        "literalMeaning": "to the bumper / limit",
+        "actualMeaning": "packed full / to the max (very common in Spain)",
+        "example": "El vagón del metro iba a tope a las ocho de la mañana."
+      },
+      "startTime": 7.03,
+      "endTime": 14.64
+    },
+    {
+      "id": 3,
+      "speaker": "Álvaro",
+      "gender": "male",
+      "spanish": "Por los pelos, tía... Mira, somos el coche cuatro, asientos de ventanilla.",
+      "english": "By the skin of our teeth, girl... Look, we're car four, window seats.",
+      "slang": {
+        "term": "Por los pelos",
+        "literalMeaning": "by the hairs",
+        "actualMeaning": "by the skin of one's teeth / just barely in time",
+        "example": "Llegamos al embarque por los pelos."
+      },
+      "startTime": 15.07,
+      "endTime": 22.2
+    },
+    {
+      "id": 4,
+      "speaker": "Elena",
+      "gender": "female",
+      "spanish": "¡Qué alivio! En cuanto arranque el tren me echo una siesta hasta llegar a Valencia.",
+      "english": "What a relief! As soon as the train pulls out I'm taking a nap all the way to Valencia.",
+      "startTime": 22.63,
+      "endTime": 29.06
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why were Álvaro and Elena almost late for their high-speed train ('el AVE')?",
+      "options": [
+        "Their bus was packed and stuck in a traffic jam on La Castellana",
+        "Elena packed the wrong suitcase",
+        "They went to the wrong train station in Madrid",
+        "Their alarm clock didn't ring"
+      ],
+      "correctIndex": 0,
+      "explanation": "Elena says: 'el autobús venía a tope por el atasco en la Castellana.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "Which train car and seats do they have, and what city are they traveling to?",
+      "options": [
+        "Car 4, window seats, heading to Valencia",
+        "Car 1, aisle seats, heading to Barcelona",
+        "Car 7, dining car, heading to Seville",
+        "Car 2, window seats, heading to Toledo"
+      ],
+      "correctIndex": 0,
+      "explanation": "Álvaro says 'somos el coche cuatro, asientos de ventanilla' and Elena says she'll nap 'hasta llegar a Valencia.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "How much time was left before baggage security closed when they arrived?",
+      "options": [
+        "3 minutes",
+        "15 minutes",
+        "30 minutes",
+        "1 hour"
+      ],
+      "correctIndex": 0,
+      "explanation": "Álvaro shouts: 'el control de equipaje del AVE cierra en tres minutos!'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Spain, what do 'venir a tope' and 'por los pelos' mean?",
+      "options": [
+        "'A tope' = packed full / to the max; 'por los pelos' = by the skin of our teeth / just barely",
+        "'A tope' = very slowly; 'por los pelos' = without luggage",
+        "'A tope' = empty; 'por los pelos' = with messy hair",
+        "'A tope' = broken down; 'por los pelos' = way too early"
+      ],
+      "correctIndex": 0,
+      "explanation": "'A tope' means packed full / at maximum capacity, and 'por los pelos' means just barely / by a hair!"
+    }
+  ]
+}

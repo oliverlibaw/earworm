@@ -1,0 +1,145 @@
+{
+  "id": "ep-012",
+  "episodeNumber": 12,
+  "date": "2026-11-17",
+  "title": "El recibo de la luz en la colonia Roma",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "cafe",
+  "audioUrl": "/earworm/episodes/2026-11-17.mp3",
+  "durationSeconds": 64.56,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "Oye, Lucía, no te pases... Acabo de ver el recibo de la luz de este bimestre y casi me da un infarto.",
+      "english": "Hey, Lucía, come on now... I just saw this two-month electricity bill and I almost had a heart attack.",
+      "slang": {
+        "term": "no te pases",
+        "literalMeaning": "don't pass yourself",
+        "actualMeaning": "come on / don't go too far / you're kidding me",
+        "example": "¡No te pases, te comiste todo el pastel!"
+      },
+      "startTime": 0.14,
+      "endTime": 9.48
+    },
+    {
+      "id": 2,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Aguanta, Mateo, no te esponjes. Es que la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido un par de noches.",
+      "english": "Hold on, Mateo, don't get worked up. Last week it was freezing cold and I left the electric space heater on for a couple of nights.",
+      "slang": {
+        "term": "no te esponjes",
+        "literalMeaning": "don't sponge yourself up",
+        "actualMeaning": "don't get puffed up / don't get worked up or angry",
+        "example": "Tranquilo, no te esponjes, fue solo una broma."
+      },
+      "startTime": 9.91,
+      "endTime": 21.7
+    },
+    {
+      "id": 3,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "¿Un par de noches? ¡Pero si subió al doble! Y tú sabes que ahorita ando bien bruja porque no me han pagado el proyecto de diseño.",
+      "english": "A couple of nights? It doubled! And you know I'm super broke right now because they haven't paid me for the design project yet.",
+      "slang": {
+        "term": "bruja",
+        "literalMeaning": "witch",
+        "actualMeaning": "completely broke / out of money (andar bruja)",
+        "example": "Fin de quincena y ya ando bien bruja."
+      },
+      "startTime": 22.13,
+      "endTime": 32.59
+    },
+    {
+      "id": 4,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Tranquilo, mi primo Javi me debía una lana de los boletos del concierto y me acaba de transferir. Yo pongo el setenta por ciento del recibo.",
+      "english": "Relax, my cousin Javi owed me cash for the concert tickets and he just sent me a transfer. I'll cover seventy percent of the bill.",
+      "startTime": 33.02,
+      "endTime": 44.23
+    },
+    {
+      "id": 5,
+      "speaker": "Mateo",
+      "gender": "male",
+      "spanish": "Uf, qué alivio... Es que el casero ya me estaba moliendo por WhatsApp desde las ocho de la mañana.",
+      "english": "Phew, what a relief... The landlord was already nagging me on WhatsApp since eight in the morning.",
+      "startTime": 44.66,
+      "endTime": 52.75
+    },
+    {
+      "id": 6,
+      "speaker": "Lucía",
+      "gender": "female",
+      "spanish": "Ya sé cómo se pone. Ándale, yo lo pago ahorita en la app y además te invito unos esquites si me echas la mano con las cajas de la bodega.",
+      "english": "I know how he gets. Come on, I'll pay it right now in the app and treat you to some corn cups too if you give me a hand with the storage room boxes.",
+      "slang": {
+        "term": "echas la mano",
+        "literalMeaning": "throw the hand",
+        "actualMeaning": "lend a hand / help someone out (echar la mano)",
+        "example": "¿Me echas la mano para subir este sillón?"
+      },
+      "startTime": 53.18,
+      "endTime": 64.32
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "What caused the two-month electricity bill in Mateo and Lucía's apartment to double?",
+      "options": [
+        "Lucía left the electric space heater on for a couple of freezing nights last week",
+        "Mateo left his computer running day and night",
+        "The landlord billed them for the whole building",
+        "Their refrigerator broke"
+      ],
+      "correctIndex": 0,
+      "explanation": "Lucía admits she left the electric space heater on ('dejé el calentador eléctrico prendido un par de noches')."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "Why is Mateo broke right now, and how much of the bill does Lucía agree to cover?",
+      "options": [
+        "He hasn't been paid for his design project yet; Lucía covers 70% of the bill",
+        "He bought concert tickets; Lucía covers 50% of the bill",
+        "He lost his wallet; Lucía covers 100% of the bill",
+        "He paid the water bill; Lucía covers 30% of the bill"
+      ],
+      "correctIndex": 0,
+      "explanation": "Mateo hasn't been paid for his design project yet, and Lucía covers 70% after her cousin Javi paid her back."
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What favor does Lucía ask of Mateo in exchange for treating him to 'esquites'?",
+      "options": [
+        "Help her with the boxes in the storage room ('la bodega')",
+        "Walk her dog in the park",
+        "Call the landlord back",
+        "Wash the dishes after dinner"
+      ],
+      "correctIndex": 0,
+      "explanation": "Lucía says: 'te invito unos esquites si me echas la mano con las cajas de la bodega.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: What do 'no te esponjes', 'andar bruja', and 'echar la mano' mean in Mexican Spanish?",
+      "options": [
+        "'No te esponjes' = don't get worked up; 'andar bruja' = to be broke; 'echar la mano' = to lend a hand",
+        "'No te esponjes' = don't get wet; 'andar bruja' = to stay up late; 'echar la mano' = to wave goodbye",
+        "'No te esponjes' = don't eat too much; 'andar bruja' = to be angry; 'echar la mano' = to applaud",
+        "'No te esponjes' = don't fall asleep; 'andar bruja' = to be lucky; 'echar la mano' = to pay in cash"
+      ],
+      "correctIndex": 0,
+      "explanation": "'No te esponjes' means don't get puffed up/angry, 'andar bruja' means to be broke, and 'echar la mano' means to lend a hand!"
+    }
+  ]
+}

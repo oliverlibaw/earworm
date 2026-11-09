@@ -1,0 +1,145 @@
+{
+  "id": "ep-009",
+  "episodeNumber": 9,
+  "date": "2026-11-14",
+  "title": "El coche prestado y el raspón en Guadalajara",
+  "region": "Mexico",
+  "regionFlag": "🇲🇽",
+  "ambientType": "street",
+  "audioUrl": "/earworm/episodes/2026-11-14.mp3",
+  "durationSeconds": 63.65,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Diego",
+      "gender": "male",
+      "spanish": "Oye, Fernanda, no manches... Acabo de bajar al estacionamiento y vi que mi coche tiene un raspón enorme en la defensa trasera.",
+      "english": "Hey, Fernanda, no way... I just went down to the parking lot and saw that my car has a huge scratch on the back bumper.",
+      "slang": {
+        "term": "no manches",
+        "literalMeaning": "don't stain",
+        "actualMeaning": "No way! / You've got to be kidding me!",
+        "example": "¡No manches, qué rápido llegaste!"
+      },
+      "startTime": 0.14,
+      "endTime": 10.9
+    },
+    {
+      "id": 2,
+      "speaker": "Fernanda",
+      "gender": "female",
+      "spanish": "Ay, Diego, te iba a decir ahorita que saliéramos. Ayer que me lo prestaste para ir por las cosas de mi chamba, un poste estaba súper pegado en la rampa.",
+      "english": "Oh, Diego, I was going to tell you right now when we went out. Yesterday when you lent it to me to pick up my work stuff, a pillar was super close on the ramp.",
+      "slang": {
+        "term": "chamba",
+        "literalMeaning": "job / gig",
+        "actualMeaning": "work / job (everyday Mexican slang)",
+        "example": "Conseguí una nueva chamba cerca de mi casa."
+      },
+      "startTime": 11.33,
+      "endTime": 24.22
+    },
+    {
+      "id": 3,
+      "speaker": "Diego",
+      "gender": "male",
+      "spanish": "¿Y pensabas hacerte pato o qué? Sabes que lo acabo de sacar del taller hace dos semanas.",
+      "english": "And were you planning to play dumb or what? You know I just got it out of the repair shop two weeks ago.",
+      "slang": {
+        "term": "hacerte pato",
+        "literalMeaning": "to make yourself a duck",
+        "actualMeaning": "to play dumb / dodge responsibility",
+        "example": "No te hagas pato, te toca lavar los platos."
+      },
+      "startTime": 24.65,
+      "endTime": 31.9
+    },
+    {
+      "id": 4,
+      "speaker": "Fernanda",
+      "gender": "female",
+      "spanish": "¡Claro que no me iba a hacer pato! Ya hablé con el taller de mi tío Memo en Zapopan. Dice que mañana mismo lo pule y lo pinta por mil quinientos pesos.",
+      "english": "Of course I wasn't going to play dumb! I already spoke with my uncle Memo's body shop in Zapopan. He says tomorrow he'll buff and paint it for fifteen hundred pesos.",
+      "startTime": 32.33,
+      "endTime": 44.69
+    },
+    {
+      "id": 5,
+      "speaker": "Diego",
+      "gender": "male",
+      "spanish": "Bueno, menos mal... Pero esa lana la pones tú, ¿eh? Y me llevas a mi oficina en la mañana mientras lo arreglan.",
+      "english": "Well, thank goodness... But you're paying that cash, alright? And you're driving me to my office in the morning while they fix it.",
+      "slang": {
+        "term": "lana",
+        "literalMeaning": "wool",
+        "actualMeaning": "money / cash (Mexican slang)",
+        "example": "Ahorré una buena lana para las vacaciones."
+      },
+      "startTime": 45.12,
+      "endTime": 54.6
+    },
+    {
+      "id": 6,
+      "speaker": "Fernanda",
+      "gender": "female",
+      "spanish": "Trato hecho. Yo pago todo el taller y encima te compro tu torta ahogada para que se te baje el coraje.",
+      "english": "Deal. I'll pay for the whole shop and on top of that I'll buy you your drowned pork sandwich so you stop being mad.",
+      "startTime": 55.03,
+      "endTime": 63.41
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why is Diego upset with Fernanda at the start of the conversation?",
+      "options": [
+        "He found a big scratch on the back bumper of his car after lending it to her",
+        "She returned his car with an empty gas tank",
+        "She forgot to pick him up from the repair shop",
+        "She parked his car in a tow-away zone"
+      ],
+      "correctIndex": 0,
+      "explanation": "Diego saw a huge scratch ('un raspón enorme') on the rear bumper ('la defensa trasera') after lending his car to Fernanda yesterday."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "How did the car get scratched, and what plan did Fernanda already arrange?",
+      "options": [
+        "She scraped a tight pillar on a ramp; her Uncle Memo's shop in Zapopan will buff and paint it tomorrow for 1,500 pesos",
+        "Another driver hit her in traffic; her insurance will pay 3,000 pesos",
+        "A shopping cart hit the door; she bought touch-up paint for 500 pesos",
+        "She backed into a tree; Diego's mechanic will fix it next week"
+      ],
+      "correctIndex": 0,
+      "explanation": "Fernanda scraped a tight pillar on a ramp and arranged for her Uncle Memo's body shop in Zapopan to buff and paint it tomorrow for 1,500 pesos."
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "In addition to Fernanda paying for the repair, what else does Diego demand—and what food does Fernanda offer him?",
+      "options": [
+        "She must drive him to his office in the morning, and she offers to buy him a 'torta ahogada'",
+        "She must wash his car, and she offers him street tacos",
+        "She must lend him her bicycle, and she offers to buy him coffee",
+        "She must pay his parking fee, and she offers to cook dinner"
+      ],
+      "correctIndex": 0,
+      "explanation": "Diego insists she pay the cash ('esa lana la pones tú') and drive him to his office in the morning, and she offers him a 'torta ahogada'."
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: What do the Mexican idioms 'hacerse pato', 'la chamba', and 'la lana' mean?",
+      "options": [
+        "'Hacerse pato' = play dumb; 'la chamba' = work/job; 'la lana' = money/cash",
+        "'Hacerse pato' = drive fast; 'la chamba' = party; 'la lana' = sweater",
+        "'Hacerse pato' = apologize; 'la chamba' = garage; 'la lana' = paint",
+        "'Hacerse pato' = get angry; 'la chamba' = school; 'la lana' = debt"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Mexican Spanish, 'hacerse pato' means to play dumb, 'la chamba' is work/job, and 'la lana' is money/cash!"
+    }
+  ]
+}

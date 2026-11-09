@@ -1,7 +1,22 @@
+import { LESSON_TIMESTAMPS } from "@/lib/lessonTimestamps";
+import type { Episode } from "@/types/episode";
+
 export interface StaticDialogueTurn {
+  id?: number;
   speaker: string;
+  gender?: "male" | "female";
   text: string;
+  spanish?: string;
   englishTranslation: string;
+  english?: string;
+  startTime?: number;
+  endTime?: number;
+  slang?: {
+    term: string;
+    literalMeaning: string;
+    actualMeaning: string;
+    example: string;
+  };
 }
 
 export interface StaticSlangNote {
@@ -41,9 +56,16 @@ export interface StaticLesson {
   survivalPhrase?: SurvivalPhraseInfo;
   title: string;
   audioUrl: string;
+  durationSeconds?: number;
+  region?: "Mexico" | "Spain" | "Argentina" | "Colombia";
+  regionFlag?: string;
+  ambientType?: "cafe" | "street" | "market" | "transit";
+  episodeNumber?: number;
+  episodeId?: string;
   dialogue: StaticDialogueTurn[];
   slangNotes: StaticSlangNote[];
   questions: StaticQuestion[];
+  episodeMeta?: Episode;
 }
 
 export type VocabStarTier = "gold" | "silver" | "bronze" | "none";
@@ -1681,13 +1703,47 @@ export function getStaticMexicanSpanishLesson(
   const key = `${safeLevel}:${safeClip}`;
   const base = RAW_MEXICAN_LESSONS[key] ?? RAW_MEXICAN_LESSONS["B1:1"];
   const basePath = getPublicBasePath();
-  const ext = safeLevel === "A1" ? "m4a" : "mp3";
+  const timing = LESSON_TIMESTAMPS[key];
+
+  const timedDialogue: StaticDialogueTurn[] = base.dialogue.map((turn, idx) => {
+    const lineTiming = timing?.lines?.[idx];
+    // Match first slang note that appears inside this dialogue line
+    const matchedSlang = base.slangNotes.find((note) => {
+      const cleanTerm = note.term.replace(/\s*\(.*?\)\s*/g, "").trim();
+      return (
+        cleanTerm.length >= 3 &&
+        turn.text.toLowerCase().includes(cleanTerm.toLowerCase())
+      );
+    });
+    return {
+      ...turn,
+      id: idx + 1,
+      gender: idx % 2 === 0 ? "female" : "male",
+      spanish: turn.text,
+      english: turn.englishTranslation,
+      startTime: lineTiming?.startTime,
+      endTime: lineTiming?.endTime,
+      slang: matchedSlang
+        ? {
+            term: matchedSlang.term,
+            literalMeaning: matchedSlang.literalTranslation,
+            actualMeaning: matchedSlang.meaning,
+            example: turn.text,
+          }
+        : undefined,
+    };
+  });
 
   return {
     ...base,
     _id: `static_Spanish_${safeLevel}_${safeClip}`,
     dateStr,
-    audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.${ext}`,
+    audioUrl: `${basePath}/audio/Spanish-${safeLevel}-${safeClip}.mp3`,
+    durationSeconds: timing?.durationSeconds,
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: safeClip === 1 ? "street" : "cafe",
+    dialogue: timedDialogue,
     survivalPhrase:
       base.survivalPhrase ??
       SURVIVAL_PHRASES_BY_LESSON[key] ??

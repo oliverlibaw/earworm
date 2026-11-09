@@ -1,0 +1,115 @@
+{
+  "id": "ep-013",
+  "episodeNumber": 13,
+  "date": "2026-11-18",
+  "title": "Rumba y trancones en Chapinero",
+  "region": "Colombia",
+  "regionFlag": "🇨🇴",
+  "ambientType": "transit",
+  "audioUrl": "/earworm/episodes/2026-11-18.mp3",
+  "durationSeconds": 31.92,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Valentina",
+      "gender": "female",
+      "spanish": "¡Aló, Pipe! ¿Dónde vienen? Llevamos media hora haciendo fila en la entrada del bar.",
+      "english": "Hello, Pipe! Where are you guys? We've been waiting in line at the bar entrance for half an hour.",
+      "startTime": 0.14,
+      "endTime": 7.42
+    },
+    {
+      "id": 2,
+      "speaker": "Pipe",
+      "gender": "male",
+      "spanish": "¡Ay, qué pena con vos, Vale! Nos cogió un trancón horrible por la carrera Séptima.",
+      "english": "Oh, I'm so sorry, Vale! We got caught in a terrible traffic jam on Seventh Avenue.",
+      "slang": {
+        "term": "trancón",
+        "literalMeaning": "big bolt / blockage",
+        "actualMeaning": "a massive traffic jam / gridlock (Colombian Spanish)",
+        "example": "Salí temprano pero había un trancón monumental en la autopista."
+      },
+      "startTime": 7.85,
+      "endTime": 15.43
+    },
+    {
+      "id": 3,
+      "speaker": "Valentina",
+      "gender": "female",
+      "spanish": "¡No me digás! Bueno, apúrense que antes de las diez no cobran cover y la rumba está buenísima.",
+      "english": "Don't tell me that! Well, hurry up because before ten o'clock there's no cover charge and the party is awesome.",
+      "slang": {
+        "term": "la rumba",
+        "literalMeaning": "the rumba dance",
+        "actualMeaning": "the party / night out dancing (standard in Colombia)",
+        "example": "Este viernes se armó la rumba en Chapinero."
+      },
+      "startTime": 15.86,
+      "endTime": 24.19
+    },
+    {
+      "id": 4,
+      "speaker": "Pipe",
+      "gender": "male",
+      "spanish": "Ya nos bajamos del taxi a dos cuadras y vamos corriendo. ¡Guardanos puesto en la mesa!",
+      "english": "We just got out of the taxi two blocks away and we're running over. Save us a spot at the table!",
+      "startTime": 24.62,
+      "endTime": 31.68
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why is Pipe running late to meet Valentina at the bar?",
+      "options": [
+        "His taxi got stuck in a terrible traffic jam ('un trancón') on Seventh Avenue",
+        "He forgot his ID card at home",
+        "He went to the wrong neighborhood",
+        "His phone battery died"
+      ],
+      "correctIndex": 0,
+      "explanation": "Pipe says: 'Nos cogió un trancón horrible por la carrera Séptima.'"
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "Why is it important that Pipe arrive before 10:00 PM?",
+      "options": [
+        "There is no cover charge before 10:00 PM",
+        "The kitchen closes at 10:00 PM",
+        "Valentina has to leave at 10:00 PM",
+        "Drinks are half-price until 10:00 PM"
+      ],
+      "correctIndex": 0,
+      "explanation": "Valentina says: 'antes de las diez no cobran cover y la rumba está buenísima.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What did Pipe and his friends do to get there faster?",
+      "options": [
+        "They hopped out of the taxi two blocks away and are running the rest of the way",
+        "They rented electric scooters",
+        "They took the subway",
+        "They asked the driver to take a shortcut"
+      ],
+      "correctIndex": 0,
+      "explanation": "Pipe says: 'Ya nos bajamos del taxi a dos cuadras y vamos corriendo.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: In Colombia, what do '¡Qué pena con vos!', 'un trancón', and 'la rumba' mean?",
+      "options": [
+        "'¡Qué pena!' = I'm so sorry / excuse me; 'un trancón' = a traffic jam; 'la rumba' = the party / night out",
+        "'¡Qué pena!' = How sad; 'un trancón' = a big drink; 'la rumba' = the band",
+        "'¡Qué pena!' = How embarrassing; 'un trancón' = a rainstorm; 'la rumba' = the street",
+        "'¡Qué pena!' = What a pity; 'un trancón' = a police checkpoint; 'la rumba' = the line"
+      ],
+      "correctIndex": 0,
+      "explanation": "In Colombia, '¡Qué pena (con vos/usted)!' is the polite way to say 'I'm so sorry / excuse me', 'un trancón' is a traffic jam, and 'la rumba' is a party/night out!"
+    }
+  ]
+}

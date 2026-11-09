@@ -1,0 +1,121 @@
+{
+  "id": "ep-008",
+  "episodeNumber": 8,
+  "date": "2026-11-13",
+  "title": "Un tinto antes del aguacero en Bogotá",
+  "region": "Colombia",
+  "regionFlag": "🇨🇴",
+  "ambientType": "cafe",
+  "audioUrl": "/earworm/episodes/2026-11-13.mp3",
+  "durationSeconds": 30.89,
+  "dialogue": [
+    {
+      "id": 1,
+      "speaker": "Natalia",
+      "gender": "female",
+      "spanish": "Uy, Andrés, mirá esas nubes negras sobre los cerros. Se va a venir un aguacero tenaz.",
+      "english": "Whoa, Andrés, look at those dark clouds over the hills. A fierce downpour is about to hit.",
+      "slang": {
+        "term": "tenaz",
+        "literalMeaning": "tenacious / stubborn",
+        "actualMeaning": "intense / fierce / crazy (very common Bogotá slang)",
+        "example": "El tráfico por la Séptima hoy está tenaz."
+      },
+      "startTime": 0.14,
+      "endTime": 7.99
+    },
+    {
+      "id": 2,
+      "speaker": "Andrés",
+      "gender": "male",
+      "spanish": "Sí, qué frío tan berraco. Entremos a esta cafetería y nos tomamos un tinto bien caliente.",
+      "english": "Yeah, it's freezing cold. Let's duck into this café and have a piping hot black coffee.",
+      "slang": {
+        "term": "un tinto",
+        "literalMeaning": "a tinted/red one",
+        "actualMeaning": "a cup of black coffee (in Colombia, 'tinto' means black coffee, not red wine!)",
+        "example": "¿Me regala un tinto sin azúcar, por favor?"
+      },
+      "startTime": 8.42,
+      "endTime": 16.46
+    },
+    {
+      "id": 3,
+      "speaker": "Natalia",
+      "gender": "female",
+      "spanish": "Buena idea. Y pidamos dos almojábanas recién salidas del horno mientras escampa.",
+      "english": "Good idea. And let's order two cheese breads fresh out of the oven while the rain lets up.",
+      "startTime": 16.9,
+      "endTime": 23.64
+    },
+    {
+      "id": 4,
+      "speaker": "Andrés",
+      "gender": "male",
+      "spanish": "Listo, de una. Apenas pare la lluvia caminamos a la estación de TransMilenio.",
+      "english": "Done, let's do it. As soon as the rain stops we'll walk to the TransMilenio bus station.",
+      "slang": {
+        "term": "de una",
+        "literalMeaning": "of one",
+        "actualMeaning": "right away / let's do it / count me in",
+        "example": "¿Vamos a almorzar ya? ¡De una!"
+      },
+      "startTime": 24.07,
+      "endTime": 30.65
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "comprehension",
+      "question": "Why do Natalia and Andrés decide to duck into a café in Bogotá?",
+      "options": [
+        "It's freezing cold and a heavy rainstorm ('aguacero') is about to start",
+        "They have a business meeting with a client there",
+        "Andrés needs Wi-Fi to send an email",
+        "The TransMilenio station is closed"
+      ],
+      "correctIndex": 0,
+      "explanation": "Natalia sees dark clouds ('se va a venir un aguacero tenaz') and Andrés says it's freezing cold ('qué frío tan berraco')."
+    },
+    {
+      "id": "q2",
+      "type": "comprehension",
+      "question": "What food do they order to go with their hot drinks?",
+      "options": [
+        "Two warm cheese breads ('almojábanas') fresh from the oven",
+        "Two slices of chocolate cake",
+        "A plate of fried plantains",
+        "Two beef empanadas"
+      ],
+      "correctIndex": 0,
+      "explanation": "Natalia says: 'Y pidamos dos almojábanas recién salidas del horno mientras escampa.'"
+    },
+    {
+      "id": "q3",
+      "type": "comprehension",
+      "question": "What is their plan once the rain stops ('mientras escampa')?",
+      "options": [
+        "Walk to the TransMilenio bus station",
+        "Call a taxi to go to the airport",
+        "Visit a museum downtown",
+        "Go grocery shopping"
+      ],
+      "correctIndex": 0,
+      "explanation": "Andrés says: 'Apenas pare la lluvia caminamos a la estación de TransMilenio.'"
+    },
+    {
+      "id": "q4",
+      "type": "slang",
+      "question": "Slang Side Quest: When Andrés orders 'un tinto bien caliente' in Colombia, what is he ordering?",
+      "options": [
+        "A cup of hot black coffee (not red wine!)",
+        "A glass of mulled red wine",
+        "A cup of hot chocolate with cheese",
+        "A herbal tea with honey"
+      ],
+      "correctIndex": 0,
+      "explanation": "False-friend alert! In Colombia, 'un tinto' always means a small cup of black coffee, whereas in Spain 'vino tinto' is red wine."
+    }
+  ]
+}

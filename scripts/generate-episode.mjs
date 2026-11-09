@@ -1,0 +1,2513 @@
+#!/usr/bin/env node
+/**
+ * Earshot Automated Episode CLI Pipeline & Natural Audio Assembler
+ *
+ * Usage:
+ *   npm run generate:episode                         # Generates/updates 14-day content buffer + natural level audio
+ *   node scripts/generate-episode.mjs --buffer       # Regenerates 14-day episode buffer & beginner audio
+ *   node scripts/generate-episode.mjs --date 2026-11-20 --region Mexico --episode 15
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+import https from "node:https";
+
+const ROOT_DIR = process.cwd();
+const PUBLIC_AUDIO_DIR = path.join(ROOT_DIR, "public", "audio");
+const PUBLIC_EPISODES_DIR = path.join(ROOT_DIR, "public", "episodes");
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/earworm";
+
+// 24kHz 64kbps Mono CBR MP3 frame constants (from Google Neural TTS endpoint)
+const FRAME_BYTES = 192;
+const FRAME_DURATION_SEC = 0.024; // 576 samples / 24000 Hz = 24ms per frame
+
+function fetchBuffer(url) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(
+        url,
+        {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+          },
+        },
+        (res) => {
+          if (res.statusCode !== 200) {
+            reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+            return;
+          }
+          const chunks = [];
+          res.on("data", (d) => chunks.push(d));
+          res.on("end", () => resolve(Buffer.concat(chunks)));
+        }
+      )
+      .on("error", reject);
+  });
+}
+
+function splitIntoMp3Frames(buf) {
+  const frames = [];
+  for (let i = 0; i + FRAME_BYTES <= buf.length; i += FRAME_BYTES) {
+    frames.push(buf.subarray(i, i + FRAME_BYTES));
+  }
+  return frames;
+}
+
+function isSilentMp3Frame(frame) {
+  let ffCount = 0;
+  for (let i = 4; i < frame.length; i++) {
+    if (frame[i] === 0xff || frame[i] === 0x00) ffCount++;
+  }
+  return ffCount > frame.length - 24;
+}
+
+function trimSilentMp3Frames(frames, keepLead = 2, keepTrail = 3) {
+  let start = 0;
+  while (start < frames.length && isSilentMp3Frame(frames[start])) start++;
+  let end = frames.length - 1;
+  while (end > start && isSilentMp3Frame(frames[end])) end--;
+  start = Math.max(0, start - keepLead);
+  end = Math.min(frames.length - 1, end + keepTrail);
+  return frames.slice(start, end + 1);
+}
+
+/**
+ * Splits a Spanish dialogue turn into natural breath clauses so beginners get
+ * human neural prosody (ttsspeed=1.0) with natural breath pauses between clauses
+ * instead of robotic phase-vocoder time-stretching.
+ */
+function splitIntoBreathClauses(text, pauseMode = "normal") {
+  const sentences = text
+    .split(/(?<=[.?!¡¿])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (pauseMode === "fast") {
+    return sentences;
+  }
+
+  // For beginner/intro or clear conversational pacing, also allow gentle breath
+  // pauses on longer comma clauses
+  const clauses = [];
+  for (const s of sentences) {
+    if (s.length > 44 && s.includes(", ")) {
+      const sub = s
+        .split(/(?<=,)\s+/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      for (const item of sub) {
+        if (
+          clauses.length > 0 &&
+          clauses[clauses.length - 1].length < 16 &&
+          !clauses[clauses.length - 1].match(/[.?!]$/)
+        ) {
+          clauses[clauses.length - 1] += " " + item;
+        } else {
+          clauses.push(item);
+        }
+      }
+    } else {
+      clauses.push(s);
+    }
+  }
+  return clauses;
+}
+
+/**
+ * Picks a regional Spanish TTS locale (`tl`) that alternates clearly between
+ * speakers (`female` vs `male`) while matching the episode's region.
+ */
+function getVoiceLocale(region, gender, turnIndex) {
+  if (region === "Spain") {
+    return gender === "female" ? "es-ES" : "es-US";
+  }
+  if (region === "Mexico") {
+    return gender === "female" ? "es-MX" : "es-US";
+  }
+  if (region === "Colombia" || region === "Argentina") {
+    return gender === "female"
+      ? turnIndex % 2 === 0
+        ? "es-MX"
+        : "es-US"
+      : "es-ES";
+  }
+  return turnIndex % 2 === 0 ? "es-MX" : "es-US";
+}
+
+/**
+ * Synthesizes a multi-speaker Spanish dialogue into a single MP3 buffer at
+ * natural neural prosody (`ttsspeed=1.0`) and returns both the MP3 Buffer and
+ * the exact `startTime` / `endTime` (in seconds) for each dialogue line.
+ */
+async function synthesizeDialogueMp3(dialogueLines, options = {}) {
+  const {
+    region = "Mexico",
+    clausePauseFrames = 9, // ~216ms natural breath between clauses
+    turnPauseFrames = 20, // ~480ms natural pause between speaker turns
+    leadSilenceFrames = 6, // ~144ms lead-in
+    trailSilenceFrames = 10, // ~240ms tail
+    pauseMode = "normal",
+  } = options;
+
+  let silentTemplateFrame = null;
+  const allFrames = [];
+  const lineTimestamps = [];
+
+  for (let i = 0; i < dialogueLines.length; i++) {
+    const line = dialogueLines[i];
+    const spanishText = line.spanish || line.text;
+    const gender = line.gender || (i % 2 === 0 ? "female" : "male");
+    const tl = getVoiceLocale(region, gender, i);
+
+    const clauses = splitIntoBreathClauses(spanishText, pauseMode);
+    const turnFrames = [];
+
+    for (let c = 0; c < clauses.length; c++) {
+      const clause = clauses[c];
+      const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
+        clause
+      )}&tl=${tl}&client=tw-ob&ttsspeed=1.0`;
+
+      const mp3Buf = await fetchBuffer(url);
+      const rawFrames = splitIntoMp3Frames(mp3Buf);
+      if (!silentTemplateFrame && rawFrames.length > 0) {
+        silentTemplateFrame =
+          rawFrames.find(isSilentMp3Frame) || rawFrames[rawFrames.length - 1];
+      }
+
+      const trimmed = trimSilentMp3Frames(rawFrames, 2, 3);
+      turnFrames.push(...trimmed);
+
+      if (c < clauses.length - 1 && silentTemplateFrame && clausePauseFrames > 0) {
+        for (let p = 0; p < clausePauseFrames; p++) {
+          turnFrames.push(silentTemplateFrame);
+        }
+      }
+    }
+
+    if (i === 0 && silentTemplateFrame) {
+      for (let p = 0; p < leadSilenceFrames; p++) {
+        allFrames.push(silentTemplateFrame);
+      }
+    }
+
+    const startFrameIdx = allFrames.length;
+    allFrames.push(...turnFrames);
+    const endFrameIdx = allFrames.length;
+
+    const startTime = Number((startFrameIdx * FRAME_DURATION_SEC).toFixed(2));
+    const endTime = Number((endFrameIdx * FRAME_DURATION_SEC).toFixed(2));
+    lineTimestamps.push({ startTime, endTime });
+
+    if (i < dialogueLines.length - 1 && silentTemplateFrame) {
+      for (let p = 0; p < turnPauseFrames; p++) {
+        allFrames.push(silentTemplateFrame);
+      }
+    }
+  }
+
+  if (silentTemplateFrame) {
+    for (let p = 0; p < trailSilenceFrames; p++) {
+      allFrames.push(silentTemplateFrame);
+    }
+  }
+
+  const durationSeconds = Number(
+    (allFrames.length * FRAME_DURATION_SEC).toFixed(2)
+  );
+  return {
+    mp3Buffer: Buffer.concat(allFrames),
+    lineTimestamps,
+    durationSeconds,
+  };
+}
+
+// ============================================================================
+// 1. LEVEL LESSONS (A1 Basic, A2 Intro, B1 Conversational, B2 Advanced)
+// ============================================================================
+const LEVEL_CLIPS = [
+  {
+    key: "A1:1",
+    outFiles: ["Spanish-A1-1.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 11, // ~264ms gentle pause between clauses for Basic
+    turnPauseFrames: 24, // ~576ms between speakers for Basic
+    pauseMode: "beginner",
+    dialogue: [
+      {
+        speaker: "Ana",
+        gender: "female",
+        spanish: "Hola, buenos días. ¿Me da un agua de mango, por favor?",
+      },
+      {
+        speaker: "Don Pepe",
+        gender: "male",
+        spanish: "¡Claro que sí! ¿Grande o chica? La grande cuesta treinta pesos.",
+      },
+      {
+        speaker: "Ana",
+        gender: "female",
+        spanish: "Chica, por favor. Aquí tiene veinte pesos. ¡Muchas gracias!",
+      },
+    ],
+  },
+  {
+    key: "A1:2",
+    outFiles: ["Spanish-A1-2.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 11,
+    turnPauseFrames: 24,
+    pauseMode: "beginner",
+    dialogue: [
+      {
+        speaker: "Marco",
+        gender: "male",
+        spanish: "Disculpe, señorita. ¿Dónde está la estación del metro más cercana?",
+      },
+      {
+        speaker: "Elena",
+        gender: "female",
+        spanish: "Está muy cerca. Camine dos cuadras derecho y doble a la izquierda.",
+      },
+      {
+        speaker: "Marco",
+        gender: "male",
+        spanish: "¡Perfecto! Está al lado del banco, ¿verdad? ¡Buen día!",
+      },
+    ],
+  },
+  {
+    key: "A2:1",
+    outFiles: ["Spanish-A2-1.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 9, // ~216ms natural breath pause for Intro
+    turnPauseFrames: 21, // ~504ms between speakers for Intro
+    pauseMode: "beginner",
+    dialogue: [
+      {
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "Oye, Valeria, tengo muchísima hambre. ¿Vamos por unos tacos de canasta aquí afuera del metro?",
+      },
+      {
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "¡Ay, sí, qué rico! Pero espera, ¿tienes efectivo? Es que el señor de la bicicleta no acepta tarjeta.",
+      },
+      {
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "Híjole, solo traigo un billete de cincuenta pesos. ¿Cuánto cuestan?",
+      },
+      {
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "La orden de cinco tacos cuesta cuarenta pesos. Y yo traigo veinte pesos en monedas para dos refrescos.",
+      },
+      {
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "¡Ah, qué chido! Entonces compartimos la orden ahorita y luego en la tarde te pago con transferencia.",
+      },
+      {
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "Sale, pide dos de papa con chorizo y tres de frijol. ¡Pero cuidado con la salsa verde que pica un montón!",
+      },
+    ],
+  },
+  {
+    key: "A2:2",
+    outFiles: ["Spanish-A2-2.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 9,
+    turnPauseFrames: 21,
+    pauseMode: "beginner",
+    dialogue: [
+      {
+        speaker: "Sofía",
+        gender: "female",
+        spanish:
+          "Oye, Luis, ¿pedimos dos cafés de olla aquí en la panadería antes de tomar el camión?",
+      },
+      {
+        speaker: "Luis",
+        gender: "male",
+        spanish:
+          "¿Mande? Perdón, estaba viendo mi celular. Sí, buena idea, hace bastante frío esta mañana.",
+      },
+      {
+        speaker: "Sofía",
+        gender: "female",
+        spanish:
+          "También voy a llevar dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.",
+      },
+      {
+        speaker: "Luis",
+        gender: "male",
+        spanish:
+          "Yo invito hoy, Sofía. Pero apúrate porque nuestro camión pasa en ocho minutos por la avenida.",
+      },
+    ],
+  },
+  {
+    key: "B1:1",
+    outFiles: ["Spanish-B1-1.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 6,
+    turnPauseFrames: 16,
+    pauseMode: "normal",
+    dialogue: [
+      {
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "Oye, Fernanda, no manches... Acabo de bajar al estacionamiento y vi que mi coche tiene un raspón enorme en la defensa trasera.",
+      },
+      {
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "Ay, Diego, te iba a decir ahorita que saliéramos. Ayer que me lo prestaste para ir por las cosas de mi chamba, un poste estaba súper pegado en la rampa.",
+      },
+      {
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "¿Y pensabas hacerte pato o qué? Sabes que lo acabo de sacar del taller hace dos semanas.",
+      },
+      {
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "¡Claro que no me iba a hacer pato! Ya hablé con el taller de mi tío Memo en Zapopan. Dice que mañana mismo lo pule y lo pinta por mil quinientos pesos.",
+      },
+      {
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "Bueno, menos mal... Pero esa lana la pones tú, ¿eh? Y me llevas a mi oficina en la mañana mientras lo arreglan.",
+      },
+      {
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "Trato hecho. Yo pago todo el taller y encima te compro tu torta ahogada para que se te baje el coraje.",
+      },
+    ],
+  },
+  {
+    key: "B1:2",
+    outFiles: ["Spanish-B1-2.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 6,
+    turnPauseFrames: 16,
+    pauseMode: "normal",
+    dialogue: [
+      {
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "Oye, Lucía, no te pases... Acabo de ver el recibo de la luz de este bimestre y casi me da un infarto.",
+      },
+      {
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Aguanta, Mateo, no te esponjes. Es que la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido un par de noches.",
+      },
+      {
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "¿Un par de noches? ¡Pero si subió al doble! Y tú sabes que ahorita ando bien bruja porque no me han pagado el proyecto de diseño.",
+      },
+      {
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Tranquilo, mi primo Javi me debía una lana de los boletos del concierto y me acaba de transferir. Yo pongo el setenta por ciento del recibo.",
+      },
+      {
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "Uf, qué alivio... Es que el casero ya me estaba moliendo por WhatsApp desde las ocho de la mañana.",
+      },
+      {
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Ya sé cómo se pone. Ándale, yo lo pago ahorita en la app y además te invito unos esquites si me echas la mano con las cajas de la bodega.",
+      },
+    ],
+  },
+  {
+    key: "B2:1",
+    outFiles: ["Spanish-B2-1.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 4,
+    turnPauseFrames: 14,
+    pauseMode: "fast",
+    dialogue: [
+      {
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "¡No mames, Mariana! El lector de códigos aquí en la puerta del Foro Sol acaba de prender en rojo con mi boleto, güey.",
+      },
+      {
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "¡No me digas eso! Te advertí que ese revendedor de Facebook se veía súper chafa, Paco. ¡Se pasó de lanza el tipo si nos vendió uno clonado!",
+      },
+      {
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "Espérate, ya me puse nervioso porque me costó un ojo de la cara y me quedé sin un quinto para toda la quincena.",
+      },
+      {
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "A ver, enséñame tu celular... ¡Ay, Paco, estás bien dormido! Estabas enseñando el código QR del estacionamiento en vez del boleto del concierto.",
+      },
+      {
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "¿Neta? ¡Qué oso hice con el de seguridad! Mira, ya escaneó el bueno y se puso en verde.",
+      },
+      {
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "¡A huevo! Casi me da el patatús. Ya córrele que la banda está a punto de tocar la primera rola y nos toca hasta la pista.",
+      },
+    ],
+  },
+  {
+    key: "B2:2",
+    outFiles: ["Spanish-B2-2.mp3"],
+    region: "Mexico",
+    clausePauseFrames: 4,
+    turnPauseFrames: 14,
+    pauseMode: "fast",
+    dialogue: [
+      {
+        speaker: "Ramiro",
+        gender: "male",
+        spanish:
+          "¿Qué onda, compa? ¿Por qué me tiraste a león toda la mañana? Quedamos de ir a comprar el carbón y la arrachera a la una.",
+      },
+      {
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "Nombre, Ramiro, discúlpame, se me armó un desmadre en la oficina porque se cayó el servidor y mi jefe no nos dejaba salir.",
+      },
+      {
+        speaker: "Ramiro",
+        gender: "male",
+        spanish:
+          "Híjole, qué mala onda... Es que los invitados llegan a las cinco y yo no traigo suficiente feria para pagar toda la carne solo.",
+      },
+      {
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "No te apures, ya pedí todo a domicilio por la carnicería San Juan y lo dejé pagado con mi tarjeta. Llega a tu casa de volada en veinte minutos.",
+      },
+      {
+        speaker: "Ramiro",
+        gender: "male",
+        spanish:
+          "¡Sobres, te quedó con madre! Entonces yo voy prendiendo el asador y pongo las cheves en la hielera.",
+      },
+    ],
+  },
+];
+
+// ============================================================================
+// 2. 14-DAY CONTENT BUFFER EPISODES (Covering Past 3 Archive Days + Today + 10 Upcoming Days)
+// ============================================================================
+const FOURTEEN_DAY_EPISODE_SPECS = [
+  {
+    id: "ep-001",
+    episodeNumber: 1,
+    date: "2026-11-06", // 3 days ago (in 3-Day Archive Drawer)
+    title: "La cuenta dividida en el café de Madrid",
+    region: "Spain",
+    regionFlag: "🇪🇸",
+    ambientType: "cafe",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Carmen",
+        gender: "female",
+        spanish:
+          "Oye, Pablo, el camarero dice que no nos divide la cuenta en la terraza.",
+        english:
+          "Hey, Pablo, the waiter says he won't split the bill for us on the patio.",
+      },
+      {
+        id: 2,
+        speaker: "Pablo",
+        gender: "male",
+        spanish:
+          "¡Qué fuerte! Bueno, no pasa nada, pago yo todo con tarjeta porque andas sin pasta.",
+        english:
+          "That's wild! Well, no worries, I'll pay the whole thing by card since you're out of cash.",
+        slang: {
+          term: "pasta",
+          literalMeaning: "pasta / dough",
+          actualMeaning: "money / cash (very common slang across Spain)",
+          example: "No salgo este finde porque no tengo nada de pasta.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Carmen",
+        gender: "female",
+        spanish:
+          "Mil gracias, tío. Te hago un Bizum de doce euros ahora mismo por mis tostadas y el cortado.",
+        english:
+          "Thanks a million, dude. I'll send you a 12-euro Bizum transfer right now for my toast and espresso.",
+        slang: {
+          term: "tío",
+          literalMeaning: "uncle",
+          actualMeaning: "dude / mate / guy (everyday Spanish friend address)",
+          example: "¡Gracias por esperarme, tío!",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Pablo",
+        gender: "male",
+        spanish:
+          "Vale, genial. Vámonos pitando que el metro cierra en veinte minutos.",
+        english:
+          "Okay, great. Let's get out of here fast because the metro closes in twenty minutes.",
+        slang: {
+          term: "pitando",
+          literalMeaning: "whistling / honking",
+          actualMeaning: "in a big hurry / right away (irse pitando)",
+          example: "Salí pitando de la oficina para no perder el tren.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "What problem do Carmen and Pablo run into at the Madrid café?",
+        options: [
+          "The waiter says he won't split the bill on the patio",
+          "The credit card machine is broken",
+          "The kitchen ran out of toast and coffee",
+          "They forgot their phones at home",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Carmen says: 'el camarero dice que no nos divide la cuenta en la terraza' (the waiter won't split the bill).",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "How does Carmen pay Pablo back for her share?",
+        options: [
+          "She gives him a 20-euro bill in cash",
+          "She sends him a 12-euro Bizum mobile transfer",
+          "She buys his metro ticket at the station",
+          "She promises to buy breakfast tomorrow",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Carmen says: 'Te hago un Bizum de doce euros ahora mismo por mis tostadas y el cortado.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "Why do they need to leave the café quickly at the end?",
+        options: [
+          "It is starting to rain on the patio",
+          "The metro closes in 20 minutes",
+          "They have a movie reservation at eight",
+          "The café is closing its terrace",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Pablo says: 'Vámonos pitando que el metro cierra en veinte minutos.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: When Pablo says 'andas sin pasta' and 'vámonos pitando', what do 'pasta' and 'irse pitando' mean in Spain?",
+        options: [
+          "'Pasta' = money/cash; 'irse pitando' = to leave in a hurry",
+          "'Pasta' = Italian food; 'irse pitando' = to whistle a song",
+          "'Pasta' = patience; 'irse pitando' = to take a taxi",
+          "'Pasta' = battery; 'irse pitando' = to argue with the waiter",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Spain, 'pasta' is slang for money/cash, and 'irse pitando' means to leave in a rush!",
+      },
+    ],
+  },
+  {
+    id: "ep-002",
+    episodeNumber: 2,
+    date: "2026-11-07", // 2 days ago (in 3-Day Archive Drawer)
+    title: "El subte cerrado en Palermo",
+    region: "Argentina",
+    regionFlag: "🇦🇷",
+    ambientType: "transit",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Julieta",
+        gender: "female",
+        spanish:
+          "Che, Tomás, la línea D del subte está cortada por obras. ¿Cómo vamos al centro?",
+        english:
+          "Hey, Tomás, subway Line D is closed for maintenance. How do we get downtown?",
+        slang: {
+          term: "subte",
+          literalMeaning: "underground (short for subterráneo)",
+          actualMeaning: "the Buenos Aires subway / metro system",
+          example: "Tomamos el subte en Plaza Italia para llegar rápido.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Tomás",
+        gender: "male",
+        spanish:
+          "¡Qué garrón! Encima no tengo saldo en la tarjeta SUBE para tomar el colectivo.",
+        english:
+          "What a bummer! On top of that, I don't have balance on my SUBE transit card to take the bus.",
+        slang: {
+          term: "garrón",
+          literalMeaning: "ankle / claw",
+          actualMeaning: "a total bummer / drag / bad luck (Argentine slang)",
+          example: "¡Qué garrón que se largó a llover justo ahora!",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Julieta",
+        gender: "female",
+        spanish:
+          "Tranquilo, boludo, acá a media cuadra hay un kiosco donde cargan la tarjeta.",
+        english:
+          "Relax, dude, half a block from here there's a convenience stand where they top up the card.",
+        slang: {
+          term: "boludo",
+          literalMeaning: "big-balled / foolish",
+          actualMeaning: "dude / buddy (friendly everyday Argentine address between friends)",
+          example: "Che, boludo, ¿a qué hora nos vemos hoy?",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Tomás",
+        gender: "male",
+        spanish:
+          "Bárbaro. Carguemos mil pesos y paso a comprar unas medialunas para el viaje.",
+        english:
+          "Awesome. Let's load a thousand pesos and I'll stop to buy some croissants for the ride.",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why can't Julieta and Tomás take the subway ('el subte') downtown?",
+        options: [
+          "Line D is closed due to maintenance work",
+          "They lost their SUBE transit cards",
+          "The station already closed for the night",
+          "The train is too crowded to board",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Julieta explains: 'la línea D del subte está cortada por obras' (Line D is closed for maintenance work).",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "Where do they go to add balance to Tomás's SUBE transit card?",
+        options: [
+          "A bank two blocks away",
+          "A neighborhood kiosk ('un kiosco') half a block away",
+          "A supermarket across the avenue",
+          "They pay the bus driver in coins",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Julieta says: 'acá a media cuadra hay un kiosco donde cargan la tarjeta.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "How much money does Tomás want to load, and what snack does he mention?",
+        options: [
+          "500 pesos and empanadas",
+          "1,000 pesos and croissants ('medialunas')",
+          "2,000 pesos and a coffee",
+          "300 pesos and a sandwich",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Tomás says: 'Carguemos mil pesos y paso a comprar unas medialunas para el viaje.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: When Tomás exclaims '¡Qué garrón!', what does 'un garrón' mean in Argentine Spanish?",
+        options: [
+          "A total bummer / drag / piece of bad luck",
+          "A great bargain / discount",
+          "A fast express train",
+          "A delicious bakery pastry",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Argentina, '¡Qué garrón!' means 'What a bummer!' or 'What a drag!'",
+      },
+    ],
+  },
+  {
+    id: "ep-003",
+    episodeNumber: 3,
+    date: "2026-11-08", // Yesterday (in 3-Day Archive Drawer)
+    title: "Fruta fresca en la plaza de Medellín",
+    region: "Colombia",
+    regionFlag: "🇨🇴",
+    ambientType: "market",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Camila",
+        gender: "female",
+        spanish:
+          "¡Quiubo, parcero! Mirá qué lulos tan bonitos tienen en este puesto de la plaza.",
+        english:
+          "What's up, buddy! Look how nice the lulo fruits are at this market stall.",
+        slang: {
+          term: "parcero",
+          literalMeaning: "partner / sharecropper",
+          actualMeaning: "buddy / close friend (iconic Colombian slang)",
+          example: "Ese man es mi parcero desde el colegio.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Sebastián",
+        gender: "male",
+        spanish:
+          "¡Están una chimba! Llevemos una bolsa para hacer jugo frío en la casa.",
+        english:
+          "They look amazing! Let's get a bag to make cold juice at home.",
+        slang: {
+          term: "una chimba",
+          literalMeaning: "awesome / super cool",
+          actualMeaning: "fantastic / amazing / top-notch (Medellín slang)",
+          example: "¡El concierto de anoche estuvo una chimba!",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Camila",
+        gender: "female",
+        spanish:
+          "La señora dice que la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.",
+        english:
+          "The lady says a dozen costs eight thousand pesos and she'll throw in two passion fruits as a free bonus.",
+        slang: {
+          term: "de ñapa",
+          literalMeaning: "from the Quechua 'yapa' (addition)",
+          actualMeaning: "as a free extra / baker's dozen bonus at a market",
+          example: "Compré tres empanadas y me dieron una más de ñapa.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Sebastián",
+        gender: "male",
+        spanish:
+          "¡De una! Pagá vos en efectivo que yo te invito las arepas de queso ahorita.",
+        english:
+          "Let's do it! You pay in cash and I'll treat you to cheese corn cakes right now.",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why do Camila and Sebastián want to buy 'lulos' at the Medellín market?",
+        options: [
+          "To make cold juice at home",
+          "To bake a birthday cake",
+          "To bring them to their office party",
+          "To sell them at their own restaurant",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Sebastián says: 'Llevemos una bolsa para hacer jugo frío en la casa.'",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "How much does a dozen cost, and what does the vendor include for free?",
+        options: [
+          "5,000 pesos plus free bananas",
+          "8,000 pesos plus two free passion fruits ('dos maracuyás de ñapa')",
+          "10,000 pesos plus a glass of orange juice",
+          "12,000 pesos plus a cheese arepa",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Camila says: 'la docena vale ocho mil pesos y nos regala dos maracuyás de ñapa.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "What does Sebastián offer to buy for Camila if she pays cash at the fruit stand?",
+        options: [
+          "Cheese corn cakes ('arepas de queso')",
+          "Two cups of Colombian coffee",
+          "A taxi ride home",
+          "Tickets to a soccer match",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Sebastián says: 'Pagá vos en efectivo que yo te invito las arepas de queso ahorita.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Colombian Spanish, what do 'parcero', 'una chimba', and 'de ñapa' mean?",
+        options: [
+          "'Parcero' = friend/buddy; 'una chimba' = amazing/cool; 'de ñapa' = as a free bonus",
+          "'Parcero' = vendor; 'una chimba' = expensive; 'de ñapa' = on credit",
+          "'Parcero' = cousin; 'una chimba' = sour; 'de ñapa' = tomorrow",
+          "'Parcero' = neighbor; 'una chimba' = heavy; 'de ñapa' = in a bag",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Colombia, 'parcero' means friend/buddy, 'una chimba' means awesome/amazing, and 'de ñapa' is a free extra thrown in by a vendor!",
+      },
+    ],
+  },
+  {
+    id: "ep-004",
+    episodeNumber: 4,
+    date: "2026-11-09", // Today
+    title: "Tacos de canasta afuera del metro",
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: "street",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "Oye, Valeria, tengo muchísima hambre. ¿Vamos por unos tacos de canasta aquí afuera del metro?",
+        english:
+          "Hey, Valeria, I'm super hungry. Shall we get some basket tacos right outside the subway?",
+        slang: {
+          term: "tacos de canasta",
+          literalMeaning: "basket tacos",
+          actualMeaning:
+            "Steamed street tacos kept warm in a cloth-lined basket, often sold from a bicycle",
+          example: "En la esquina del metro venden tacos de canasta buenísimos.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "¡Ay, sí, qué rico! Pero espera, ¿tienes efectivo? Es que el señor de la bicicleta no acepta tarjeta.",
+        english:
+          "Oh, yes, delicious! But wait, do you have cash? The guy with the bicycle doesn't take cards.",
+      },
+      {
+        id: 3,
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "Híjole, solo traigo un billete de cincuenta pesos. ¿Cuánto cuestan?",
+        english:
+          "Shoot, I only have a fifty-peso bill on me. How much do they cost?",
+        slang: {
+          term: "Híjole",
+          literalMeaning: "little son (altered exclamation)",
+          actualMeaning: "Shoot! / Gosh! / Oh man! (mild Mexican exclamation of surprise)",
+          example: "¡Híjole, se me olvidaron las llaves adentro de la casa!",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "La orden de cinco tacos cuesta cuarenta pesos. Y yo traigo veinte pesos en monedas para dos refrescos.",
+        english:
+          "An order of five tacos costs forty pesos. And I have twenty pesos in coins for two sodas.",
+      },
+      {
+        id: 5,
+        speaker: "Carlos",
+        gender: "male",
+        spanish:
+          "¡Ah, qué chido! Entonces compartimos la orden ahorita y luego en la tarde te pago con transferencia.",
+        english:
+          "Oh, awesome! Then let's share the order right now and later this afternoon I'll pay you back by bank transfer.",
+        slang: {
+          term: "qué chido",
+          literalMeaning: "how cool",
+          actualMeaning: "How awesome / great / cool (classic Mexican slang)",
+          example: "¡Qué chido que pudiste venir a la fiesta!",
+        },
+      },
+      {
+        id: 6,
+        speaker: "Valeria",
+        gender: "female",
+        spanish:
+          "Sale, pide dos de papa con chorizo y tres de frijol. ¡Pero cuidado con la salsa verde que pica un montón!",
+        english:
+          "Deal, order two potato-and-chorizo ones and three bean ones. But watch out for the green salsa—it's super spicy!",
+        slang: {
+          term: "pica un montón",
+          literalMeaning: "it bites a pile",
+          actualMeaning: "It's super spicy / has a lot of chili heat",
+          example: "No le pongas tanta salsa habanera porque pica un montón.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question:
+          "What are Carlos and Valeria trying to figure out outside the subway station ('afuera del metro')?",
+        options: [
+          "Whether they have enough cash ('efectivo') to buy street tacos and sodas ('refrescos')",
+          "Which subway line ('línea del metro') they need to take to get to a restaurant",
+          "Where to find an ATM ('cajero') because they lost their wallets",
+          "How to cook potato and bean tacos ('tacos de papa y frijol') at home tonight",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Carlos is hungry for tacos de canasta outside the metro, and Valeria checks if they have enough cash ('efectivo') since the bicycle vendor doesn't take cards.",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question:
+          "How much money does Carlos have on him, and how much does an order of 5 tacos cost?",
+        options: [
+          "He has a 20-peso bill ('veinte pesos'), and the tacos cost 50 pesos ('cincuenta pesos')",
+          "He has a 50-peso bill ('cincuenta pesos'), and the 5 tacos cost 40 pesos ('cuarenta pesos')",
+          "He has 100 pesos in coins ('cien pesos'), and the tacos cost 60 pesos ('sesenta pesos')",
+          "He has no cash at all, so Valeria pays 40 pesos by card ('con tarjeta')",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Carlos says 'solo traigo un billete de cincuenta pesos' (50-peso bill), and Valeria says 'La orden de cinco tacos cuesta cuarenta pesos' (40 pesos).",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question:
+          "Which taco fillings does Valeria ask Carlos to order for them to share?",
+        options: [
+          "Five pork tacos with red salsa ('cinco de carnitas con salsa roja')",
+          "Three chicken tacos and two cheese tacos ('tres de pollo y dos de queso')",
+          "Two potato-with-chorizo and three bean tacos ('dos de papa con chorizo y tres de frijol')",
+          "Four steak tacos and one potato taco ('cuatro de bistec y uno de papa')",
+        ],
+        correctIndex: 2,
+        explanation:
+          "Valeria says: 'Sale, pide dos de papa con chorizo y tres de frijol' (two potato-with-chorizo and three bean tacos).",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: When Carlos says 'Híjole', '¡qué chido!', and Valeria warns that the salsa 'pica un montón', what do those expressions mean?",
+        options: [
+          "'Híjole' = shoot/oh man; 'qué chido' = how awesome; 'pica un montón' = it's super spicy",
+          "'Híjole' = hurry up; 'qué chido' = how expensive; 'pica un montón' = it costs extra",
+          "'Híjole' = excuse me; 'qué chido' = how cold; 'pica un montón' = it's sour",
+          "'Híjole' = thank you; 'qué chido' = how small; 'pica un montón' = it's very hot",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Mexican Spanish, 'híjole' is 'shoot/oh man', 'qué chido' is 'how cool/awesome', and 'pica un montón' means 'it's super spicy!'",
+      },
+    ],
+  },
+  {
+    id: "ep-005",
+    episodeNumber: 5,
+    date: "2026-11-10",
+    title: "El café de olla y el pan dulce en Coyoacán",
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: "cafe",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Sofía",
+        gender: "female",
+        spanish:
+          "Oye, Luis, ¿pedimos dos cafés de olla aquí en la panadería antes de tomar el camión?",
+        english:
+          "Hey, Luis, should we order two spiced pot coffees here at the bakery before taking the bus?",
+        slang: {
+          term: "camión",
+          literalMeaning: "truck",
+          actualMeaning: "city passenger bus (standard everyday word in Mexico)",
+          example: "El camión al centro pasa cada diez minutos.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Luis",
+        gender: "male",
+        spanish:
+          "¿Mande? Perdón, estaba viendo mi celular. Sí, buena idea, hace bastante frío esta mañana.",
+        english:
+          "Pardon? Sorry, I was looking at my phone. Yes, good idea, it's pretty cold this morning.",
+        slang: {
+          term: "¿Mande?",
+          literalMeaning: "command me?",
+          actualMeaning:
+            "Pardon? / What did you say? (Polite Mexican way to ask someone to repeat)",
+          example: "¿Mande, abuelita? No te escuché bien.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Sofía",
+        gender: "female",
+        spanish:
+          "También voy a llevar dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.",
+        english:
+          "I'm also going to get two vanilla sweet breads to eat for breakfast at the office. It's thirty-five pesos total.",
+      },
+      {
+        id: 4,
+        speaker: "Luis",
+        gender: "male",
+        spanish:
+          "Yo invito hoy, Sofía. Pero apúrate porque nuestro camión pasa en ocho minutos por la avenida.",
+        english:
+          "It's my treat today, Sofía. But hurry up because our bus comes down the avenue in eight minutes.",
+        slang: {
+          term: "Yo invito",
+          literalMeaning: "I invite",
+          actualMeaning: "It's my treat / I'm paying for both of us",
+          example: "Guarda tu cartera, hoy yo invito los tacos.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why does Luis say '¿Mande?' when Sofía first speaks to him?",
+        options: [
+          "He was looking at his phone and didn't catch what she said",
+          "He doesn't like spiced coffee",
+          "He forgot his wallet at home",
+          "The bakery music is too loud",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Luis replies: '¿Mande? Perdón, estaba viendo mi celular.'",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "What does Sofía pick up to eat at the office, and how much is the total?",
+        options: [
+          "Two vanilla conchas (sweet breads) for 35 pesos total",
+          "Three churros for 50 pesos total",
+          "One ham sandwich for 45 pesos total",
+          "Two tamales for 30 pesos total",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Sofía gets 'dos conchas de vainilla para desayunar en la oficina. Son treinta y cinco pesos en total.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "Why does Luis tell Sofía to hurry up at the end?",
+        options: [
+          "Their bus ('el camión') comes down the avenue in 8 minutes",
+          "The bakery is about to close",
+          "It is starting to rain outside",
+          "Their boss just called on his cell phone",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Luis says: 'apúrate porque nuestro camión pasa en ocho minutos por la avenida.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Mexican Spanish, what do '¿Mande?', 'el camión', and 'Yo invito' mean?",
+        options: [
+          "'¿Mande?' = Pardon?; 'el camión' = the city bus; 'Yo invito' = It's my treat",
+          "'¿Mande?' = Send it; 'el camión' = the subway; 'Yo invito' = Come to my party",
+          "'¿Mande?' = Hurry up; 'el camión' = the bicycle; 'Yo invito' = Let's split it",
+          "'¿Mande?' = Excuse me; 'el camión' = the taxi; 'Yo invito' = You pay today",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Mexico, '¿Mande?' is the polite way to say 'Pardon?', 'el camión' is the passenger bus, and 'Yo invito' means 'My treat!'",
+      },
+    ],
+  },
+  {
+    id: "ep-006",
+    episodeNumber: 6,
+    date: "2026-11-11",
+    title: "Tapas de última hora en Lavapiés",
+    region: "Spain",
+    regionFlag: "🇪🇸",
+    ambientType: "street",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "¡Hola, Javi! ¿Qué tal el curro hoy? Te veo con una cara de cansado impresionante.",
+        english:
+          "Hi, Javi! How was work today? You look completely exhausted.",
+        slang: {
+          term: "el curro",
+          literalMeaning: "the job / work",
+          actualMeaning: "work / job (everyday colloquial word in Spain)",
+          example: "Salgo del curro a las seis y nos vemos en el centro.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Javi",
+        gender: "male",
+        spanish:
+          "Uf, ni me hables, tía. Estuve liado con un informe toda la tarde, pero ya tengo hambre.",
+        english:
+          "Phew, don't even get me started, girl. I was tied up with a report all afternoon, but now I'm hungry.",
+        slang: {
+          term: "liado",
+          literalMeaning: "tied / wrapped up",
+          actualMeaning: "swamped / super busy with something",
+          example: "Perdona que no te llamara, anduve muy liado toda la mañana.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Venga, entremos a esta taberna que ponen unas patatas bravas que flipas por cinco euros.",
+        english:
+          "Come on, let's go into this tavern—they serve mind-blowing patatas bravas for five euros.",
+        slang: {
+          term: "que flipas",
+          literalMeaning: "that you flip out",
+          actualMeaning: "mind-blowing / incredible / amazing (Spain slang)",
+          example: "Hicieron una paella que flipas.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Javi",
+        gender: "male",
+        spanish:
+          "¡De lujo! Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.",
+        english:
+          "Awesome! You order two ice-cold draft beers while I look for an empty table in the back.",
+        slang: {
+          term: "dos cañas",
+          literalMeaning: "two reeds / canes",
+          actualMeaning: "two small glasses of draft beer (standard across Spain)",
+          example: "Nos tomamos dos cañas con unas aceitunas en la plaza.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why does Javi look so tired when he meets Lucía?",
+        options: [
+          "He was swamped working on a report all afternoon",
+          "He walked all the way across Madrid in the rain",
+          "He stayed up late watching a soccer match",
+          "He just came back from the gym",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Javi explains: 'Estuve liado con un informe toda la tarde' (he was swamped with a report all afternoon).",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "What food does Lucía recommend at the tavern, and how much does it cost?",
+        options: [
+          "Patatas bravas for 5 euros",
+          "Spanish tortilla for 10 euros",
+          "Calamari sandwiches for 8 euros",
+          "Ham croquettes for 12 euros",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Lucía says: 'ponen unas patatas bravas que flipas por cinco euros.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "What does Javi ask Lucía to order while he looks for a table in the back?",
+        options: [
+          "Two cold draft beers ('dos cañas bien frías')",
+          "A pitcher of sangria",
+          "Two bottles of sparkling water",
+          "Two cups of espresso",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Javi says: 'Pide tú dos cañas bien frías mientras busco una mesa libre al fondo.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Spain, what do 'el curro', 'estar liado', and 'que flipas' mean?",
+        options: [
+          "'El curro' = work/job; 'estar liado' = to be swamped/busy; 'que flipas' = mind-blowing/amazing",
+          "'El curro' = the bus; 'estar liado' = to be lost; 'que flipas' = overpriced",
+          "'El curro' = the boss; 'estar liado' = to be hungry; 'que flipas' = very spicy",
+          "'El curro' = the gym; 'estar liado' = to be sleepy; 'que flipas' = frozen",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Spain, 'el curro' means work, 'estar liado' means to be busy/swamped, and 'que flipas' means amazing/mind-blowing!",
+      },
+    ],
+  },
+  {
+    id: "ep-007",
+    episodeNumber: 7,
+    date: "2026-11-12",
+    title: "Asado del domingo en San Telmo",
+    region: "Argentina",
+    regionFlag: "🇦🇷",
+    ambientType: "market",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Martín",
+        gender: "male",
+        spanish:
+          "Che, Flor, acá en la carnicería del mercado queda el último kilo de vacío para el asado.",
+        english:
+          "Hey, Flor, right here at the market butcher shop they have the last kilo of flank steak for the barbecue.",
+      },
+      {
+        id: 2,
+        speaker: "Flor",
+        gender: "female",
+        spanish:
+          "¡Qué joya! Llevate también cuatro chorizos y una bolsa de carbón antes de que se acabe.",
+        english:
+          "What a gem! Grab four sausages and a bag of charcoal too before it sells out.",
+        slang: {
+          term: "joya",
+          literalMeaning: "jewel",
+          actualMeaning: "awesome / fantastic / great news (Argentine slang)",
+          example: "¿Conseguiste entradas para el partido? ¡Joya!",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Martín",
+        gender: "male",
+        spanish:
+          "Dale, son doce mil mangos en total. ¿Ponemos mitad y mitad o pagás vos las bebidas?",
+        english:
+          "Sounds good, it's twelve thousand pesos total. Should we split it fifty-fifty or do you want to buy the drinks?",
+        slang: {
+          term: "mangos",
+          literalMeaning: "mangoes / handles",
+          actualMeaning: "bucks / pesos (classic Argentine slang for money)",
+          example: "Esta campera me salió veinte mil mangos.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Flor",
+        gender: "female",
+        spanish:
+          "Yo compro el vino tinto y el pan acá al lado. ¡Nos va a quedar re copado el almuerzo!",
+        english:
+          "I'll buy the red wine and bread right next door. Lunch is going to turn out super cool!",
+        slang: {
+          term: "re copado",
+          literalMeaning: "very topped / filled",
+          actualMeaning: "super cool / awesome (Argentine 're' + 'copado')",
+          example: "El lugar nuevo en Palermo está re copado.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "What items do Martín and Flor buy at the butcher shop for Sunday's barbecue?",
+        options: [
+          "The last kilo of 'vacío' (flank steak), four sausages ('chorizos'), and charcoal",
+          "Two chickens, potatoes, and salad greens",
+          "Fish fillets, lemons, and white wine",
+          "Pork ribs and a dozen empanadas",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Martín spots 'el último kilo de vacío' and Flor tells him: 'Llevate también cuatro chorizos y una bolsa de carbón.'",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "How much does the butcher shop order cost in total?",
+        options: [
+          "5,000 pesos",
+          "8,000 pesos",
+          "12,000 pesos ('doce mil mangos')",
+          "20,000 pesos",
+        ],
+        correctIndex: 2,
+        explanation:
+          "Martín says: 'Dale, son doce mil mangos en total' (12,000 pesos total).",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "How do they divide the expenses for the barbecue?",
+        options: [
+          "Martín pays for the meat/charcoal, and Flor buys the red wine and bread next door",
+          "Flor pays for everything with her credit card",
+          "They ask their friends to transfer money first",
+          "They decide to eat at a restaurant instead",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Flor says: 'Yo compro el vino tinto y el pan acá al lado.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Argentina, what do 'doce mil mangos' and 're copado' mean?",
+        options: [
+          "'Mangos' = pesos/bucks; 're copado' = super cool / awesome",
+          "'Mangos' = tropical fruit; 're copado' = way too crowded",
+          "'Mangos' = coins; 're copado' = burnt on the grill",
+          "'Mangos' = grams; 're copado' = very expensive",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Argentine Spanish, 'mangos' means pesos/bucks, and 're copado' means super cool or awesome!",
+      },
+    ],
+  },
+  {
+    id: "ep-008",
+    episodeNumber: 8,
+    date: "2026-11-13",
+    title: "Un tinto antes del aguacero en Bogotá",
+    region: "Colombia",
+    regionFlag: "🇨🇴",
+    ambientType: "cafe",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Natalia",
+        gender: "female",
+        spanish:
+          "Uy, Andrés, mirá esas nubes negras sobre los cerros. Se va a venir un aguacero tenaz.",
+        english:
+          "Whoa, Andrés, look at those dark clouds over the hills. A fierce downpour is about to hit.",
+        slang: {
+          term: "tenaz",
+          literalMeaning: "tenacious / stubborn",
+          actualMeaning: "intense / fierce / crazy (very common Bogotá slang)",
+          example: "El tráfico por la Séptima hoy está tenaz.",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Andrés",
+        gender: "male",
+        spanish:
+          "Sí, qué frío tan berraco. Entremos a esta cafetería y nos tomamos un tinto bien caliente.",
+        english:
+          "Yeah, it's freezing cold. Let's duck into this café and have a piping hot black coffee.",
+        slang: {
+          term: "un tinto",
+          literalMeaning: "a tinted/red one",
+          actualMeaning:
+            "a cup of black coffee (in Colombia, 'tinto' means black coffee, not red wine!)",
+          example: "¿Me regala un tinto sin azúcar, por favor?",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Natalia",
+        gender: "female",
+        spanish:
+          "Buena idea. Y pidamos dos almojábanas recién salidas del horno mientras escampa.",
+        english:
+          "Good idea. And let's order two cheese breads fresh out of the oven while the rain lets up.",
+      },
+      {
+        id: 4,
+        speaker: "Andrés",
+        gender: "male",
+        spanish:
+          "Listo, de una. Apenas pare la lluvia caminamos a la estación de TransMilenio.",
+        english:
+          "Done, let's do it. As soon as the rain stops we'll walk to the TransMilenio bus station.",
+        slang: {
+          term: "de una",
+          literalMeaning: "of one",
+          actualMeaning: "right away / let's do it / count me in",
+          example: "¿Vamos a almorzar ya? ¡De una!",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why do Natalia and Andrés decide to duck into a café in Bogotá?",
+        options: [
+          "It's freezing cold and a heavy rainstorm ('aguacero') is about to start",
+          "They have a business meeting with a client there",
+          "Andrés needs Wi-Fi to send an email",
+          "The TransMilenio station is closed",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Natalia sees dark clouds ('se va a venir un aguacero tenaz') and Andrés says it's freezing cold ('qué frío tan berraco').",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "What food do they order to go with their hot drinks?",
+        options: [
+          "Two warm cheese breads ('almojábanas') fresh from the oven",
+          "Two slices of chocolate cake",
+          "A plate of fried plantains",
+          "Two beef empanadas",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Natalia says: 'Y pidamos dos almojábanas recién salidas del horno mientras escampa.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "What is their plan once the rain stops ('mientras escampa')?",
+        options: [
+          "Walk to the TransMilenio bus station",
+          "Call a taxi to go to the airport",
+          "Visit a museum downtown",
+          "Go grocery shopping",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Andrés says: 'Apenas pare la lluvia caminamos a la estación de TransMilenio.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: When Andrés orders 'un tinto bien caliente' in Colombia, what is he ordering?",
+        options: [
+          "A cup of hot black coffee (not red wine!)",
+          "A glass of mulled red wine",
+          "A cup of hot chocolate with cheese",
+          "A herbal tea with honey",
+        ],
+        correctIndex: 0,
+        explanation:
+          "False-friend alert! In Colombia, 'un tinto' always means a small cup of black coffee, whereas in Spain 'vino tinto' is red wine.",
+      },
+    ],
+  },
+  {
+    id: "ep-009",
+    episodeNumber: 9,
+    date: "2026-11-14",
+    title: "El coche prestado y el raspón en Guadalajara",
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: "street",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "Oye, Fernanda, no manches... Acabo de bajar al estacionamiento y vi que mi coche tiene un raspón enorme en la defensa trasera.",
+        english:
+          "Hey, Fernanda, no way... I just went down to the parking lot and saw that my car has a huge scratch on the back bumper.",
+        slang: {
+          term: "no manches",
+          literalMeaning: "don't stain",
+          actualMeaning: "No way! / You've got to be kidding me!",
+          example: "¡No manches, qué rápido llegaste!",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "Ay, Diego, te iba a decir ahorita que saliéramos. Ayer que me lo prestaste para ir por las cosas de mi chamba, un poste estaba súper pegado en la rampa.",
+        english:
+          "Oh, Diego, I was going to tell you right now when we went out. Yesterday when you lent it to me to pick up my work stuff, a pillar was super close on the ramp.",
+        slang: {
+          term: "chamba",
+          literalMeaning: "job / gig",
+          actualMeaning: "work / job (everyday Mexican slang)",
+          example: "Conseguí una nueva chamba cerca de mi casa.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "¿Y pensabas hacerte pato o qué? Sabes que lo acabo de sacar del taller hace dos semanas.",
+        english:
+          "And were you planning to play dumb or what? You know I just got it out of the repair shop two weeks ago.",
+        slang: {
+          term: "hacerte pato",
+          literalMeaning: "to make yourself a duck",
+          actualMeaning: "to play dumb / dodge responsibility",
+          example: "No te hagas pato, te toca lavar los platos.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "¡Claro que no me iba a hacer pato! Ya hablé con el taller de mi tío Memo en Zapopan. Dice que mañana mismo lo pule y lo pinta por mil quinientos pesos.",
+        english:
+          "Of course I wasn't going to play dumb! I already spoke with my uncle Memo's body shop in Zapopan. He says tomorrow he'll buff and paint it for fifteen hundred pesos.",
+      },
+      {
+        id: 5,
+        speaker: "Diego",
+        gender: "male",
+        spanish:
+          "Bueno, menos mal... Pero esa lana la pones tú, ¿eh? Y me llevas a mi oficina en la mañana mientras lo arreglan.",
+        english:
+          "Well, thank goodness... But you're paying that cash, alright? And you're driving me to my office in the morning while they fix it.",
+        slang: {
+          term: "lana",
+          literalMeaning: "wool",
+          actualMeaning: "money / cash (Mexican slang)",
+          example: "Ahorré una buena lana para las vacaciones.",
+        },
+      },
+      {
+        id: 6,
+        speaker: "Fernanda",
+        gender: "female",
+        spanish:
+          "Trato hecho. Yo pago todo el taller y encima te compro tu torta ahogada para que se te baje el coraje.",
+        english:
+          "Deal. I'll pay for the whole shop and on top of that I'll buy you your drowned pork sandwich so you stop being mad.",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why is Diego upset with Fernanda at the start of the conversation?",
+        options: [
+          "He found a big scratch on the back bumper of his car after lending it to her",
+          "She returned his car with an empty gas tank",
+          "She forgot to pick him up from the repair shop",
+          "She parked his car in a tow-away zone",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Diego saw a huge scratch ('un raspón enorme') on the rear bumper ('la defensa trasera') after lending his car to Fernanda yesterday.",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "How did the car get scratched, and what plan did Fernanda already arrange?",
+        options: [
+          "She scraped a tight pillar on a ramp; her Uncle Memo's shop in Zapopan will buff and paint it tomorrow for 1,500 pesos",
+          "Another driver hit her in traffic; her insurance will pay 3,000 pesos",
+          "A shopping cart hit the door; she bought touch-up paint for 500 pesos",
+          "She backed into a tree; Diego's mechanic will fix it next week",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Fernanda scraped a tight pillar on a ramp and arranged for her Uncle Memo's body shop in Zapopan to buff and paint it tomorrow for 1,500 pesos.",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question:
+          "In addition to Fernanda paying for the repair, what else does Diego demand—and what food does Fernanda offer him?",
+        options: [
+          "She must drive him to his office in the morning, and she offers to buy him a 'torta ahogada'",
+          "She must wash his car, and she offers him street tacos",
+          "She must lend him her bicycle, and she offers to buy him coffee",
+          "She must pay his parking fee, and she offers to cook dinner",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Diego insists she pay the cash ('esa lana la pones tú') and drive him to his office in the morning, and she offers him a 'torta ahogada'.",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: What do the Mexican idioms 'hacerse pato', 'la chamba', and 'la lana' mean?",
+        options: [
+          "'Hacerse pato' = play dumb; 'la chamba' = work/job; 'la lana' = money/cash",
+          "'Hacerse pato' = drive fast; 'la chamba' = party; 'la lana' = sweater",
+          "'Hacerse pato' = apologize; 'la chamba' = garage; 'la lana' = paint",
+          "'Hacerse pato' = get angry; 'la chamba' = school; 'la lana' = debt",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Mexican Spanish, 'hacerse pato' means to play dumb, 'la chamba' is work/job, and 'la lana' is money/cash!",
+      },
+    ],
+  },
+  {
+    id: "ep-010",
+    episodeNumber: 10,
+    date: "2026-11-15",
+    title: "Perdiendo el AVE en Atocha",
+    region: "Spain",
+    regionFlag: "🇪🇸",
+    ambientType: "transit",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Álvaro",
+        gender: "male",
+        spanish:
+          "¡Corre, Elena, que el control de equipaje del AVE cierra en tres minutos!",
+        english:
+          "Run, Elena, the baggage check for the high-speed train closes in three minutes!",
+      },
+      {
+        id: 2,
+        speaker: "Elena",
+        gender: "female",
+        spanish:
+          "¡Madre mía, qué agobio! Es que el autobús venía a tope por el atasco en la Castellana.",
+        english:
+          "Oh my goodness, how stressful! The bus was packed to the gills because of the traffic jam on La Castellana.",
+        slang: {
+          term: "a tope",
+          literalMeaning: "to the bumper / limit",
+          actualMeaning: "packed full / to the max (very common in Spain)",
+          example: "El vagón del metro iba a tope a las ocho de la mañana.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Álvaro",
+        gender: "male",
+        spanish:
+          "Por los pelos, tía... Mira, somos el coche cuatro, asientos de ventanilla.",
+        english:
+          "By the skin of our teeth, girl... Look, we're car four, window seats.",
+        slang: {
+          term: "Por los pelos",
+          literalMeaning: "by the hairs",
+          actualMeaning: "by the skin of one's teeth / just barely in time",
+          example: "Llegamos al embarque por los pelos.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Elena",
+        gender: "female",
+        spanish:
+          "¡Qué alivio! En cuanto arranque el tren me echo una siesta hasta llegar a Valencia.",
+        english:
+          "What a relief! As soon as the train pulls out I'm taking a nap all the way to Valencia.",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why were Álvaro and Elena almost late for their high-speed train ('el AVE')?",
+        options: [
+          "Their bus was packed and stuck in a traffic jam on La Castellana",
+          "Elena packed the wrong suitcase",
+          "They went to the wrong train station in Madrid",
+          "Their alarm clock didn't ring",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Elena says: 'el autobús venía a tope por el atasco en la Castellana.'",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "Which train car and seats do they have, and what city are they traveling to?",
+        options: [
+          "Car 4, window seats, heading to Valencia",
+          "Car 1, aisle seats, heading to Barcelona",
+          "Car 7, dining car, heading to Seville",
+          "Car 2, window seats, heading to Toledo",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Álvaro says 'somos el coche cuatro, asientos de ventanilla' and Elena says she'll nap 'hasta llegar a Valencia.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "How much time was left before baggage security closed when they arrived?",
+        options: [
+          "3 minutes",
+          "15 minutes",
+          "30 minutes",
+          "1 hour",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Álvaro shouts: 'el control de equipaje del AVE cierra en tres minutos!'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Spain, what do 'venir a tope' and 'por los pelos' mean?",
+        options: [
+          "'A tope' = packed full / to the max; 'por los pelos' = by the skin of our teeth / just barely",
+          "'A tope' = very slowly; 'por los pelos' = without luggage",
+          "'A tope' = empty; 'por los pelos' = with messy hair",
+          "'A tope' = broken down; 'por los pelos' = way too early",
+        ],
+        correctIndex: 0,
+        explanation:
+          "'A tope' means packed full / at maximum capacity, and 'por los pelos' means just barely / by a hair!",
+      },
+    ],
+  },
+  {
+    id: "ep-011",
+    episodeNumber: 11,
+    date: "2026-11-16",
+    title: "Mate y facturas en la costanera",
+    region: "Argentina",
+    regionFlag: "🇦🇷",
+    ambientType: "street",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Micaela",
+        gender: "female",
+        spanish:
+          "Che, Nico, ¡qué lindo solcito hay hoy en la costanera! ¿Trajiste el termo con agua caliente?",
+        english:
+          "Hey, Nico, what lovely sunshine on the waterfront today! Did you bring the thermos with hot water?",
+      },
+      {
+        id: 2,
+        speaker: "Nico",
+        gender: "male",
+        spanish:
+          "¡Olvidate! Está a punto para cebar unos buenos mates. Y compré media docena de facturas con dulce de leche.",
+        english:
+          "You bet! It's at the perfect temperature to brew some good mates. And I bought half a dozen pastries with dulce de leche.",
+        slang: {
+          term: "facturas",
+          literalMeaning: "invoices / bills",
+          actualMeaning:
+            "sweet bakery pastries (in Argentina, 'facturas' at a bakery are pastries!)",
+          example: "Traje una docena de facturas para tomar el mate en la tarde.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Micaela",
+        gender: "female",
+        spanish:
+          "¡Sos un genio! Sentémonos en ese banco frente al río que corre una brisa divina.",
+        english:
+          "You're a legend! Let's sit on that bench facing the river where there's a lovely breeze.",
+      },
+      {
+        id: 4,
+        speaker: "Nico",
+        gender: "male",
+        spanish:
+          "Dale, pero ojo con el primer mate que siempre sale un poco fuerte, ¿viste?",
+        english:
+          "Sure, just watch out for the first mate since it always comes out a bit strong, you know?",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Where are Micaela and Nico spending the afternoon?",
+        options: [
+          "On a bench facing the river along the waterfront ('la costanera')",
+          "Inside a shopping mall downtown",
+          "At Nico's office",
+          "On a long-distance bus",
+        ],
+        correctIndex: 0,
+        explanation:
+          "They are at 'la costanera' (the waterfront) and sit on 'ese banco frente al río' (that bench facing the river).",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "What did Nico bring along with his thermos of hot water?",
+        options: [
+          "Half a dozen pastries ('facturas') with dulce de leche",
+          "Two ham and cheese sandwiches",
+          "A bag of apples and oranges",
+          "A box of pizza",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Nico says: 'compré media docena de facturas con dulce de leche.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "What does Nico warn Micaela about at the end?",
+        options: [
+          "The first mate always comes out a bit strong/bitter",
+          "The water in the thermos is already cold",
+          "The seagulls might steal their pastries",
+          "The park closes at five o'clock",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Nico warns: 'ojo con el primer mate que siempre sale un poco fuerte.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: When Nico says '¡Olvidate!' and 'compré media docena de facturas', what do '¡Olvidate!' and 'facturas' mean in Argentina?",
+        options: [
+          "'¡Olvidate!' = You bet / Of course!; 'facturas' = sweet bakery pastries",
+          "'¡Olvidate!' = I forgot it!; 'facturas' = electricity bills",
+          "'¡Olvidate!' = Never mind; 'facturas' = bus tickets",
+          "'¡Olvidate!' = Wait for me; 'facturas' = tea bags",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Argentina, '¡Olvidate!' is an enthusiastic 'You bet / Of course!' (not 'I forgot!'), and 'facturas' are bakery pastries!",
+      },
+    ],
+  },
+  {
+    id: "ep-012",
+    episodeNumber: 12,
+    date: "2026-11-17",
+    title: "El recibo de la luz en la colonia Roma",
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: "cafe",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "Oye, Lucía, no te pases... Acabo de ver el recibo de la luz de este bimestre y casi me da un infarto.",
+        english:
+          "Hey, Lucía, come on now... I just saw this two-month electricity bill and I almost had a heart attack.",
+        slang: {
+          term: "no te pases",
+          literalMeaning: "don't pass yourself",
+          actualMeaning: "come on / don't go too far / you're kidding me",
+          example: "¡No te pases, te comiste todo el pastel!",
+        },
+      },
+      {
+        id: 2,
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Aguanta, Mateo, no te esponjes. Es que la semana pasada hizo un frío horrible y dejé el calentador eléctrico prendido un par de noches.",
+        english:
+          "Hold on, Mateo, don't get worked up. Last week it was freezing cold and I left the electric space heater on for a couple of nights.",
+        slang: {
+          term: "no te esponjes",
+          literalMeaning: "don't sponge yourself up",
+          actualMeaning: "don't get puffed up / don't get worked up or angry",
+          example: "Tranquilo, no te esponjes, fue solo una broma.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "¿Un par de noches? ¡Pero si subió al doble! Y tú sabes que ahorita ando bien bruja porque no me han pagado el proyecto de diseño.",
+        english:
+          "A couple of nights? It doubled! And you know I'm super broke right now because they haven't paid me for the design project yet.",
+        slang: {
+          term: "bruja",
+          literalMeaning: "witch",
+          actualMeaning: "completely broke / out of money (andar bruja)",
+          example: "Fin de quincena y ya ando bien bruja.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Tranquilo, mi primo Javi me debía una lana de los boletos del concierto y me acaba de transferir. Yo pongo el setenta por ciento del recibo.",
+        english:
+          "Relax, my cousin Javi owed me cash for the concert tickets and he just sent me a transfer. I'll cover seventy percent of the bill.",
+      },
+      {
+        id: 5,
+        speaker: "Mateo",
+        gender: "male",
+        spanish:
+          "Uf, qué alivio... Es que el casero ya me estaba moliendo por WhatsApp desde las ocho de la mañana.",
+        english:
+          "Phew, what a relief... The landlord was already nagging me on WhatsApp since eight in the morning.",
+      },
+      {
+        id: 6,
+        speaker: "Lucía",
+        gender: "female",
+        spanish:
+          "Ya sé cómo se pone. Ándale, yo lo pago ahorita en la app y además te invito unos esquites si me echas la mano con las cajas de la bodega.",
+        english:
+          "I know how he gets. Come on, I'll pay it right now in the app and treat you to some corn cups too if you give me a hand with the storage room boxes.",
+        slang: {
+          term: "echas la mano",
+          literalMeaning: "throw the hand",
+          actualMeaning: "lend a hand / help someone out (echar la mano)",
+          example: "¿Me echas la mano para subir este sillón?",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question:
+          "What caused the two-month electricity bill in Mateo and Lucía's apartment to double?",
+        options: [
+          "Lucía left the electric space heater on for a couple of freezing nights last week",
+          "Mateo left his computer running day and night",
+          "The landlord billed them for the whole building",
+          "Their refrigerator broke",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Lucía admits she left the electric space heater on ('dejé el calentador eléctrico prendido un par de noches').",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question:
+          "Why is Mateo broke right now, and how much of the bill does Lucía agree to cover?",
+        options: [
+          "He hasn't been paid for his design project yet; Lucía covers 70% of the bill",
+          "He bought concert tickets; Lucía covers 50% of the bill",
+          "He lost his wallet; Lucía covers 100% of the bill",
+          "He paid the water bill; Lucía covers 30% of the bill",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Mateo hasn't been paid for his design project yet, and Lucía covers 70% after her cousin Javi paid her back.",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question:
+          "What favor does Lucía ask of Mateo in exchange for treating him to 'esquites'?",
+        options: [
+          "Help her with the boxes in the storage room ('la bodega')",
+          "Walk her dog in the park",
+          "Call the landlord back",
+          "Wash the dishes after dinner",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Lucía says: 'te invito unos esquites si me echas la mano con las cajas de la bodega.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: What do 'no te esponjes', 'andar bruja', and 'echar la mano' mean in Mexican Spanish?",
+        options: [
+          "'No te esponjes' = don't get worked up; 'andar bruja' = to be broke; 'echar la mano' = to lend a hand",
+          "'No te esponjes' = don't get wet; 'andar bruja' = to stay up late; 'echar la mano' = to wave goodbye",
+          "'No te esponjes' = don't eat too much; 'andar bruja' = to be angry; 'echar la mano' = to applaud",
+          "'No te esponjes' = don't fall asleep; 'andar bruja' = to be lucky; 'echar la mano' = to pay in cash",
+        ],
+        correctIndex: 0,
+        explanation:
+          "'No te esponjes' means don't get puffed up/angry, 'andar bruja' means to be broke, and 'echar la mano' means to lend a hand!",
+      },
+    ],
+  },
+  {
+    id: "ep-013",
+    episodeNumber: 13,
+    date: "2026-11-18",
+    title: "Rumba y trancones en Chapinero",
+    region: "Colombia",
+    regionFlag: "🇨🇴",
+    ambientType: "transit",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Valentina",
+        gender: "female",
+        spanish:
+          "¡Aló, Pipe! ¿Dónde vienen? Llevamos media hora haciendo fila en la entrada del bar.",
+        english:
+          "Hello, Pipe! Where are you guys? We've been waiting in line at the bar entrance for half an hour.",
+      },
+      {
+        id: 2,
+        speaker: "Pipe",
+        gender: "male",
+        spanish:
+          "¡Ay, qué pena con vos, Vale! Nos cogió un trancón horrible por la carrera Séptima.",
+        english:
+          "Oh, I'm so sorry, Vale! We got caught in a terrible traffic jam on Seventh Avenue.",
+        slang: {
+          term: "trancón",
+          literalMeaning: "big bolt / blockage",
+          actualMeaning: "a massive traffic jam / gridlock (Colombian Spanish)",
+          example: "Salí temprano pero había un trancón monumental en la autopista.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Valentina",
+        gender: "female",
+        spanish:
+          "¡No me digás! Bueno, apúrense que antes de las diez no cobran cover y la rumba está buenísima.",
+        english:
+          "Don't tell me that! Well, hurry up because before ten o'clock there's no cover charge and the party is awesome.",
+        slang: {
+          term: "la rumba",
+          literalMeaning: "the rumba dance",
+          actualMeaning: "the party / night out dancing (standard in Colombia)",
+          example: "Este viernes se armó la rumba en Chapinero.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Pipe",
+        gender: "male",
+        spanish:
+          "Ya nos bajamos del taxi a dos cuadras y vamos corriendo. ¡Guardanos puesto en la mesa!",
+        english:
+          "We just got out of the taxi two blocks away and we're running over. Save us a spot at the table!",
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question: "Why is Pipe running late to meet Valentina at the bar?",
+        options: [
+          "His taxi got stuck in a terrible traffic jam ('un trancón') on Seventh Avenue",
+          "He forgot his ID card at home",
+          "He went to the wrong neighborhood",
+          "His phone battery died",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Pipe says: 'Nos cogió un trancón horrible por la carrera Séptima.'",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question: "Why is it important that Pipe arrive before 10:00 PM?",
+        options: [
+          "There is no cover charge before 10:00 PM",
+          "The kitchen closes at 10:00 PM",
+          "Valentina has to leave at 10:00 PM",
+          "Drinks are half-price until 10:00 PM",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Valentina says: 'antes de las diez no cobran cover y la rumba está buenísima.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question: "What did Pipe and his friends do to get there faster?",
+        options: [
+          "They hopped out of the taxi two blocks away and are running the rest of the way",
+          "They rented electric scooters",
+          "They took the subway",
+          "They asked the driver to take a shortcut",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Pipe says: 'Ya nos bajamos del taxi a dos cuadras y vamos corriendo.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: In Colombia, what do '¡Qué pena con vos!', 'un trancón', and 'la rumba' mean?",
+        options: [
+          "'¡Qué pena!' = I'm so sorry / excuse me; 'un trancón' = a traffic jam; 'la rumba' = the party / night out",
+          "'¡Qué pena!' = How sad; 'un trancón' = a big drink; 'la rumba' = the band",
+          "'¡Qué pena!' = How embarrassing; 'un trancón' = a rainstorm; 'la rumba' = the street",
+          "'¡Qué pena!' = What a pity; 'un trancón' = a police checkpoint; 'la rumba' = the line",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Colombia, '¡Qué pena (con vos/usted)!' is the polite way to say 'I'm so sorry / excuse me', 'un trancón' is a traffic jam, and 'la rumba' is a party/night out!",
+      },
+    ],
+  },
+  {
+    id: "ep-014",
+    episodeNumber: 14,
+    date: "2026-11-19",
+    title: "El boleto falso afuera del Foro Sol",
+    region: "Mexico",
+    regionFlag: "🇲🇽",
+    ambientType: "street",
+    dialogue: [
+      {
+        id: 1,
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "¡No mames, Mariana! El lector de códigos aquí en la puerta del Foro Sol acaba de prender en rojo con mi boleto, güey.",
+        english:
+          "No freaking way, Mariana! The barcode scanner right here at the Foro Sol gate just flashed red on my ticket, dude.",
+      },
+      {
+        id: 2,
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "¡No me digas eso! Te advertí que ese revendedor de Facebook se veía súper chafa, Paco. ¡Se pasó de lanza el tipo si nos vendió uno clonado!",
+        english:
+          "Don't tell me that! I warned you that Facebook reseller looked super sketchy, Paco. That guy totally ripped us off if he sold us a cloned ticket!",
+        slang: {
+          term: "chafa",
+          literalMeaning: "shoddy / low-grade",
+          actualMeaning: "sketchy, fake, or low-quality (Mexican slang)",
+          example: "Compré unos audífonos baratos pero salieron bien chafas.",
+        },
+      },
+      {
+        id: 3,
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "Espérate, ya me puse nervioso porque me costó un ojo de la cara y me quedé sin un quinto para toda la quincena.",
+        english:
+          "Wait a second, now I'm nervous because it cost me an arm and a leg and left me without a cent for the whole two-week pay period.",
+        slang: {
+          term: "sin un quinto",
+          literalMeaning: "without a five-cent coin",
+          actualMeaning: "penniless / without a single cent left",
+          example: "Después de pagar la renta me quedé sin un quinto.",
+        },
+      },
+      {
+        id: 4,
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "A ver, enséñame tu celular... ¡Ay, Paco, estás bien dormido! Estabas enseñando el código QR del estacionamiento en vez del boleto del concierto.",
+        english:
+          "Hold on, show me your phone... Oh, Paco, you're half asleep! You were showing the QR code for the parking lot instead of the concert ticket.",
+      },
+      {
+        id: 5,
+        speaker: "Paco",
+        gender: "male",
+        spanish:
+          "¿Neta? ¡Qué oso hice con el de seguridad! Mira, ya escaneó el bueno y se puso en verde.",
+        english:
+          "For real? How embarrassing in front of the security guard! Look, he just scanned the right one and it turned green.",
+        slang: {
+          term: "Qué oso",
+          literalMeaning: "what a bear",
+          actualMeaning: "How embarrassing! / What a blunder!",
+          example: "¡Qué oso cuando me caí frente a toda la clase!",
+        },
+      },
+      {
+        id: 6,
+        speaker: "Mariana",
+        gender: "female",
+        spanish:
+          "¡A huevo! Casi me da el patatús. Ya córrele que la banda está a punto de tocar la primera rola y nos toca hasta la pista.",
+        english:
+          "Hell yeah! I almost had a heart attack. Run now, the band is about to play their first song and our spot is all the way down on the floor.",
+        slang: {
+          term: "rola",
+          literalMeaning: "roll",
+          actualMeaning: "song / music track (Mexican slang)",
+          example: "Esa banda acaba de sacar una rola buenísima.",
+        },
+      },
+    ],
+    questions: [
+      {
+        id: "q1",
+        type: "comprehension",
+        question:
+          "Why do Paco and Mariana panic when they arrive at the entrance to the Foro Sol concert venue?",
+        options: [
+          "The ticket scanner flashes red on Paco's ticket, making them fear he bought a fake ticket",
+          "Paco forgot his cell phone in the parking lot",
+          "The concert was canceled due to rain",
+          "Mariana bought tickets for the wrong date",
+        ],
+        correctIndex: 0,
+        explanation:
+          "The scanner flashes red ('acaba de prender en rojo'), making them fear the Facebook reseller sold Paco a cloned ticket.",
+      },
+      {
+        id: "q2",
+        type: "comprehension",
+        question:
+          "What silly mistake does Mariana discover when she looks at Paco's phone screen?",
+        options: [
+          "He was showing the QR code for the parking lot instead of the concert ticket",
+          "His screen brightness was turned all the way down",
+          "He was showing an old movie ticket",
+          "His phone battery had died",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Mariana sees he was showing 'el código QR del estacionamiento en vez del boleto del concierto.'",
+      },
+      {
+        id: "q3",
+        type: "comprehension",
+        question:
+          "Why do they have to run once the real ticket scans green?",
+        options: [
+          "The band is about to play their first song ('la primera rola') and their spot is down on the floor ('la pista')",
+          "The stadium gates are closing in one minute",
+          "It is starting to rain heavily",
+          "They need to meet their friends at the merchandise booth",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Mariana says: 'la banda está a punto de tocar la primera rola y nos toca hasta la pista.'",
+      },
+      {
+        id: "q4",
+        type: "slang",
+        question:
+          "Slang Side Quest: What do 'chafa', 'sin un quinto', '¡qué oso!', and 'la rola' mean in Mexican slang?",
+        options: [
+          "'Chafa' = sketchy/low-quality; 'sin un quinto' = penniless; 'qué oso' = how embarrassing; 'la rola' = the song",
+          "'Chafa' = polite; 'sin un quinto' = five minutes late; 'qué oso' = how lucky; 'la rola' = the stage",
+          "'Chafa' = expensive; 'sin un quinto' = without a ticket; 'qué oso' = how scary; 'la rola' = the guitar",
+          "'Chafa' = famous; 'sin un quinto' = alone; 'qué oso' = how funny; 'la rola' = the exit",
+        ],
+        correctIndex: 0,
+        explanation:
+          "In Mexico City slang, 'chafa' is sketchy/shoddy, 'sin un quinto' is penniless, '¡qué oso!' is 'how embarrassing!', and 'la rola' is the song!",
+      },
+    ],
+  },
+];
+
+async function main() {
+  fs.mkdirSync(PUBLIC_AUDIO_DIR, { recursive: true });
+  fs.mkdirSync(PUBLIC_EPISODES_DIR, { recursive: true });
+
+  console.log("=== Step 1: Generating Natural Multi-Speaker Level Clips (A1, A2, B1, B2) ===");
+  const lessonTimestampsMap = {};
+
+  for (const clip of LEVEL_CLIPS) {
+    console.log(`Synthesizing ${clip.key} (${clip.outFiles[0]})...`);
+    const { mp3Buffer, lineTimestamps, durationSeconds } =
+      await synthesizeDialogueMp3(clip.dialogue, {
+        region: clip.region,
+        clausePauseFrames: clip.clausePauseFrames,
+        turnPauseFrames: clip.turnPauseFrames,
+        pauseMode: clip.pauseMode,
+      });
+
+    for (const fileName of clip.outFiles) {
+      const filePath = path.join(PUBLIC_AUDIO_DIR, fileName);
+      fs.writeFileSync(filePath, mp3Buffer);
+    }
+
+    lessonTimestampsMap[clip.key] = {
+      durationSeconds,
+      lines: lineTimestamps,
+    };
+    console.log(
+      `  ✓ Saved ${clip.outFiles.join(", ")} (${durationSeconds}s, ${
+        lineTimestamps.length
+      } timed turns)`
+    );
+  }
+
+  // Write lib/lessonTimestamps.ts
+  const lessonTimestampsTs = `// Auto-generated by scripts/generate-episode.mjs — DO NOT EDIT MANUALLY
+export interface LineTimestampRange {
+  startTime: number;
+  endTime: number;
+}
+
+export interface LessonTimestampData {
+  durationSeconds: number;
+  lines: LineTimestampRange[];
+}
+
+export const LESSON_TIMESTAMPS: Record<string, LessonTimestampData> = ${JSON.stringify(
+    lessonTimestampsMap,
+    null,
+    2
+  )};
+`;
+  fs.writeFileSync(
+    path.join(ROOT_DIR, "lib", "lessonTimestamps.ts"),
+    lessonTimestampsTs
+  );
+  console.log("  ✓ Updated lib/lessonTimestamps.ts");
+
+  console.log("\n=== Step 2: Generating 14-Day Episode Content Buffer (JSON + MP3s) ===");
+  const generatedEpisodes = [];
+
+  for (const spec of FOURTEEN_DAY_EPISODE_SPECS) {
+    console.log(
+      `Building ${spec.id} (${spec.date}) — "${spec.title}" [${spec.regionFlag} ${spec.region}]...`
+    );
+    const { mp3Buffer, lineTimestamps, durationSeconds } =
+      await synthesizeDialogueMp3(spec.dialogue, {
+        region: spec.region,
+        clausePauseFrames: 7,
+        turnPauseFrames: 18,
+        pauseMode: "normal",
+      });
+
+    const mp3FileName = `${spec.date}.mp3`;
+    const mp3FilePath = path.join(PUBLIC_EPISODES_DIR, mp3FileName);
+    fs.writeFileSync(mp3FilePath, mp3Buffer);
+
+    const timedDialogue = spec.dialogue.map((line, idx) => {
+      // Validate slang substring if present
+      if (line.slang && !line.spanish.includes(line.slang.term)) {
+        throw new Error(
+          `Episode ${spec.id} line ${line.id}: slang.term "${line.slang.term}" is not an exact substring of "${line.spanish}"`
+        );
+      }
+      return {
+        ...line,
+        startTime: lineTimestamps[idx].startTime,
+        endTime: lineTimestamps[idx].endTime,
+      };
+    });
+
+    const episodeObj = {
+      id: spec.id,
+      episodeNumber: spec.episodeNumber,
+      date: spec.date,
+      title: spec.title,
+      region: spec.region,
+      regionFlag: spec.regionFlag,
+      ambientType: spec.ambientType,
+      audioUrl: `${BASE_PATH}/episodes/${mp3FileName}`,
+      durationSeconds,
+      dialogue: timedDialogue,
+      questions: spec.questions,
+    };
+
+    const jsonFilePath = path.join(PUBLIC_EPISODES_DIR, `${spec.date}.json`);
+    fs.writeFileSync(jsonFilePath, JSON.stringify(episodeObj, null, 2));
+    generatedEpisodes.push(episodeObj);
+
+    console.log(
+      `  ✓ Saved public/episodes/${mp3FileName} & ${spec.date}.json (${durationSeconds}s)`
+    );
+  }
+
+  // Write index JSON
+  fs.writeFileSync(
+    path.join(PUBLIC_EPISODES_DIR, "index.json"),
+    JSON.stringify(generatedEpisodes, null, 2)
+  );
+
+  // Write lib/episodesBuffer.ts
+  const episodesBufferTs = `// Auto-generated by scripts/generate-episode.mjs — 14-Day Episode Content Buffer
+import type { Episode } from "@/types/episode";
+
+export const EPISODES_14_DAY_BUFFER: Episode[] = ${JSON.stringify(
+    generatedEpisodes,
+    null,
+    2
+  )};
+`;
+  fs.writeFileSync(
+    path.join(ROOT_DIR, "lib", "episodesBuffer.ts"),
+    episodesBufferTs
+  );
+  console.log("  ✓ Updated lib/episodesBuffer.ts & public/episodes/index.json");
+}
+
+main().catch((err) => {
+  console.error("Error in generate-episode pipeline:", err);
+  process.exit(1);
+});
